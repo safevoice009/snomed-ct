@@ -1,0 +1,94 @@
+{
+  "concepts": [
+    {
+      "concept_id": "25064002",
+      "preferred_name": "Headache (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["headache", "head ache", "sar dard", "sar dard ho raha hai", "sar dard tha"]
+    },
+    {
+      "concept_id": "62315008",
+      "preferred_name": "Diarrhoea (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["diarrhea", "diarrhoea", "loose motion", "loose motions", "pet kharab", "pet kharab hai"]
+    },
+    {
+      "concept_id": "60845006",
+      "preferred_name": "Dyspnea on exertion (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["SOBOE", "shortness of breath on exertion", "dyspnea on exertion", "breathlessness on walking"]
+    },
+    {
+      "concept_id": "30711000",
+      "preferred_name": "Edema of foot (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["pedal edema", "pedal edema +", "foot swelling", "swelling in feet"]
+    },
+    {
+      "concept_id": "21522001",
+      "preferred_name": "Abdominal pain (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["abdominal pain", "AP+", "pain in abdomen", "AP positive", "stomach pain"]
+    },
+    {
+      "concept_id": "367389006",
+      "preferred_name": "Acid peptic disease (disorder)",
+      "semantic_tag": "disorder",
+      "synonyms": ["APD", "acid peptic disease", "acidity", "gastritis"]
+    },
+    {
+      "concept_id": "422400008",
+      "preferred_name": "Nausea (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["nausea", "ulti jaisa lag raha hai", "feeling like vomiting", "nauseous"]
+    },
+    {
+      "concept_id": "9651007",
+      "preferred_name": "Heartburn (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["heartburn", "jalan in chest", "chest burning", "acidity in chest"]
+    },
+    {
+      "concept_id": "37894001",
+      "preferred_name": "Rheumatoid arthritis (disorder)",
+      "semantic_tag": "disorder",
+      "synonyms": ["rheumatoid arthritis", "RA"]
+    },
+    {
+      "concept_id": "1221000189104",
+      "preferred_name": "Amavata (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["amavata", "joint stiffness with fever", "ayurvedic arthritis"],
+      "ayush_extension": true,
+      "cross_allopathy_mapping": {
+        "concept_id": "37894001",
+        "relationship": "therapeutically_linked_to"
+      }
+    },
+    {
+      "concept_id": "1221000189106",
+      "preferred_name": "Vata vyadhi (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["vata vyadhi", "neuromuscular vata disorder"],
+      "ayush_extension": true
+    },
+    {
+      "concept_id": "322262002",
+      "preferred_name": "Paracetamol (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["paracetamol", "acetaminophen", "PCM", "Dolo 650", "Dolo-650", "Calpol"]
+    },
+    {
+      "concept_id": "386864001",
+      "preferred_name": "Pantoprazole (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["pantoprazole", "Pantocid 40", "Pantocid", "Pantosec"]
+    },
+    {
+      "concept_id": "387494008",
+      "preferred_name": "Furosemide (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["furosemide", "frusemide", "Lasix 40mg", "Lasix", "Lasix 40"]
+    }
+  ]
+}
