@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service &amp; Clinical Disclaimer | SICCE</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .legal-container { max-width: 860px; margin: 2rem auto; padding: 2.5rem; background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px; line-height: 1.7; }
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff; }
+    h2 { font-size: 1.25rem; margin-top: 1.75rem; margin-bottom: 0.5rem; color: var(--primary); border-bottom: 1px solid var(--border-color); padding-bottom: 0.35rem; }
+    p, li { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 0.75rem; }
+    ul { padding-left: 1.5rem; }
+    .alert-box { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 1rem; color: #fca5a5; margin: 1.25rem 0; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="legal-container">
+    <a href="/" style="color: var(--primary); text-decoration: none; font-size: 0.85rem;">&larr; Back to Studio</a>
+    <h1 style="margin-top: 1rem;">Terms of Service &amp; Medical Disclaimer</h1>
+    <p><em>Effective Date: August 2026 | Governing Law: Republic of India</em></p>
+
+    <div class="alert-box">
+      <strong>CRITICAL MEDICAL DISCLAIMER:</strong> SICCE IS AN ADMINISTRATIVE AND CLINICAL CODING ASSISTIVE SOFTWARE TOOL. IT DOES NOT PROVIDE MEDICAL ADVICE, DIAGNOSIS, OR TREATMENT DECISIONS. FINAL CLINICAL RESPONSIBILITY AND TREATMENT VALIDATION RESIDE EXCLUSIVELY WITH THE LICENSED REGISTERED MEDICAL PRACTITIONER (RMP).
+    </div>
+
+    <h2>1. Acceptance of Terms</h2>
+    <p>By accessing the SICCE Web Studio, invoking REST APIs (<code>/api/v1/*</code>), or generating ABDM FHIR Bundles, you (the "Healthcare Entity" or "Authorized Practitioner") agree to be bound by these Terms of Service.</p>
+
+    <h2>2. Medical Practitioner Sole Liability &amp; Safe Harbor</h2>
+    <p>Under the National Medical Commission (NMC) Registered Medical Practitioner Regulations and Section 79 of the Information Technology Act, 2000 (Intermediary Safe Harbor):</p>
+    <ul>
+      <li>SICCE provides automated terminology extraction based on clinical ontologies (SNOMED CT, LOINC, NRCES).</li>
+      <li>All generated FHIR resources (Diagnoses, Prescriptions, Observations) must be reviewed, verified, and approved by a qualified practitioner before clinical execution or insurance claim submission.</li>
+      <li>SICCE, its developers, and affiliates disclaim all liability for any medical misdiagnosis, drug interaction, dosage error, or patient outcome resulting from unverified software outputs.</li>
+    </ul>
+
+    <h2>3. B2B Client Obligations (DPDP Act Compliance)</h2>
+    <p>The Client represents and warrants that:</p>
+    <ul>
+      <li>It has obtained all necessary patient consents required under the Indian Digital Personal Data Protection Act, 2023.</li>
+      <li>It shall maintain the confidentiality of all issued <code>X-API-KEY</code> tokens and assume responsibility for unauthorized access arising from credential leakage.</li>
+    </ul>
+
+    <h2>4. Limitation of Liability</h2>
+    <p>To the maximum extent permitted by Indian Law, SICCE's total aggregate liability arising out of or related to the software services shall not exceed the total fees paid by the client in the preceding one (1) month.</p>
+
+    <h2>5. Governing Law &amp; Jurisdiction</h2>
+    <p>These Terms are governed by and construed in accordance with the laws of India. Any disputes arising hereunder shall be subject to the exclusive jurisdiction of the competent courts in India.</p>
+  </div>
+</body>
+</html>
