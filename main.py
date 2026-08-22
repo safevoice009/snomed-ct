@@ -11,7 +11,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from fastapi import FastAPI, Depends, Header, HTTPException, status, Request
+from fastapi import FastAPI, Depends, Header, HTTPException, status, Request, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -24,6 +24,7 @@ from dotenv import load_dotenv
 from nlp_parser import ClinicalParser
 from terminology_resolver import TerminologyResolver
 from fhir_generator import FHIRGenerator
+from vision_parser import VisionOCRParser
 from auth_service import AuthService, SignUpRequest, SignInRequest, APIKeyCreateRequest
 
 # Load configuration
@@ -132,6 +133,53 @@ async def parse_clinical_text(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal processing error: {str(e)}"
         )
+
+
+@app.post("/api/v1/ocr-parse")
+@limiter.limit("30/minute")
+async def ocr_parse_prescription(
+    request: Request,
+    file: UploadFile = File(...),
+    api_key: str = Depends(verify_api_key)
+):
+    """Ingests raw prescription images/scans, executes Document Vision OCR, resolves SNOMED CT, and returns ABDM FHIR R4 Bundle."""
+    if not (file.content_type.startswith("image/") or file.content_type == "application/pdf"):
+        raise HTTPException(status_code=400, detail="Invalid file type. Please upload a JPEG, PNG, WebP or PDF image.")
+        
+    image_bytes = await file.read()
+    if len(image_bytes) == 0:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+        
+    vision_engine = VisionOCRParser()
+    ocr_result = await vision_engine.parse_image(image_bytes, mime_type=file.content_type)
+    
+    # Run local extraction & safety rules on raw text
+    nlp_extractions = await parser.parse(ocr_result.get("raw_text", ""))
+    
+    merged_symptoms = list(set(ocr_result.get("symptoms", []) + nlp_extractions.get("symptoms", [])))
+    merged_diagnoses = list(set(ocr_result.get("diagnoses", []) + nlp_extractions.get("diagnoses", [])))
+    merged_meds = ocr_result.get("medications", []) or nlp_extractions.get("medications", [])
+    
+    raw_extraction = {
+        "symptoms": merged_symptoms,
+        "diagnoses": merged_diagnoses,
+        "medications": merged_meds,
+        "ddi_alerts": nlp_extractions.get("ddi_alerts", []),
+        "vernacular_dosages": nlp_extractions.get("vernacular_dosages", [])
+    }
+    
+    resolved_profile = resolver.resolve_extraction(raw_extraction)
+    fhir_bundle = generator.create_op_consultation_bundle(resolved_profile)
+    
+    return {
+        "raw_text": ocr_result.get("raw_text", ""),
+        "clinic_name": ocr_result.get("clinic_name", "OPD Clinic"),
+        "doctor_name": ocr_result.get("doctor_name", "Consultant Physician"),
+        "bounding_boxes": ocr_result.get("bounding_boxes", []),
+        "extraction": raw_extraction,
+        "resolved": resolved_profile,
+        "bundle": fhir_bundle
+    }
 
 
 # --- Better Auth Endpoints ---
