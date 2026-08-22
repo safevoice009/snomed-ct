@@ -7,9 +7,9 @@ from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
 # Ensure workspace packages can be executed
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+PARENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PARENT_DIR not in sys.path:
+    sys.path.insert(0, PARENT_DIR)
 
 from fastapi import FastAPI, Depends, Header, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -101,7 +101,7 @@ class ParseRequest(BaseModel):
 @limiter.limit("60/minute")
 async def parse_clinical_text(
     payload: ParseRequest, 
-    request: Request, # required by slowapi
+    request: Request,
     api_key: str = Depends(verify_api_key)
 ):
     """Processes clinical text input and returns a validated FHIR R4 Bundle."""
@@ -211,24 +211,14 @@ async def get_billing_packages():
                 "name": "Developer Starter Pack",
                 "price": 499,
                 "credits": 3000,
-                "rate_per_call": "₹0.166",
-                "features": ["3,000 OCR & FHIR calls", "Hinglish NLP", "Supabase Trigram", "Valid 1 Year"]
+                "rate_per_call": "₹0.166"
             },
             {
                 "id": "pack_pro",
                 "name": "Clinic Pro Pack",
                 "price": 1999,
                 "credits": 15000,
-                "rate_per_call": "₹0.133",
-                "features": ["15,000 OCR & FHIR calls", "AYUSH NAMASTE Bridge", "DDI Safety Engine", "Priority Support"]
-            },
-            {
-                "id": "pack_scale",
-                "name": "Hospital Scale Pack",
-                "price": 4999,
-                "credits": 45000,
-                "rate_per_call": "₹0.111",
-                "features": ["45,000 OCR & FHIR calls", "Dedicated ABDM Bridge", "Custom SLA", "24/7 Support"]
+                "rate_per_call": "₹0.133"
             }
         ]
     }
@@ -241,12 +231,11 @@ async def get_api_credit_balance(x_api_key: str = Header("test-dev-key", alias="
         "plan": "Developer Free Sandbox",
         "credits_total": 1000,
         "credits_remaining": 982,
-        "credits_used": 18,
-        "auto_recharge": False
+        "credits_used": 18
     }
 
 
-# --- Postman Collection & Developer OpenAPI Export ---
+# --- Postman Collection Export ---
 @app.get("/api/v1/postman-collection")
 async def get_postman_collection():
     """Returns a ready-to-import Postman v2.1 Collection JSON for instant developer testing."""
@@ -258,7 +247,7 @@ async def get_postman_collection():
         },
         "item": [
             {
-                "name": "1. Parse Clinical Note (Hinglish / Indian OPD)",
+                "name": "1. Parse Clinical Note",
                 "request": {
                     "method": "POST",
                     "header": [
@@ -279,7 +268,7 @@ async def get_postman_collection():
                 }
             },
             {
-                "name": "2. Health & System Telemetry",
+                "name": "2. Health Telemetry",
                 "request": {
                     "method": "GET",
                     "url": {
@@ -290,27 +279,6 @@ async def get_postman_collection():
                         "path": ["health"]
                     }
                 }
-            },
-            {
-                "name": "3. DPDP Section 12 Cryptographic Purge",
-                "request": {
-                    "method": "POST",
-                    "header": [
-                        {"key": "Content-Type", "value": "application/json"},
-                        {"key": "Authorization", "value": "Bearer YOUR_SESSION_TOKEN"}
-                    ],
-                    "body": {
-                        "mode": "raw",
-                        "raw": "{\"confirmation\": \"PURGE_AUDIT_LOGS\"}"
-                    },
-                    "url": {
-                        "raw": "http://localhost:8000/api/v1/compliance/purge-records",
-                        "protocol": "http",
-                        "host": ["localhost"],
-                        "port": "8000",
-                        "path": ["api", "v1", "compliance", "purge-records"]
-                    }
-                }
             }
         ]
     }
@@ -319,6 +287,7 @@ async def get_postman_collection():
 # --- Health Check ---
 @app.get("/health")
 async def health_check():
+
     """Connectivity health check for backend services."""
     gemini_api_configured = bool(os.getenv("GEMINI_API_KEY") and os.getenv("GEMINI_API_KEY") != "your-gemini-api-key")
     supabase_db_configured = bool(os.getenv("SUPABASE_URL") and os.getenv("SUPABASE_KEY"))
@@ -335,56 +304,19 @@ async def health_check():
 
 
 # Mount static files for Clinical Studio Web UI
-static_dir = os.path.join(PROJECT_ROOT, "static")
+static_dir = os.path.join(PARENT_DIR, "static")
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 @app.get("/")
 async def serve_index():
-    index_file = os.path.join(PROJECT_ROOT, "static", "index.html")
+    index_file = os.path.join(PARENT_DIR, "static", "index.html")
     if os.path.exists(index_file):
-        return FileResponse(
-            index_file,
-            headers={
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0"
-            }
-        )
+        return FileResponse(index_file)
     return {"message": "SICCE Clinical Gateway running. Open /docs for API schema."}
 
 
-async def run_cli_tests():
-    """Runs a dry CLI translation test case loop."""
-    print("Running local CLI pipeline demonstration...")
-    test_cases = [
-        "Pt c/o loose motion x 3 days, AP+, Dolo 650 BD",
-        "Sar dard ho raha hai and ulti jaisa lag raha hai. APD positive. Pantocid 40 OD.",
-        "Pt has h/o Amavata. c/o SOBOE on walking. pedal edema + B/L. Rx Lasix 40mg BD."
-    ]
-    for case in test_cases:
-        print("="*60)
-        print(f"INPUT NOTE: \"{case}\"")
-        print("="*60)
-        
-        raw_extraction = await parser.parse(case)
-        print("\n[Step 1: NLP Entity Extraction]")
-        print(json.dumps(raw_extraction, indent=2))
-        
-        resolved_profile = resolver.resolve_extraction(raw_extraction)
-        print("\n[Step 2: SNOMED CT / LOINC Code Mapping]")
-        print(json.dumps(resolved_profile, indent=2))
-        
-        fhir_bundle = generator.create_op_consultation_bundle(resolved_profile)
-        print("\n[Step 3: Generated ABDM FHIR R4 OPConsultation Bundle]")
-        print(json.dumps(fhir_bundle, indent=2))
-        print("="*60 + "\n")
-
-
 if __name__ == "__main__":
-    if "--cli" in sys.argv or "--test" in sys.argv:
-        asyncio.run(run_cli_tests())
-    else:
-        import uvicorn
-        port = int(os.getenv("PORT", 8000))
-        uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

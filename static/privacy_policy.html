@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — DPDP Act 2023 Compliance | SICCE</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .legal-container { max-width: 860px; margin: 2rem auto; padding: 2.5rem; background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px; line-height: 1.7; }
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff; }
+    h2 { font-size: 1.25rem; margin-top: 1.75rem; margin-bottom: 0.5rem; color: var(--primary); border-bottom: 1px solid var(--border-color); padding-bottom: 0.35rem; }
+    p, li { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 0.75rem; }
+    ul { padding-left: 1.5rem; }
+    .badge-legal { background: rgba(16, 185, 129, 0.15); color: var(--primary); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="legal-container">
+    <a href="/" style="color: var(--primary); text-decoration: none; font-size: 0.85rem;">&larr; Back to Studio</a>
+    <h1 style="margin-top: 1rem;">Privacy &amp; Data Protection Policy</h1>
+    <p><span class="badge-legal">Digital Personal Data Protection Act, 2023 (DPDP Act) Compliant</span></p>
+    <p><em>Last Updated: August 2026 | Effective for all SICCE API Gateways &amp; Services</em></p>
+
+    <h2>1. Statutory Role &amp; Processing Scope</h2>
+    <p>SICCE operates strictly as a <strong>Data Processor</strong> under Section 2(k) and Section 8(2) of the Indian Digital Personal Data Protection Act, 2023 (DPDP Act 2023). Our B2B healthcare clients (Hospitals, Clinics, Diagnostic Labs, and Registered Medical Practitioners) act as the <strong>Data Fiduciaries</strong> responsible for obtaining informed patient consent under the Ayushman Bharat Digital Mission (ABDM) guidelines.</p>
+
+    <h2>2. Purpose Limitation (Section 5 DPDP Act)</h2>
+    <p>SICCE processes clinical notes solely for:</p>
+    <ul>
+      <li>Translating unstructured physician notes into standardized SNOMED CT and LOINC concept codes.</li>
+      <li>Generating ABDM-compliant HL7 FHIR R4 <code>OPConsultation</code> document bundles.</li>
+      <li>Facilitating interoperability between hospital Electronic Medical Record (EMR) systems and National Health Claims registries.</li>
+    </ul>
+
+    <h2>3. Zero Data Retention &amp; Ephemeral Processing</h2>
+    <p>To guarantee maximum confidentiality and patient privacy:</p>
+    <ul>
+      <li><strong>Ephemeral Execution:</strong> Unstructured clinical narratives submitted to the <code>/api/v1/parse</code> gateway are processed entirely in-memory and are permanently discarded immediately upon FHIR bundle transmission.</li>
+      <li><strong>No Model Training on PHI:</strong> Patient health records submitted via API are never used to train, fine-tune, or refine general machine learning models.</li>
+    </ul>
+
+    <h2>4. Technical &amp; Organizational Safeguards (Section 8(5))</h2>
+    <p>We enforce strict enterprise-grade security safeguards:</p>
+    <ul>
+      <li><strong>In-Transit Encryption:</strong> Enforced TLS 1.3 encryption across all REST/JSON endpoints.</li>
+      <li><strong>At-Rest Encryption:</strong> AES-256 encryption on all relational user credentials and database tables.</li>
+      <li><strong>Automated PHI De-identification:</strong> Direct identifiers (Phone Numbers, 14-digit ABHA IDs, Aadhaar Numbers, Patient Names) are automatically masked prior to semantic translation.</li>
+    </ul>
+
+    <h2>5. Data Principal Rights (Sections 11 &amp; 12)</h2>
+    <p>Patients whose data is processed through registered EMRs may exercise their statutory rights of access, correction, and erasure by contacting their primary healthcare provider (the Data Fiduciary) or submitting a request to our Grievance Redressal Officer.</p>
+
+    <h2>6. Contact Grievance Officer (Section 13)</h2>
+    <p>For any data protection inquiries or grievance escalations, contact:</p>
+    <p><strong>Designated Grievance Redressal Officer</strong><br>
+    Email: <a href="mailto:grievance@sicce.health" style="color: var(--primary);">grievance@sicce.health</a><br>
+    Statutory SLA: Acknowledgment within 24 hours, resolution within 7 working days.</p>
+  </div>
+</body>
+</html>

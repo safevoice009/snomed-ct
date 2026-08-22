@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B2B Data Processing Agreement (DPA) — DPDP Act 2023 | SICCE</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .legal-container { max-width: 860px; margin: 2rem auto; padding: 2.5rem; background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px; line-height: 1.7; }
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff; }
+    h2 { font-size: 1.25rem; margin-top: 1.75rem; margin-bottom: 0.5rem; color: var(--primary); border-bottom: 1px solid var(--border-color); padding-bottom: 0.35rem; }
+    p, li { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 0.75rem; }
+    ul { padding-left: 1.5rem; }
+    .badge-legal { background: rgba(16, 185, 129, 0.15); color: var(--primary); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="legal-container">
+    <a href="/" style="color: var(--primary); text-decoration: none; font-size: 0.85rem;">&larr; Back to Studio</a>
+    <h1 style="margin-top: 1rem;">B2B Data Processing Agreement (DPA)</h1>
+    <p><span class="badge-legal">Standard Contractual Clauses under DPDP Act 2023 Section 8(2)</span></p>
+    <p><em>Between SICCE (Data Processor) and Registered Healthcare Entity / Hospital / Clinic (Data Fiduciary)</em></p>
+
+    <h2>1. Purpose &amp; Scope of Data Processing</h2>
+    <p>This Data Processing Agreement ("DPA") governs the automated processing of digital clinical text by SICCE on behalf of the Data Fiduciary for ABDM HL7 FHIR R4 interoperability and SNOMED CT / LOINC terminology translation.</p>
+
+    <h2>2. Obligations of the Data Processor (SICCE)</h2>
+    <ul>
+      <li><strong>Statutory Instructions:</strong> Process personal clinical data strictly in accordance with the documented technical API instructions of the Data Fiduciary.</li>
+      <li><strong>Automated PHI Sanitization:</strong> Apply automated pattern masking to direct identifiers prior to cloud model translation.</li>
+      <li><strong>Ephemeral Processing:</strong> Retain zero unencrypted raw medical narratives in persistent storage.</li>
+      <li><strong>Breach Notification:</strong> In the event of a confirmed security incident, notify the Data Fiduciary without undue delay in accordance with DPDP Act Section 8(6).</li>
+    </ul>
+
+    <h2>3. Obligations of the Data Fiduciary (Hospital / Clinic)</h2>
+    <ul>
+      <li>Ensure a valid lawful basis and patient consent under ABDM guidelines prior to invoking the API gateway.</li>
+      <li>Maintain sole clinical responsibility for reviewing and verifying all generated FHIR codes before clinical use.</li>
+    </ul>
+
+    <h2>4. Technical &amp; Security Measures</h2>
+    <p>The Data Processor shall maintain industry-standard security safeguards including TLS 1.3 encryption in transit, AES-256 encryption at rest for account tokens, and multi-tenant key isolation.</p>
+  </div>
+</body>
+</html>

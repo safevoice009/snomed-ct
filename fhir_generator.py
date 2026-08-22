@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import logging
 from typing import Dict, Any, List
@@ -43,7 +43,7 @@ class FHIRGenerator:
         
         bundle_id = str(uuid.uuid4())
         composition_id = str(uuid.uuid4())
-        timestamp = datetime.utcnow().isoformat() + "Z"
+        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         
         # 1. Initialize Bundle Root
         bundle = {
@@ -53,6 +53,18 @@ class FHIRGenerator:
                 "lastUpdated": timestamp,
                 "profile": [
                     "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+                ],
+                "tag": [
+                    {
+                        "system": "https://sicce.health/fhir/security/classification",
+                        "code": "non-samd-administrative-middleware",
+                        "display": "Non-SaMD Administrative Coding Tool (Requires Licensed RMP Review)"
+                    },
+                    {
+                        "system": "https://sicce.health/fhir/ip/snomed-attribution",
+                        "code": "snomed-international-nrces",
+                        "display": "SNOMED CT licensed under MoHFW NRCES National License India"
+                    }
                 ]
             },
             "identifier": {

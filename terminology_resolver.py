@@ -39,14 +39,20 @@ class TerminologyResolver:
     def load_database(self):
         """Loads mock concepts from JSON file."""
         if not os.path.exists(self.db_path):
-            # Try workspace absolute path
-            alternate_path = os.path.join("/home/sucharithpop/Downloads/snomed ct", self.db_path)
-            if os.path.exists(alternate_path):
-                self.db_path = alternate_path
+            # Check relative to current file's directory
+            file_dir = os.path.dirname(os.path.abspath(__file__))
+            candidate = os.path.join(file_dir, os.path.basename(self.db_path))
+            if os.path.exists(candidate):
+                self.db_path = candidate
             else:
-                logger.error(f"Mock database not found at {self.db_path}. Initializing empty database.")
-                self.concepts = []
-                return
+                # Check parent directory (useful if invoked from api/ or tests/)
+                parent_candidate = os.path.join(os.path.dirname(file_dir), os.path.basename(self.db_path))
+                if os.path.exists(parent_candidate):
+                    self.db_path = parent_candidate
+                else:
+                    logger.error(f"Mock database not found at {self.db_path}. Initializing empty database.")
+                    self.concepts = []
+                    return
                 
         try:
             with open(self.db_path, "r", encoding="utf-8") as f:

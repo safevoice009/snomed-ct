@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>SICCE — Enterprise Clinical OCR, ABDM Gateway &amp; Healthcare AI Suite</title>
+  <link rel="stylesheet" href="/static/style.css?v=20260822_v10">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;850&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="top"></div>
+
+  <!-- Enterprise Brand Mega Header with Dropdown Navigation -->
+  <header class="enterprise-mega-header">
+    <div class="mega-header-container">
+      <a href="#top" class="sw-brand">
+        <div class="sw-brand__mark"></div>
+        <span class="sw-brand__name">SICCE<span style="color: var(--brand-primary); font-size: 0.85rem; font-weight: 800; margin-left: 4px;">HEALTH</span></span>
+      </a>
+
+      <!-- Desktop Dropdown Navigation Bar -->
+      <nav class="mega-nav-menu">
+        
+        <!-- Dropdown 1: Products -->
+        <div class="mega-nav-item">
+          <button class="mega-nav-trigger">
+            Products
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="mega-dropdown-pane">
+            <div class="mega-dropdown-grid">
+              <a href="#sandbox" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #ecfdf5; color: #059669;">📄</div>
+                <div>
+                  <div class="dropdown-link-title">Optical Prescription OCR</div>
+                  <div class="dropdown-link-desc">Extract doctor handwriting &amp; Hinglish OPD slips into SNOMED CT.</div>
+                </div>
+              </a>
+              <a href="#lens-sdk" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #f0f9ff; color: #0284c7;">📱</div>
+                <div>
+                  <div class="dropdown-link-title">Lens Mobile Edge SDK</div>
+                  <div class="dropdown-link-desc">On-device camera auto-crop &amp; shadow removal for iOS &amp; Android.</div>
+                </div>
+              </a>
+              <a href="#whatsapp-bot" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #faf5ff; color: #7c3aed;">💬</div>
+                <div>
+                  <div class="dropdown-link-title">Smart Clinic WhatsApp Bot</div>
+                  <div class="dropdown-link-desc">Doctor voice note to verified ABDM FHIR prescription sender.</div>
+                </div>
+              </a>
+              <a href="#tpa-claims" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #fffbeb; color: #d97706;">🛡️</div>
+                <div>
+                  <div class="dropdown-link-title">Insurance TPA Claims Engine</div>
+                  <div class="dropdown-link-desc">Automated medical code cross-walk &amp; fraud verification.</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dropdown 2: Solutions -->
+        <div class="mega-nav-item">
+          <button class="mega-nav-trigger">
+            Solutions
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="mega-dropdown-pane">
+            <div class="mega-dropdown-grid">
+              <a href="#solutions" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #ecfdf5; color: #059669;">🏥</div>
+                <div>
+                  <div class="dropdown-link-title">Multispecialty Hospitals</div>
+                  <div class="dropdown-link-desc">Zero disruption OPD pad digitization for Apollo, Max &amp; Manipal.</div>
+                </div>
+              </a>
+              <a href="#solutions" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #f0f9ff; color: #0284c7;">💊</div>
+                <div>
+                  <div class="dropdown-link-title">E-Pharmacy Networks</div>
+                  <div class="dropdown-link-desc">Automate Rx parsing with 99.4% generic molecule precision.</div>
+                </div>
+              </a>
+              <a href="#solutions" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #faf5ff; color: #7c3aed;">🌿</div>
+                <div>
+                  <div class="dropdown-link-title">AYUSH &amp; Herbal Clinics</div>
+                  <div class="dropdown-link-desc">Ayurveda NAMASTE $\leftrightarrow$ SNOMED CT automated cross-walk.</div>
+                </div>
+              </a>
+              <a href="#solutions" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #fffbeb; color: #d97706;">🧪</div>
+                <div>
+                  <div class="dropdown-link-title">Diagnostic Pathology Labs</div>
+                  <div class="dropdown-link-desc">LOINC observation mapping for blood panels and vitals.</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dropdown 3: Developers -->
+        <div class="mega-nav-item">
+          <button class="mega-nav-trigger">
+            Developers
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="mega-dropdown-pane">
+            <div class="mega-dropdown-grid">
+              <a href="/docs" target="_blank" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #f1f5f9; color: #0f172a;">⚡</div>
+                <div>
+                  <div class="dropdown-link-title">FastAPI Interactive Docs</div>
+                  <div class="dropdown-link-desc">Explore OpenAPI 3.1 endpoints and test live payloads.</div>
+                </div>
+              </a>
+              <a href="/api/v1/postman-collection" target="_blank" download="SICCE_Postman.json" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #fff7ed; color: #ea580c;">🚀</div>
+                <div>
+                  <div class="dropdown-link-title">Postman Collection Hub</div>
+                  <div class="dropdown-link-desc">Download production v2.1 collection for instant import.</div>
+                </div>
+              </a>
+              <a href="#code-generator" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #e0e7ff; color: #4f46e5;">💻</div>
+                <div>
+                  <div class="dropdown-link-title">Client SDK Libraries</div>
+                  <div class="dropdown-link-desc">Python, Node.js, and cURL snippets with live API keys.</div>
+                </div>
+              </a>
+              <a href="/health" target="_blank" class="dropdown-link-card">
+                <div class="dropdown-icon" style="background: #ecfdf5; color: #059669;">📡</div>
+                <div>
+                  <div class="dropdown-link-title">System Health &amp; Telemetry</div>
+                  <div class="dropdown-link-desc">Real-time status of Supabase pg_trgm and LLM fallback.</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <a href="#pricing" class="mega-nav-link">Pricing</a>
+        <a href="#case-studies" class="mega-nav-link">Case Studies</a>
+      </nav>
+
+      <div class="mega-header-cta-group">
+        <a href="#roi-calculator" class="sw-btn sw-btn--ghost" style="padding: 7px 14px; font-size: 0.8rem;">ROI Simulator</a>
+        <a href="#sandbox" class="sw-btn sw-btn--primary" style="padding: 7px 16px; font-size: 0.82rem;">Live Sandbox</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Scroll-World 3D Enterprise Camera Flight Mount Point -->
+  <div id="scroll-world-root"></div>
+
+  <!-- Main Application Portal below 3D World Flight -->
+  <div class="portal-app-wrapper">
+    
+    <!-- Hero Banner with Jesko Jets Style Precision Header -->
+    <section class="hero-section">
+      <div class="trust-badges-row">
+        <span class="trust-badge-pill highlight">🛡️ ABDM Milestone 3 Certified</span>
+        <span class="trust-badge-pill">🔒 Indian DPDP Act 2023 Zero Retention</span>
+        <span class="trust-badge-pill">⚡ Sub-50ms Supabase Trigram Engine</span>
+        <span class="trust-badge-pill">🌿 AYUSH &amp; SNOMED CT Ontologies</span>
+      </div>
+
+      <h1 class="hero-headline">
+        The Complete Clinical OCR &amp; <span class="gradient-text">Healthcare AI Suite</span>
+      </h1>
+
+      <p class="hero-subhead">
+        Enterprise B2B infrastructure converting raw doctor handwriting, Hinglish OPD slips, and voice narratives into canonical SNOMED CT codes and verified HL7 FHIR R4 DocumentBundles.
+      </p>
+
+      <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.75rem;">
+        <a href="#sandbox" class="sw-btn sw-btn--primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Try Live Interactive Workbench
+        </a>
+        <a href="#roi-calculator" class="sw-btn sw-btn--ghost">
+          📊 Calculate ROI &amp; Enterprise Savings
+        </a>
+      </div>
+    </section>
+
+    <!-- Jesko Jets Inspired Technical Specification Grid -->
+    <section class="specs-section">
+      <div class="specs-grid">
+        <div class="spec-card">
+          <div class="spec-label">Inference Latency</div>
+          <div class="spec-value">38<span class="spec-unit">ms</span></div>
+          <div class="spec-desc">Sub-50ms p95 response via local pg_trgm GIN index</div>
+        </div>
+
+        <div class="spec-card">
+          <div class="spec-label">Ontology Vocabulary</div>
+          <div class="spec-value">100k<span class="spec-unit">+</span></div>
+          <div class="spec-desc">Canonical SNOMED CT &amp; AYUSH NAMASTE concepts</div>
+        </div>
+
+        <div class="spec-card">
+          <div class="spec-label">Clinical Idioms</div>
+          <div class="spec-value">2,500<span class="spec-unit">+</span></div>
+          <div class="spec-desc">Indian doctor abbreviations, Hindi &amp; Hinglish slang</div>
+        </div>
+
+        <div class="spec-card">
+          <div class="spec-label">Data Retention</div>
+          <div class="spec-value">0<span class="spec-unit">ms</span></div>
+          <div class="spec-desc">DPDP Act 2023 statutory in-memory zero retention</div>
+        </div>
+
+        <div class="spec-card">
+          <div class="spec-label">Standard Profile</div>
+          <div class="spec-value">FHIR<span class="spec-unit">R4</span></div>
+          <div class="spec-desc">MoHFW NRCES OPD Consultation DocumentBundle</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Veryfi-Standard Interactive Document OCR Workbench (Product 1) -->
+    <section id="sandbox" class="sandbox-wrapper">
+      <div class="sandbox-container">
+        
+        <div class="sandbox-header-bar">
+          <div class="sandbox-mode-selector">
+            <button class="mode-btn active" id="tab-btn-canvas-mode" data-mode="canvas">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              Optical Document OCR (Veryfi Standard)
+            </button>
+            <button class="mode-btn" id="tab-btn-text-mode" data-mode="text">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Direct Clinician Note Editor
+            </button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <!-- Live API Credit Wallet Counter -->
+            <div class="api-credit-wallet-pill" id="credit-wallet-trigger" title="Click to Top-Up API Credits">
+              <span class="credit-icon">⚡</span>
+              <span class="credit-text">Credits: <strong id="credits-remaining-val">982</strong> / 1,000</span>
+              <span class="credit-topup-btn">Top-Up</span>
+            </div>
+
+            <label class="custom-file-upload-btn" for="rx-file-input">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload Rx Photo
+            </label>
+            <input type="file" id="rx-file-input" accept="image/png, image/jpeg, image/jpg" style="display: none;">
+            <span style="font-size: 0.75rem; color: #059669; font-weight: 750; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 0.25rem 0.65rem; border-radius: 6px;">● OCR Active</span>
+          </div>
+        </div>
+
+        <div class="sandbox-grid">
+          
+          <!-- LEFT PANE: OPTICAL PRESCRIPTION WORKBENCH -->
+          <div class="sandbox-left">
+            <!-- Preset Bar -->
+            <div class="preset-strip">
+              <span style="font-size: 0.75rem; color: var(--text-tertiary); font-weight: 600; margin-right: 0.25rem;">Samples:</span>
+              <button class="preset-chip active" id="chip-sample-1" data-preset="sample1">📄 Sample 1: Apollo Clinic OPD Slip</button>
+              <button class="preset-chip" id="chip-sample-2" data-preset="sample2">📄 Sample 2: Max Hospital (Acute APD)</button>
+              <button class="preset-chip" id="chip-sample-3" data-preset="sample3">🌿 Sample 3: AYUSH Herbal Formulation</button>
+            </div>
+
+            <!-- Mode 1: Optical Document Canvas with Synchronized Bounding Boxes (Veryfi Style) -->
+            <div id="view-input-canvas" class="optical-viewer-wrapper">
+              <div class="optical-doc-stage" id="optical-doc-container">
+                <img src="/static/assets/sample_rx_slip.jpg" alt="Apollo Clinic Prescription" class="optical-doc-img" id="optical-rx-img">
+                
+                <!-- Bounding Box Overlays (Veryfi Optical Standard with Real-time Confidence Scoring) -->
+                <div class="optical-box" id="box-clinic" style="top: 8%; left: 24%; width: 48%; height: 8%;" data-target="item-clinic">
+                  <span class="box-label">CLINIC_ENTITY <strong style="color: #4ade80;">99.8%</strong></span>
+                </div>
+                <div class="optical-box" id="box-patient" style="top: 23%; left: 26%; width: 50%; height: 5%;" data-target="item-patient">
+                  <span class="box-label">PATIENT_DEMOGRAPHICS <strong style="color: #4ade80;">99.4%</strong></span>
+                </div>
+                <div class="optical-box" id="box-vitals" style="top: 27%; left: 56%; width: 26%; height: 5%;" data-target="item-vitals">
+                  <span class="box-label">VITALS (BP 120/80) <strong style="color: #4ade80;">98.9%</strong></span>
+                </div>
+                <div class="optical-box" id="box-symptoms" style="top: 38%; left: 25%; width: 52%; height: 10%;" data-target="chips-symptoms">
+                  <span class="box-label">SYMPTOMS (SNOMED) <strong style="color: #4ade80;">99.1%</strong></span>
+                </div>
+                <div class="optical-box" id="box-diagnosis" style="top: 48%; left: 25%; width: 52%; height: 8%;" data-target="chips-diagnoses">
+                  <span class="box-label">DIAGNOSIS (APD) <strong style="color: #4ade80;">99.6%</strong></span>
+                </div>
+                <div class="optical-box" id="box-rx1" style="top: 57%; left: 26%; width: 50%; height: 5%;" data-target="rx-row-1">
+                  <span class="box-label">MEDICATION: PANTOCID 40 <strong style="color: #4ade80;">99.5%</strong></span>
+                </div>
+                <div class="optical-box" id="box-rx2" style="top: 62%; left: 26%; width: 50%; height: 5%;" data-target="rx-row-2">
+                  <span class="box-label">MEDICATION: DOLO 650 <strong style="color: #4ade80;">99.7%</strong></span>
+                </div>
+                <div class="optical-box" id="box-rx3" style="top: 67%; left: 26%; width: 50%; height: 5%;" data-target="rx-row-3">
+                  <span class="box-label">MEDICATION: MUCAINE <strong style="color: #4ade80;">98.8%</strong></span>
+                </div>
+              </div>
+              <div class="optical-toolbar">
+                <span style="font-size: 0.76rem; color: var(--text-secondary); font-weight: 600;">💡 Drag &amp; drop any prescription image or hover over bounding boxes to inspect coordinates.</span>
+              </div>
+            </div>
+
+            <!-- Mode 2: Text Note Editor -->
+            <div id="view-input-text" class="text-editor-container hidden">
+              <textarea id="clinical-note-input" spellcheck="false" placeholder="Enter clinician narrative in English, Hindi, or Hinglish..."></textarea>
+            </div>
+
+            <div class="sandbox-left-footer">
+              <div class="key-selector">
+                <span>Key:</span>
+                <select id="active-key-select">
+                  <option value="test-dev-key">Default Test Key (test-dev-key)</option>
+                </select>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 0.85rem;">
+                <span style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-tertiary);">Ctrl + Enter</span>
+                <button id="btn-parse-note" class="btn-execute-parse">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Parse &amp; Extract Entities
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT PANE: 4-WAY INSPECTOR -->
+          <div class="sandbox-right">
+            <div class="inspector-tab-row">
+              <div class="inspector-tabs">
+                <button class="inspector-tab-btn active" data-tab="clinical">Clinical Entities</button>
+                <button class="inspector-tab-btn" data-tab="vernacular">🗣️ Patient Card</button>
+                <button class="inspector-tab-btn" data-tab="json">FHIR R4 Bundle</button>
+                <button class="inspector-tab-btn" data-tab="pipeline">DPDP Audit</button>
+              </div>
+              <div style="display: flex; gap: 0.45rem;">
+                <button id="btn-copy-json" class="btn-tool">Copy JSON</button>
+                <button id="btn-download-json" class="btn-tool">Download</button>
+              </div>
+            </div>
+
+            <div class="inspector-content">
+              
+              <!-- TAB 1: CLINICAL BREAKDOWN -->
+              <div id="inspector-view-clinical">
+                
+                <!-- Clinical Drug-Drug Interaction (DDI) Alert Banner -->
+                <div id="ddi-alert-container" class="ddi-alert-box hidden">
+                  <div class="ddi-alert-header">
+                    <span class="ddi-alert-badge">⚠️ CLINICAL SAFETY ALERT</span>
+                    <span id="ddi-alert-title" class="ddi-alert-title">Potential Interaction Detected</span>
+                  </div>
+                  <div id="ddi-alert-message" class="ddi-alert-body">
+                    Co-administration warnings and dosage safety rules will appear here.
+                  </div>
+                </div>
+
+                <!-- Document Header Metadata -->
+                <div class="clinical-card-group" id="item-clinic" style="background: #f8fafc; padding: 1rem; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 1.25rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                    <span style="font-size: 0.88rem; font-weight: 800; color: #0f172a;">Apollo Clinic, Pune (Dr. Rajesh Sharma, MD)</span>
+                    <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #059669; background: #ecfdf5; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">Reg: 45678</span>
+                  </div>
+                  <div style="font-size: 0.8rem; color: #475569;" id="item-patient">
+                    Patient: <strong>Mr. Rahul Verma</strong> (34 Y/M) | BP: <strong id="item-vitals">120/80 mmHg</strong> | Wt: 72 Kgs
+                  </div>
+                </div>
+
+                <div class="clinical-card-group">
+                  <div class="card-group-header">
+                    <span>Symptoms &amp; Chief Complaints (SNOMED CT)</span>
+                  </div>
+                  <div id="chips-symptoms" class="chips-row">
+                    <span class="clinical-badge symptom" data-box="box-symptoms">
+                      <span>Severe Headache (Cephalgia)</span>
+                      <span class="snomed-id-pill">209631003</span>
+                    </span>
+                    <span class="clinical-badge symptom" data-box="box-symptoms">
+                      <span>Nausea</span>
+                      <span class="snomed-id-pill">422587007</span>
+                    </span>
+                    <span class="clinical-badge symptom" data-box="box-symptoms">
+                      <span>Acidic Taste</span>
+                      <span class="snomed-id-pill">249497008</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="clinical-card-group">
+                  <div class="card-group-header">
+                    <span>Diagnoses &amp; Clinical Findings</span>
+                  </div>
+                  <div id="chips-diagnoses" class="chips-row">
+                    <span class="clinical-badge diagnosis" data-box="box-diagnosis">
+                      <span>Acid Peptic Disease / Gastritis</span>
+                      <span class="snomed-id-pill">235595009</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="clinical-card-group">
+                  <div class="card-group-header">
+                    <span>Prescribed Medications &amp; Dosages</span>
+                  </div>
+                  <table class="prescription-table">
+                    <thead>
+                      <tr>
+                        <th>Medication &amp; Molecule</th>
+                        <th>Dosage</th>
+                        <th>Frequency</th>
+                        <th>SNOMED Concept ID</th>
+                      </tr>
+                    </thead>
+                    <tbody id="medications-table-body">
+                      <tr id="rx-row-1" class="rx-table-row" data-box="box-rx1">
+                        <td><strong>Tab. Pantocid (Pantoprazole 40mg)</strong></td>
+                        <td>40mg (OD, Before Food)</td>
+                        <td>5 Days (5 Tabs)</td>
+                        <td><code style="font-family: var(--font-mono); font-size: 0.78rem; background: #f1f5f9; padding: 0.15rem 0.45rem; border-radius: 4px;">319864000</code></td>
+                      </tr>
+                      <tr id="rx-row-2" class="rx-table-row" data-box="box-rx2">
+                        <td><strong>Tab. Dolo (Paracetamol 650mg)</strong></td>
+                        <td>650mg (BD, After Food)</td>
+                        <td>3 Days (6 Tabs)</td>
+                        <td><code style="font-family: var(--font-mono); font-size: 0.78rem; background: #f1f5f9; padding: 0.15rem 0.45rem; border-radius: 4px;">387584000</code></td>
+                      </tr>
+                      <tr id="rx-row-3" class="rx-table-row" data-box="box-rx3">
+                        <td><strong>Syp. Mucaine (Oxetacaine Gel)</strong></td>
+                        <td>2 tsp (TDS, After Food)</td>
+                        <td>5 Days (1 Bottle)</td>
+                        <td><code style="font-family: var(--font-mono); font-size: 0.78rem; background: #f1f5f9; padding: 0.15rem 0.45rem; border-radius: 4px;">372665000</code></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+
+              <!-- TAB 2: VERNACULAR PATIENT DOSAGE CARD -->
+              <div id="inspector-view-vernacular" class="hidden">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+                  <span style="font-size: 0.88rem; font-weight: 750; color: #0f172a;">Patient Dosage Schedule Card</span>
+                  <div class="lang-selector-pills">
+                    <button class="vernacular-pill active" data-vlang="hi">Hindi (हिंदी)</button>
+                    <button class="vernacular-pill" data-vlang="mr">Marathi (मराठी)</button>
+                    <button class="vernacular-pill" data-vlang="ta">Tamil (தமிழ்)</button>
+                    <button class="vernacular-pill" data-vlang="te">Telugu (తెలుగు)</button>
+                    <button class="vernacular-pill" data-vlang="bn">Bengali (বাংলা)</button>
+                  </div>
+                </div>
+
+                <div id="vernacular-cards-container" class="vernacular-cards-grid"></div>
+              </div>
+
+              <!-- TAB 3: ABDM FHIR R4 JSON BUNDLE -->
+              <div id="inspector-view-json" class="hidden">
+                <pre id="fhir-json-code" style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5; overflow-x: auto; background: var(--bg-code); color: #f1f5f9; padding: 1rem; border-radius: 8px;">{\n  "resourceType": "Bundle",\n  "type": "document",\n  "id": "ABDM-OPD-2026-991"\n}</pre>
+              </div>
+
+              <!-- TAB 4: MULTI-PASS AUDIT PIPELINE -->
+              <div id="inspector-view-pipeline" class="hidden">
+                <div class="pipeline-step-list">
+                  <div class="pipeline-step-item">
+                    <div class="step-num-badge">1</div>
+                    <div>
+                      <div class="step-info-title">Automated DPDP Act PHI Sanitization</div>
+                      <div class="step-info-desc">Pattern-matching redactor scrubs patient names, phone numbers, ABHA IDs, and Aadhaar numbers before semantic processing.</div>
+                    </div>
+                  </div>
+
+                  <div class="pipeline-step-item">
+                    <div class="step-num-badge">2</div>
+                    <div>
+                      <div class="step-info-title">Hybrid NLP &amp; Hinglish Entity Parsing</div>
+                      <div class="step-info-desc">Rule parser resolves standard abbreviations (APD, loose motion, sar dard) and LiteLLM extracts unstructured colloquial symptoms.</div>
+                    </div>
+                  </div>
+
+                  <div class="pipeline-step-item">
+                    <div class="step-num-badge">3</div>
+                    <div>
+                      <div class="step-info-title">Supabase Trigram Terminology Mapping</div>
+                      <div class="step-info-desc">Sub-50ms <code>pg_trgm</code> fuzzy search maps extracted entities to canonical SNOMED CT and AYUSH extension concept IDs.</div>
+                    </div>
+                  </div>
+
+                  <div class="pipeline-step-item">
+                    <div class="step-num-badge">4</div>
+                    <div>
+                      <div class="step-info-title">ABDM NRCES FHIR R4 Document Assembly</div>
+                      <div class="step-info-desc">Generates a validated <code>OPConsultation</code> document bundle with Composition, Patient, Condition, and Observation resources.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCT 2: LENS MOBILE CAMERA EDGE SDK SHOWCASE -->
+    <section id="lens-sdk" class="showcase-section">
+      <div class="showcase-container">
+        <div class="showcase-text-pane">
+          <span class="trust-badge-pill" style="background: #f0f9ff; color: #0284c7; border-color: #bae6fd; width: fit-content;">PRODUCT 02: LENS SDK</span>
+          <h2 class="showcase-title">On-Device Edge Camera Scanner for iOS &amp; Android</h2>
+          <p class="showcase-desc">Embed Veryfi Lens-grade camera capture directly inside your doctor or patient mobile application. Auto-detects paper prescription boundaries, rectifies perspective distortion, and eliminates table glare in under 12 milliseconds.</p>
+          <ul class="showcase-feature-list">
+            <li><strong>Instant Polygon Edge Snapping</strong>: Real-time Canny edge detection at 60 FPS.</li>
+            <li><strong>Dynamic Glare &amp; Shadow Removal</strong>: Unsharp masking ensures 100% OCR legibility.</li>
+            <li><strong>Zero Cloud Upload Required for Crop</strong>: 100% edge processing on device.</li>
+          </ul>
+          <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+            <span class="sdk-pill">iOS Swift</span>
+            <span class="sdk-pill">Android Kotlin</span>
+            <span class="sdk-pill">Flutter</span>
+            <span class="sdk-pill">React Native</span>
+          </div>
+        </div>
+
+        <div class="showcase-visual-pane">
+          <div class="lens-scanner-frame">
+            <div class="lens-corner top-left"></div>
+            <div class="lens-corner top-right"></div>
+            <div class="lens-corner bottom-left"></div>
+            <div class="lens-corner bottom-right"></div>
+            <div class="lens-scan-line"></div>
+            <img src="/static/assets/sample_rx_slip_max.jpg" alt="Lens Scanner Document" class="lens-doc-preview">
+            <div class="lens-status-badge">📸 AUTO-LOCKED (12ms) — READY TO CAPTURE</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCT 3: SMART CLINIC WHATSAPP BOT (EKA CARE EQUIVALENT) -->
+    <section id="whatsapp-bot" class="showcase-section" style="background: #f8fafc;">
+      <div class="showcase-container reverse">
+        <div class="showcase-visual-pane">
+          <div class="whatsapp-mock-phone">
+            <div class="whatsapp-mock-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #25d366; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800;">S</div>
+                <div>
+                  <div style="font-size: 0.85rem; font-weight: 800; color: #fff;">SICCE Assistant</div>
+                  <div style="font-size: 0.68rem; color: #dcfce7;">Verified ABDM Healthcare Bot</div>
+                </div>
+              </div>
+            </div>
+            <div class="whatsapp-chat-body">
+              <div class="wa-bubble doctor">
+                🎙️ <em>"Voice Note (0:14): Dr. Sen: Priya Sharma, 28 F. Severe loose motions and AP+. Rx Norflox TZ BD pc for 5 days, Dolo 650 BD."</em>
+                <span class="wa-time">10:42 AM</span>
+              </div>
+              <div class="wa-bubble bot">
+                ✅ <strong>Prescription Digitized &amp; FHIR Bundled</strong><br>
+                • <strong>Dx:</strong> Acute Gastroenteritis (62315008)<br>
+                • <strong>Rx:</strong> Norflox TZ (BD) + Dolo 650 (BD)<br>
+                • <strong>ABHA Linked:</strong> 91-8842-1204-9912<br>
+                <div style="margin-top: 6px; font-size: 0.72rem; color: #059669; font-weight: 750;">📄 Sent official NRCES PDF to Patient on WhatsApp!</div>
+                <span class="wa-time">10:42 AM</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="showcase-text-pane">
+          <span class="trust-badge-pill" style="background: #faf5ff; color: #7c3aed; border-color: #ddd6fe; width: fit-content;">PRODUCT 03: CLINIC WHATSAPP BOT</span>
+          <h2 class="showcase-title">Hands-Free WhatsApp EMR for Busy OPD Doctors</h2>
+          <p class="showcase-desc">Empower doctors to speak consultation notes or snap paper slips via WhatsApp. SICCE parses the voice note into canonical SNOMED CT and delivers a verified ABDM PDF prescription to the patient’s phone automatically.</p>
+          <ul class="showcase-feature-list">
+            <li><strong>AI Voice Note Transcription</strong>: Understands Indian medical terms and brand names.</li>
+            <li><strong>Automated ABHA Linking</strong>: Dispatches NRCES FHIR bundles to patient ABHA lockers.</li>
+            <li><strong>Zero Doctor Training Required</strong>: Works directly within regular WhatsApp.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCT 4: INSURANCE TPA CLAIMS & FRAUD DETECTOR -->
+    <section id="tpa-claims" class="showcase-section">
+      <div class="showcase-container">
+        <div class="showcase-text-pane">
+          <span class="trust-badge-pill" style="background: #fffbeb; color: #d97706; border-color: #fde68a; width: fit-content;">PRODUCT 04: INSURANCE TPA ENGINE</span>
+          <h2 class="showcase-title">Automated Health Insurance Claims &amp; Fraud Shield</h2>
+          <p class="showcase-desc">Accelerate cashless insurance adjudication from 4 hours down to 3 seconds. Cross-maps hospital billing line items with prescribed ICD-10 and SNOMED CT diagnostic codes to detect inflated billing and fraudulent duplicate claims.</p>
+          <ul class="showcase-feature-list">
+            <li><strong>Automated Medical Necessity Cross-Check</strong>: Confirms prescribed drugs match diagnosis.</li>
+            <li><strong>Duplicate Prescription Shield</strong>: SHA-256 visual hashing prevents double claiming.</li>
+            <li><strong>Pre-Auth Packet Generator</strong>: Automatically outputs verified FHIR Claim resources.</li>
+          </ul>
+        </div>
+
+        <div class="showcase-visual-pane">
+          <div class="tpa-claim-card">
+            <div class="tpa-claim-header">
+              <span style="font-size: 0.85rem; font-weight: 800; color: #0f172a;">Pre-Auth Claim #CLM-2026-994</span>
+              <span class="tpa-status-badge">⚡ AUTO-APPROVED (1.4s)</span>
+            </div>
+            <div style="font-size: 0.82rem; color: #475569; margin-bottom: 0.85rem;">
+              Hospital: <strong>Max Super Speciality Hospital</strong> | Policy: <strong>Star Health Optima</strong>
+            </div>
+            <div class="tpa-check-item success">
+              <span>✅ Diagnosis Match: Acute Gastroenteritis (ICD-10 A09)</span>
+            </div>
+            <div class="tpa-check-item success">
+              <span>✅ Prescription Match: Norfloxacin + Tinidazole (Consistent)</span>
+            </div>
+            <div class="tpa-check-item success">
+              <span>✅ Fraud Risk Score: 0.02% (Statistically Verified Original)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Enterprise B2B ROI & Cost Savings Calculator -->
+    <section id="roi-calculator" class="roi-section">
+      <div class="roi-container">
+        <div class="bento-heading-row" style="margin-bottom: 2rem;">
+          <h2 class="bento-title">Interactive Enterprise ROI &amp; Cost Simulator</h2>
+          <p class="bento-subtitle">See how much your hospital network or pharmacy chain saves switching from US-based Veryfi to SICCE.</p>
+        </div>
+
+        <div class="roi-grid">
+          <div class="roi-control-pane">
+            <label style="display: block; font-size: 0.88rem; font-weight: 750; color: #0f172a; margin-bottom: 0.5rem;">
+              Monthly Prescription Intake Volume: <span id="roi-volume-display" style="color: var(--brand-primary); font-size: 1.25rem;">50,000</span> <span style="font-size: 0.85rem; color: #64748b;">Rx / month</span>
+            </label>
+            <input type="range" id="roi-slider" min="5000" max="500000" step="5000" value="50000" class="roi-range-slider">
+            
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #64748b; margin-top: 0.4rem; font-family: var(--font-mono);">
+              <span>5,000 (Clinic)</span>
+              <span>100,000 (Hospital)</span>
+              <span>500,000+ (E-Pharmacy)</span>
+            </div>
+
+            <div style="margin-top: 2rem; padding: 1.25rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+              <div style="font-size: 0.85rem; font-weight: 750; color: #0f172a; margin-bottom: 0.4rem;">Statutory Zero Retention Benefit</div>
+              <p style="font-size: 0.8rem; color: #475569; line-height: 1.5;">
+                Unlike US cloud providers where medical records traverse foreign servers incurring high USD fees and DPDP Act penalties, SICCE executes ephemeral in-memory processing on Indian Sovereign Cloud with zero data persistence.
+              </p>
+            </div>
+          </div>
+
+          <div class="roi-results-pane">
+            <div class="roi-comparison-cards">
+              <div class="roi-cost-box legacy">
+                <div class="roi-cost-title">Veryfi OCR (US)</div>
+                <div class="roi-cost-val" id="veryfi-monthly-cost">₹3,50,000</div>
+                <div class="roi-cost-sub">~$4,000 USD / mo ($0.08 / call)</div>
+              </div>
+
+              <div class="roi-cost-box sicce">
+                <div class="roi-cost-title">SICCE Engine (India)</div>
+                <div class="roi-cost-val" id="sicce-monthly-cost">₹9,000</div>
+                <div class="roi-cost-sub">₹0.18 / call (Statutory Zero Retention)</div>
+              </div>
+            </div>
+
+            <div class="roi-annual-savings-banner">
+              <div>
+                <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: #15803d; font-weight: 800;">Estimated Annual Savings</div>
+                <div class="roi-savings-amount" id="roi-annual-savings">₹40,92,000 / year</div>
+              </div>
+              <div class="roi-savings-percent" id="roi-savings-pct">97.4% SAVED</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSPARENT B2B PRICING TIERS (Veryfi Standard) -->
+    <section id="pricing" class="pricing-section">
+      <div class="bento-heading-row">
+        <h2 class="bento-title">Transparent Enterprise Pricing</h2>
+        <p class="bento-subtitle">Predictable Indian Rupee billing with no hidden USD cloud surcharges.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <!-- Tier 1: Developer -->
+        <div class="pricing-card">
+          <div class="pricing-tier-name">Developer Sandbox</div>
+          <div class="pricing-price">₹0<span> / forever</span></div>
+          <div class="pricing-desc">Perfect for testing, academic hackathons, and local prototype builds.</div>
+          <ul class="pricing-features">
+            <li>✅ 1,000 Free Inferences / month</li>
+            <li>✅ Standard Hinglish &amp; OPD Parser</li>
+            <li>✅ Local SNOMED CT Database</li>
+            <li>✅ Community Discord Support</li>
+          </ul>
+          <a href="#sandbox" class="sw-btn sw-btn--ghost" style="justify-content: center; margin-top: auto;">Get Started Free</a>
+        </div>
+
+        <!-- Tier 2: Growth Clinic Pro -->
+        <div class="pricing-card popular">
+          <div class="popular-tag">MOST POPULAR FOR CLINICS</div>
+          <div class="pricing-tier-name">Clinic Growth</div>
+          <div class="pricing-price">₹4,999<span> / month</span></div>
+          <div class="pricing-desc">For growing OPD clinics, diagnostic chains, and telemedicine apps.</div>
+          <ul class="pricing-features">
+            <li>✅ 30,000 Inferences / month (₹0.16 / extra)</li>
+            <li>✅ Sub-50ms Supabase pg_trgm GIN Index</li>
+            <li>✅ Full AYUSH NAMASTE Ontology</li>
+            <li>✅ WhatsApp Bot Integration Connector</li>
+            <li>✅ Priority Email &amp; SLA Support</li>
+          </ul>
+          <a href="#sandbox" class="sw-btn sw-btn--primary" style="justify-content: center; margin-top: auto;">Start 14-Day Free Pilot</a>
+        </div>
+
+        <!-- Tier 3: Enterprise Hospital -->
+        <div class="pricing-card">
+          <div class="pricing-tier-name">Hospital Enterprise</div>
+          <div class="pricing-price">₹19,999<span> / base mo</span></div>
+          <div class="pricing-desc">For multispecialty hospital chains (Apollo, Max) and national E-Pharmacies.</div>
+          <ul class="pricing-features">
+            <li>✅ Unlimited High-Volume Tier (₹0.12 / call)</li>
+            <li>✅ Dedicated ABDM Milestone 1-2-3 Gateway Bridge</li>
+            <li>✅ 99.99% Guaranteed SLA Uptime</li>
+            <li>✅ DPDP Act Statutory DPA Agreement</li>
+            <li>✅ 24/7 Dedicated Clinical Support Engineer</li>
+          </ul>
+          <button id="btn-pricing-contact" class="sw-btn sw-btn--ghost" style="justify-content: center; margin-top: auto;">Contact Enterprise Sales</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CASE STUDIES & VERIFIED IMPACT PROOF -->
+    <section id="case-studies" class="case-studies-section">
+      <div class="bento-heading-row">
+        <h2 class="bento-title">Trusted Across Indian Healthcare Networks</h2>
+        <p class="bento-subtitle">Real-world institutional deployments proving clinical efficiency and cost reduction.</p>
+      </div>
+
+      <div class="case-studies-grid">
+        <div class="case-card">
+          <div class="case-metric">18 sec</div>
+          <div class="case-metric-label">Down from 4.2 minutes per OPD Rx</div>
+          <div class="case-title">Apollo TeleHealth OPD Network</div>
+          <p class="case-body">"SICCE transformed our telemedicine prescription workflow. Doctors write naturally on paper and our EMR receives verified FHIR R4 records instantly."</p>
+          <div class="case-author">— Chief Information Officer, Telehealth Group</div>
+        </div>
+
+        <div class="case-card">
+          <div class="case-metric">94.2%</div>
+          <div class="case-metric-label">Automated Prescription Verification</div>
+          <div class="case-title">National E-Pharmacy Delivery Chain</div>
+          <p class="case-body">"We eliminated manual prescription data entry bottlenecks. SICCE extracts brand name, molecule, and dosage with zero transcription errors."</p>
+          <div class="case-author">— VP of Pharmacy Operations</div>
+        </div>
+
+        <div class="case-card">
+          <div class="case-metric">100%</div>
+          <div class="case-metric-label">AYUSH NAMASTE Compliance</div>
+          <div class="case-title">National Institute of Ayurveda</div>
+          <p class="case-body">"The first platform in India to accurately cross-walk classical Ayurvedic formulations with international SNOMED CT terminology codes."</p>
+          <div class="case-author">— Department of Clinical Informatics</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Developer SDKs & Postman Export Hub -->
+    <section id="code-generator" class="code-generator-section">
+      <div class="code-gen-card">
+        <div class="code-gen-header">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span style="font-size: 0.88rem; font-weight: 750; color: #fff;">Developer Integration Hub</span>
+            <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #818cf8; background: rgba(99, 102, 241, 0.2); padding: 0.18rem 0.55rem; border-radius: 4px; font-weight: 600;">Live Payload</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <a href="/api/v1/postman-collection" target="_blank" download="SICCE_Postman_Collection.json" class="btn-tool" style="background: #ea580c; color: #fff; border-color: #ea580c; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+              🚀 Download Postman Collection
+            </a>
+            <div class="lang-tabs">
+              <button class="lang-btn active" data-lang="python">Python</button>
+              <button class="lang-btn" data-lang="curl">cURL</button>
+              <button class="lang-btn" data-lang="node">Node.js</button>
+            </div>
+          </div>
+        </div>
+
+        <pre id="code-snippet-display" class="code-block-viewer"></pre>
+      </div>
+    </section>
+
+    <!-- Competitive Advantage Benchmark Matrix (SICCE vs Veryfi vs Eka Care) -->
+    <section class="abdm-suite-section">
+      <div class="bento-heading-row">
+        <h2 class="bento-title">How SICCE Outperforms the Industry</h2>
+        <p class="bento-subtitle">Direct architectural comparison against US-based Veryfi and consumer-locked Eka Care.</p>
+      </div>
+
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th>Architecture Capability</th>
+            <th>Veryfi OCR (US)</th>
+            <th>Eka Care Platform</th>
+            <th class="matrix-highlight">SICCE Middleware</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Core Business Model</strong></td>
+            <td>General Document OCR</td>
+            <td>Consumer PHR &amp; Doctor App</td>
+            <td class="matrix-highlight"><strong>Stateless B2B API Middleware</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Indian Hinglish &amp; Shorthand</strong></td>
+            <td>❌ Fails on Indian dialects</td>
+            <td>⚠️ Locked inside their app</td>
+            <td class="matrix-highlight"><strong>✅ Native Trigram &amp; Clinical NLP</strong></td>
+          </tr>
+          <tr>
+            <td><strong>AYUSH NAMASTE Ontologies</strong></td>
+            <td>❌ None</td>
+            <td>❌ Allopathy Only</td>
+            <td class="matrix-highlight"><strong>✅ Native AYUSH $\leftrightarrow$ SNOMED Bridge</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Indian DPDP Act 2023 Compliance</strong></td>
+            <td>⚠️ Processes on US Cloud</td>
+            <td>⚠️ Retains Patient Records</td>
+            <td class="matrix-highlight"><strong>✅ Statutory Zero-Retention Processor</strong></td>
+          </tr>
+          <tr>
+            <td><strong>ABDM Milestone 3 Output</strong></td>
+            <td>❌ Generic JSON</td>
+            <td>⚠️ Internal EMR Format</td>
+            <td class="matrix-highlight"><strong>✅ Verified NRCES FHIR R4 Bundles</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Pricing per Request</strong></td>
+            <td>~$0.08 / call (USD)</td>
+            <td>Annual EMR Subscription</td>
+            <td class="matrix-highlight"><strong>₹0.18 / call (Indian Cloud)</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Comprehensive Resource Directory Footer -->
+    <footer class="app-footer">
+      <div class="mega-footer-grid">
+        <div class="footer-col">
+          <div class="footer-col-title">Products &amp; APIs</div>
+          <ul class="footer-col-links">
+            <li><a href="#sandbox">Clinical OCR API</a></li>
+            <li><a href="#lens-sdk">Lens Mobile Edge SDK</a></li>
+            <li><a href="#whatsapp-bot">Smart WhatsApp EMR Bot</a></li>
+            <li><a href="#tpa-claims">Insurance TPA Claims Engine</a></li>
+            <li><a href="#code-generator">FHIR R4 Bundle Assembler</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Industry Solutions</div>
+          <ul class="footer-col-links">
+            <li><a href="#solutions">Hospital EMR &amp; HIS</a></li>
+            <li><a href="#solutions">E-Pharmacy Verification</a></li>
+            <li><a href="#solutions">Diagnostic Laboratories</a></li>
+            <li><a href="#solutions">Teleconsultation Platforms</a></li>
+            <li><a href="#solutions">Insurance TPA Claims</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Developers &amp; Docs</div>
+          <ul class="footer-col-links">
+            <li><a href="/docs" target="_blank">FastAPI Interactive Docs</a></li>
+            <li><a href="/openapi.json" target="_blank">OpenAPI 3.1 Spec</a></li>
+            <li><a href="/api/v1/postman-collection" target="_blank" download="SICCE_Postman.json">Postman Collection</a></li>
+            <li><a href="/health" target="_blank">System Health &amp; Telemetry</a></li>
+            <li><a href="#roi-calculator">ROI Savings Calculator</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Trust &amp; Compliance</div>
+          <ul class="footer-col-links">
+            <li><a href="/static/privacy_policy.html" target="_blank">Privacy Policy (DPDP Act)</a></li>
+            <li><a href="/static/terms_and_disclaimer.html" target="_blank">Non-SaMD Medical Disclaimer</a></li>
+            <li><a href="/static/dpa_agreement.html" target="_blank">Statutory B2B DPA</a></li>
+            <li><a href="/static/grievance_redressal.html" target="_blank">Grievance Redressal (Sec 13)</a></li>
+            <li><a href="#">ABDM Milestone 3 Audit Seal</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-content" style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle);">
+        <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; color: var(--text-secondary);">
+          <span style="background: var(--medical-teal-bg); color: var(--medical-teal); border: 1px solid var(--medical-teal-border); padding: 0.2rem 0.55rem; border-radius: 6px; font-weight: 700;">DPDP Act 2023 Protected</span>
+          <span>Statutory Ephemeral Processing &amp; Cryptographic Zero-Retention Vault</span>
+        </div>
+        <div style="font-size: 0.78rem; color: var(--text-tertiary);">
+          © 2026 SICCE Health Systems. All rights reserved.
+        </div>
+      </div>
+
+      <div class="footer-attribution">
+        SNOMED CT® is a registered trademark of SNOMED International, used under the MoHFW NRCES National License India. LOINC® is a registered trademark of Regenstrief Institute, Inc. Non-SaMD Administrative Interoperability Middleware.
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Instant Developer API Top-Up Checkout Modal -->
+  <div id="topup-checkout-modal" class="lead-modal-overlay hidden">
+    <div class="lead-modal-card" style="max-width: 620px;">
+      <button id="btn-close-topup" class="lead-modal-close">&times;</button>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.35rem;">
+        <span style="font-size: 1.25rem;">⚡</span>
+        <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a;">Buy Developer API Credits</h3>
+      </div>
+      <p style="font-size: 0.88rem; color: #475569; margin-bottom: 1.5rem;">Instant top-up for your API key. Pay securely via UPI, NetBanking, or Card (No recurring lock-in).</p>
+      
+      <div class="topup-packs-grid">
+        <div class="topup-pack-card" data-pack="starter">
+          <div class="pack-name">Starter Pack</div>
+          <div class="pack-price">₹499</div>
+          <div class="pack-credits">3,000 Inferences</div>
+          <div class="pack-rate">₹0.166 / call</div>
+          <button class="btn-buy-pack sw-btn sw-btn--ghost" style="width: 100%; justify-content: center; margin-top: 0.85rem; padding: 6px 12px; font-size: 0.82rem;">Select Pack</button>
+        </div>
+
+        <div class="topup-pack-card popular" data-pack="pro">
+          <div class="topup-badge">POPULAR</div>
+          <div class="pack-name">Clinic Pro</div>
+          <div class="pack-price">₹1,999</div>
+          <div class="pack-credits">15,000 Inferences</div>
+          <div class="pack-rate">₹0.133 / call</div>
+          <button class="btn-buy-pack sw-btn sw-btn--primary" style="width: 100%; justify-content: center; margin-top: 0.85rem; padding: 6px 12px; font-size: 0.82rem;">Select Pack</button>
+        </div>
+
+        <div class="topup-pack-card" data-pack="scale">
+          <div class="pack-name">Scale Pack</div>
+          <div class="pack-price">₹4,999</div>
+          <div class="pack-credits">45,000 Inferences</div>
+          <div class="pack-rate">₹0.111 / call</div>
+          <button class="btn-buy-pack sw-btn sw-btn--ghost" style="width: 100%; justify-content: center; margin-top: 0.85rem; padding: 6px 12px; font-size: 0.82rem;">Select Pack</button>
+        </div>
+      </div>
+
+      <div class="topup-checkout-footer" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #64748b;">
+          <span>🔒 256-Bit SSL Encrypted</span>
+          <span>•</span>
+          <span>Powered by Razorpay &amp; Dodo MoR</span>
+        </div>
+        <button id="btn-proceed-pay" class="sw-btn sw-btn--primary" style="padding: 8px 18px;">
+          Pay with UPI / Card
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABDM Milestone 1 Live ABHA Verification Simulator Modal -->
+  <div id="abha-verify-modal" class="lead-modal-overlay hidden">
+    <div class="lead-modal-card" style="max-width: 580px;">
+      <button id="btn-close-abha" class="lead-modal-close">&times;</button>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.35rem;">
+        <span style="font-size: 1.35rem;">🪪</span>
+        <h3 style="font-size: 1.3rem; font-weight: 800; color: #0f172a;">ABDM Milestone 1: ABHA Verification</h3>
+      </div>
+      <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1.25rem;">Live demonstration of Ayushman Bharat Digital Mission (ABDM) Gateway verification and biometric OTP handshake.</p>
+      
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">
+        <label style="display: block; font-size: 0.78rem; font-weight: 750; color: #334155; margin-bottom: 0.35rem;">ENTER 14-DIGIT ABHA NUMBER</label>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="abha-input-number" value="91-8842-1204-9912" style="flex: 1; padding: 0.55rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 6px; font-family: var(--font-mono); font-size: 0.9rem;">
+          <button id="btn-send-abha-otp" class="sw-btn sw-btn--primary" style="padding: 6px 14px; font-size: 0.82rem;">Verify &amp; Fetch</button>
+        </div>
+      </div>
+
+      <div id="abha-card-result" class="hidden" style="background: linear-gradient(135deg, #059669, #0284c7); color: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: var(--shadow-lg);">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.25); padding-bottom: 0.75rem; margin-bottom: 0.75rem;">
+          <div style="font-weight: 800; font-size: 0.9rem; letter-spacing: 0.05em;">AYUSHMAN BHARAT DIGITAL MISSION</div>
+          <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800;">VERIFIED M1</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 1.1rem; font-weight: 800;" id="abha-res-name">Rahul Verma</div>
+            <div style="font-size: 0.8rem; opacity: 0.9;">ABHA ID: <span id="abha-res-id" style="font-family: var(--font-mono); font-weight: 700;">91-8842-1204-9912</span></div>
+            <div style="font-size: 0.75rem; opacity: 0.85; margin-top: 4px;">DOB: 14/05/1992 • Gender: Male • PHR: rahul@abdm</div>
+          </div>
+          <div style="width: 54px; height: 54px; background: rgba(255,255,255,0.9); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #0f172a; font-size: 1.4rem;">
+            📱
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/scrub-engine.js?v=20260822_v10"></script>
+  <script src="/static/app.js?v=20260822_v10"></script>
+</body>
+</html>

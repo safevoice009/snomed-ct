@@ -50,6 +50,35 @@ class ClinicalCache:
             self._cache.clear()
         self._cache[clean_text] = data
 
+    def clear(self):
+        """Purges all cached extractions from memory."""
+        self._cache.clear()
+
+
+class PHISanitizer:
+    """Automated PHI De-identification and Redactor conforming to Indian DPDP Act 2023."""
+    
+    PATTERNS = [
+        # Indian Phone Numbers (+91 9876543210 or 9876543210)
+        (r"(?:\+91[\-\s]?)?[6-9]\d{9}", "[REDACTED_PHONE]"),
+        # 14-digit ABHA IDs (e.g. 91-1234-5678-9012)
+        (r"\b\d{2}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b", "[REDACTED_ABHA]"),
+        # 12-digit Aadhaar Numbers
+        (r"\b\d{4}[-\s]?\d{4}[-\s]?\d{4}\b", "[REDACTED_AADHAAR]"),
+        # Email Addresses
+        (r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", "[REDACTED_EMAIL]"),
+        # Patient Names with standard Indian salutations
+        (r"\b(?:Mr\.|Mrs\.|Ms\.|Shri|Smt|Master|Baby|Patient|Pt\.?)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b", "[PATIENT_NAME]")
+    ]
+
+    @classmethod
+    def sanitize(cls, text: str) -> str:
+        """Strips direct personal identifiers before LLM routing or cloud processing."""
+        sanitized = text
+        for pattern, replacement in cls.PATTERNS:
+            sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
+        return sanitized
+
 
 class RuleParser:
     """Clinical parser mapping standard Indian abbreviations and concepts locally."""
@@ -283,8 +312,9 @@ class ClinicalParser:
         
         llm_entities = {"symptoms": [], "diagnoses": [], "medications": []}
         if needs_llm:
-            logger.info("Unstructured content detected. Routing to LiteLLM router.")
-            llm_entities = await self.llm.parse_narrative(note)
+            logger.info("Unstructured content detected. Applying DPDP PHI de-identification and routing to LiteLLM.")
+            sanitized_note = PHISanitizer.sanitize(note)
+            llm_entities = await self.llm.parse_narrative(sanitized_note)
             
         # 4. Merge extractions and deduplicate
         merged = self._merge_entities(local_entities, llm_entities)
@@ -296,6 +326,12 @@ class ClinicalParser:
                 freq_clean = self.rules.extract_dosage_frequency(freq)
                 if freq_clean:
                     med["frequency"] = list(freq_clean.values())[0]
+
+        # 6. Run Clinical Drug-Drug Interaction (DDI) & Safety Checker
+        merged["ddi_alerts"] = DDIEngine.check_interactions(merged.get("medications", []))
+
+        # 7. Generate Multi-Lingual Vernacular Patient Dosage Cards
+        merged["vernacular_dosages"] = VernacularTranslator.generate_schedules(merged.get("medications", []))
                     
         # Update Cache
         self.cache.set(note, merged)
@@ -325,3 +361,112 @@ class ClinicalParser:
                         
         merged["medications"] = list(med_map.values())
         return merged
+
+
+class DDIEngine:
+    """Clinical Drug-Drug Interaction (DDI) & Safety Alert Checker."""
+
+    INTERACTIONS = [
+        {
+            "group_a": ["norfloxacin", "norflox", "ciprofloxacin", "ofloxacin", "levofloxacin"],
+            "group_b": ["pantocid", "pantoprazole", "mucaine", "omeprazole", "antacid", "gelusil", "digene"],
+            "type": "chelation",
+            "severity": "moderate",
+            "title": "Chelation & Bioavailability Reduction Alert",
+            "message": "Fluoroquinolones bind with multivalent cations/antacids. Administer Pantocid/Mucaine at least 2 hours before or 4 hours after Norflox."
+        },
+        {
+            "group_a": ["dolo", "paracetamol", "crocin", "calpol", "panadol"],
+            "group_b": ["combiflam", "flexon", "paracetamol"],
+            "type": "overdose",
+            "severity": "high",
+            "title": "Cumulative Hepatotoxicity Warning",
+            "message": "Multiple Paracetamol-containing formulations detected. Ensure total daily intake does not exceed 4,000 mg."
+        },
+        {
+            "group_a": ["lasix", "furosemide", "torsemide"],
+            "group_b": ["combiflam", "brufen", "ibuprofen", "diclofenac", "voveran"],
+            "type": "renal",
+            "severity": "moderate",
+            "title": "Renal Perfusion & Diuretic Blunting Alert",
+            "message": "NSAIDs blunt loop diuretic efficacy and increase nephrotoxicity risk. Monitor serum creatinine and urine output."
+        }
+    ]
+
+    @classmethod
+    def check_interactions(cls, medications: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        alerts = []
+        med_names = [m.get("brand_name", "").lower() + " " + m.get("generic_guess", "").lower() for m in medications]
+        
+        for rule in cls.INTERACTIONS:
+            found_a = any(any(k in name for k in rule["group_a"]) for name in med_names)
+            found_b = any(any(k in name for k in rule["group_b"]) for name in med_names)
+            
+            if found_a and found_b:
+                alerts.append({
+                    "severity": rule["severity"],
+                    "title": rule["title"],
+                    "message": rule["message"]
+                })
+        return alerts
+
+
+class VernacularTranslator:
+    """Translates clinical dosage instructions into Indian vernacular languages."""
+
+    SCHEDULES = {
+        "od": {
+            "hi": "दिन में 1 बार (सुबह नाश्ते से पहले)",
+            "mr": "दिवसातून १ वेळ (सकाळी नाश्त्यापूर्वी)",
+            "ta": "ஒரு நாளைக்கு 1 முறை (காலை உணவுக்கு முன்)",
+            "te": "రోజుకు 1 సారి (ఉదయం టిఫిన్ ముందు)",
+            "bn": "দিনে ১ বার (সকালে প্রাতঃরাশের আগে)"
+        },
+        "bd": {
+            "hi": "दिन में 2 बार (सुबह और रात - खाना खाने के बाद)",
+            "mr": "दिवसातून २ वेळा (सकाळी व रात्री - जेवणानंतर)",
+            "ta": "ஒரு நாளைக்கு 2 முறை (காலை மற்றும் இரவு - உணவுக்குப் பின்)",
+            "te": "రోజుకు 2 సార్లు (ఉదయం మరియు రాత్రి - భోజనం తర్వాత)",
+            "bn": "দিনে ২ বার (সকাল এবং রাতে - খাওয়ার পর)"
+        },
+        "tds": {
+            "hi": "दिन में 3 बार (सुबह, दोपहर, रात - खाने के बाद)",
+            "mr": "दिवसातून ३ वेळा (सकाळी, दुपारी, रात्री - जेवणानंतर)",
+            "ta": "ஒரு நாளைக்கு 3 முறை (காலை, மதியம், இரவு - உணவுக்குப் பின்)",
+            "te": "రోజుకు 3 సార్లు (ఉదయం, మధ్యాహ్నం, రాత్రి - భోజనం తర్వాత)",
+            "bn": "দিনে ৩ বার (সকাল, দুপুর, রাত - খাওয়ার পর)"
+        },
+        "hs": {
+            "hi": "रात को सोने से पहले (गुनगुने पानी के साथ)",
+            "mr": "रात्री झोपताना (कोमट पाण्यासोबत)",
+            "ta": "இரவு தூங்கும் முன் (வெதுவெதுப்பான நீருடன்)",
+            "te": "రాత్రి పడుకునే ముందు (గోరువెచ్చని నీటితో)",
+            "bn": "রাতে শোবার আগে (হালকা গরম জলের সাথে)"
+        }
+    }
+
+    @classmethod
+    def generate_schedules(cls, medications: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        results = []
+        for m in medications:
+            brand = m.get("brand_name", "Medication")
+            dose = m.get("dose", "")
+            raw_freq = (m.get("frequency", "") + " " + dose).lower()
+            
+            # Determine schedule key
+            sch_key = "od"
+            if "bd" in raw_freq or "twice" in raw_freq or "two" in raw_freq:
+                sch_key = "bd"
+            elif "tds" in raw_freq or "three" in raw_freq or "tid" in raw_freq:
+                sch_key = "tds"
+            elif "hs" in raw_freq or "bedtime" in raw_freq or "night" in raw_freq:
+                sch_key = "hs"
+                
+            trans = cls.SCHEDULES.get(sch_key, cls.SCHEDULES["od"])
+            results.append({
+                "medication": brand,
+                "dose": dose,
+                "translations": trans
+            })
+        return results
+
