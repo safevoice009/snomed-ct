@@ -259,44 +259,52 @@ class RuleParser:
 
 
 class LLMParser:
-    """LiteLLM endpoint router parsing unstructured clinical narratives in the cloud."""
+    """High-speed zero-shot Gemini 2.5 Flash router extracting clinical entities with strict JSON validation."""
     
     def __init__(self):
-        self.model = os.getenv("LLM_MODEL", "gemini/gemini-1.5-flash")
+        self.model = os.getenv("LLM_MODEL", "gemini-2.5-flash")
         
     async def parse_narrative(self, text: str) -> Dict[str, Any]:
-        """Extracts clinical entities using cloud-based AI with Pydantic JSON validation."""
-        
-        system_prompt = (
-            "You are a Clinical Named Entity Recognition (NER) assistant specialized in Indian health records.\n"
-            "The input notes are often written in a mix of English, clinical abbreviations, and Hinglish.\n"
-            "Extract symptoms, diagnoses, and medications.\n"
-            "If you find Hinglish terms, translate them to standard English clinical entities (e.g. 'sar dard' -> 'Headache', 'khansi' -> 'Cough')."
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            return {"symptoms": [], "diagnoses": [], "medications": []}
+            
+        system_instruction = (
+            "You are an expert Clinical NER assistant specialized in Indian OPD prescriptions and health records.\n"
+            "Extract clinical entities into JSON with exactly these keys:\n"
+            "- 'symptoms': list of standard English symptom names (e.g. 'Cough', 'Headache', 'Fever', 'Chest tightness')\n"
+            "- 'diagnoses': list of disease conditions (e.g. 'Hypertension', 'Allergic rhinitis', 'Type 2 Diabetes', 'Acid peptic disease')\n"
+            "- 'medications': list of objects with 'brand_name', 'generic_guess', 'dose', 'frequency' (e.g. 'Tab Levocet M', 'Levocetirizine', '5mg', 'at bedtime')\n"
+            "Translate colloquial Hinglish phrases (e.g. 'sar dard' -> 'Headache', 'khansi' -> 'Cough', 'pet me marod' -> 'Abdominal pain')."
         )
         
-        user_prompt = f"Extract clinical entities from this note:\n\"\"\"\n{text}\n\"\"\""
+        prompt = f"{system_instruction}\n\nClinical Note:\n\"\"\"\n{text}\n\"\"\"\n\nReturn pure JSON matching the schema."
         
         try:
-            api_key = os.getenv("GEMINI_API_KEY")
-            if not api_key:
-                return {"symptoms": [], "diagnoses": [], "medications": []}
-                
-            response = await litellm.acompletion(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                response_format=ClinicalEntities,
-                temperature=0.0
-            )
-            
-            content = response.choices[0].message.content
-            return json.loads(content)
-            
+            import httpx
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={api_key}"
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                res = await client.post(
+                    url,
+                    headers={"Content-Type": "application/json"},
+                    json={
+                        "contents": [{"parts": [{"text": prompt}]}],
+                        "generationConfig": {"response_mime_type": "application/json"}
+                    }
+                )
+                if res.status_code == 200:
+                    data = res.json()
+                    content = data["candidates"][0]["content"]["parts"][0]["text"]
+                    parsed = json.loads(content)
+                    return {
+                        "symptoms": parsed.get("symptoms", []),
+                        "diagnoses": parsed.get("diagnoses", []),
+                        "medications": parsed.get("medications", [])
+                    }
         except Exception as e:
-            logger.error(f"LiteLLM structured output error: {e}")
-            return {"symptoms": [], "diagnoses": [], "medications": []}
+            logger.error(f"Gemini 2.5 Flash clinical extraction error: {e}")
+            
+        return {"symptoms": [], "diagnoses": [], "medications": []}
 
 
 class ClinicalParser:
