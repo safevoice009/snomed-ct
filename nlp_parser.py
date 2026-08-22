@@ -86,6 +86,7 @@ class RuleParser:
     ABBREVIATIONS = {
         r"\bc/o\b": "complaining of",
         r"\bh/o\b": "history of",
+        r"\bk/c/o\b": "known case of",
         r"\bsoboe\b": "dyspnea on exertion",
         r"\bpedal edema\s*\+": "edema of foot",
         r"\bpedal edema\b": "edema of foot",
@@ -96,7 +97,9 @@ class RuleParser:
         r"\bloose motion(s)?\b": "diarrhoea",
         r"\bsar dard\b": "headache",
         r"\bpet kharab\b": "diarrhoea",
-        r"\bulti\b": "vomiting"
+        r"\bulti\b": "vomiting",
+        r"\bkhansi\b": "cough",
+        r"\bbukhar\b": "fever"
     }
     
     DOSAGES = {
@@ -104,14 +107,32 @@ class RuleParser:
         r"\bod\b": "once daily",
         r"\btds\b": "three times daily",
         r"\bhs\b": "at bedtime",
-        r"\bqid\b": "four times daily"
+        r"\bqid\b": "four times daily",
+        r"\bsos\b": "as needed",
+        r"\bprn\b": "as needed"
     }
+
+    KNOWN_DRUGS = [
+        {"pattern": r"levocet[\s\-]m", "brand": "Tab Levocet M", "generic": "Levocetirizine and montelukast", "dose": "5mg/10mg"},
+        {"pattern": r"ascoril[\s\-]d", "brand": "Syp Ascoril D", "generic": "Dextromethorphan hydrobromide", "dose": "100ml"},
+        {"pattern": r"telma[\s\-]40|telma\b", "brand": "Tab Telma 40", "generic": "Telmisartan", "dose": "40mg"},
+        {"pattern": r"amlo(dipine|ng)?\s*(5|10)?", "brand": "Tab Amlodipine 5mg", "generic": "Amlodipine", "dose": "5mg"},
+        {"pattern": r"dolo[\s\-]650|dolo\b", "brand": "Tab Dolo 650", "generic": "Paracetamol", "dose": "650mg"},
+        {"pattern": r"pantocid[\s\-]40|pantocid\b|pan[\s\-]40", "brand": "Cap Pantocid 40", "generic": "Pantoprazole", "dose": "40mg"},
+        {"pattern": r"norflox[\s\-]tz|norflox\b", "brand": "Tab Norflox TZ", "generic": "Norfloxacin and tinidazole", "dose": "400mg/600mg"},
+        {"pattern": r"lasix[\s\-]40|lasix\b", "brand": "Tab Lasix 40mg", "generic": "Furosemide", "dose": "40mg"},
+        {"pattern": r"glycomet[\s\-]500|glycomet\b|metformin\b", "brand": "Tab Glycomet 500", "generic": "Metformin hydrochloride", "dose": "500mg"},
+        {"pattern": r"azithral[\s\-]500|azithral\b|azithromycin\b", "brand": "Tab Azithral 500", "generic": "Azithromycin", "dose": "500mg"},
+        {"pattern": r"augmentin[\s\-]625|augmentin\b|clavam\b", "brand": "Tab Augmentin 625", "generic": "Amoxicillin and clavulanic acid", "dose": "625mg"},
+        {"pattern": r"atorva[\s\-]10|atorva\b|atorvastatin\b", "brand": "Tab Atorva 10", "generic": "Atorvastatin", "dose": "10mg"},
+        {"pattern": r"ors\b|electral\b", "brand": "ORS Electral Sachet", "generic": "Oral rehydration salts", "dose": "1 sachet in 1L"},
+        {"pattern": r"steam(\s+inhalation)?", "brand": "Steam Inhalation", "generic": "Steam inhalation", "dose": "10 mins"}
+    ]
 
     def __init__(self):
         self.medspacy_nlp = None
         if MEDSPACY_AVAILABLE:
             try:
-                # Load default medspacy model
                 self.medspacy_nlp = medspacy.load()
                 target_matcher = self.medspacy_nlp.get_pipe("medspacy_target_matcher")
                 rules = [
@@ -120,6 +141,7 @@ class RuleParser:
                     TargetRule("sar dard", category="SYMPTOM"),
                     TargetRule("pet kharab", category="SYMPTOM"),
                     TargetRule("ulti", category="SYMPTOM"),
+                    TargetRule("khansi", category="SYMPTOM"),
                     TargetRule("soboe", category="SYMPTOM"),
                     TargetRule("pedal edema", category="SYMPTOM"),
                     TargetRule("ap+", category="SYMPTOM"),
@@ -134,14 +156,12 @@ class RuleParser:
                 self.medspacy_nlp = None
 
     def clean_text(self, text: str) -> str:
-        """Applies case-insensitive abbreviation expanding."""
         cleaned = text.lower()
         for pattern, replacement in self.ABBREVIATIONS.items():
             cleaned = re.sub(pattern, replacement, cleaned)
         return cleaned
 
     def extract_dosage_frequency(self, text: str) -> Dict[str, str]:
-        """Scans text for dosage frequencies like BD, OD."""
         extracted = {}
         for pattern, desc in self.DOSAGES.items():
             if re.search(pattern, text, re.IGNORECASE):
@@ -149,7 +169,7 @@ class RuleParser:
         return extracted
 
     def parse_locally(self, text: str) -> Dict[str, Any]:
-        """Performs localized extraction of standard abbreviations and entities to save on LLM costs."""
+        """Comprehensive rule engine detecting symptoms, diagnoses, and prescription lines."""
         text_lower = text.lower()
         extracted = {
             "symptoms": [],
@@ -157,88 +177,85 @@ class RuleParser:
             "medications": []
         }
         
-        # Use medspacy if available, otherwise run regex rules
-        if self.medspacy_nlp:
-            try:
-                doc = self.medspacy_nlp(text)
-                for ent in doc.ents:
-                    if ent.label_ == "SYMPTOM":
-                        # Map to normalized preferred terms
-                        term = ent.text.lower()
-                        if "loose motion" in term or "pet kharab" in term:
-                            extracted["symptoms"].append("Diarrhoea")
-                        elif "sar dard" in term:
-                            extracted["symptoms"].append("Headache")
-                        elif "soboe" in term:
-                            extracted["symptoms"].append("Dyspnea on exertion")
-                        elif "pedal edema" in term:
-                            extracted["symptoms"].append("Edema of foot")
-                        elif "ap+" in term:
-                            extracted["symptoms"].append("Abdominal pain")
-                        elif "amavata" in term:
-                            extracted["symptoms"].append("Amavata")
-                        elif "vata vyadhi" in term:
-                            extracted["symptoms"].append("Vata vyadhi")
-                        else:
-                            extracted["symptoms"].append(ent.text.capitalize())
-                    elif ent.label_ == "DIAGNOSIS":
-                        if "apd" in ent.text.lower():
-                            extracted["diagnoses"].append("Acid peptic disease")
-                        else:
-                            extracted["diagnoses"].append(ent.text.capitalize())
-            except Exception as e:
-                logger.error(f"medspacy parsing runtime exception: {e}. Falling back to regex parser.")
-                self._run_regex_fallback(text_lower, extracted)
-        else:
-            self._run_regex_fallback(text_lower, extracted)
-
-        # Parse local medications
-        if "dolo" in text_lower:
-            freq = "twice daily" if "bd" in text_lower else ("once daily" if "od" in text_lower else "")
-            extracted["medications"].append({
-                "brand_name": "Dolo 650",
-                "generic_guess": "Paracetamol",
-                "dose": "650mg",
-                "frequency": freq
-            })
-        if "pantocid" in text_lower:
-            freq = "once daily" if "od" in text_lower else ""
-            extracted["medications"].append({
-                "brand_name": "Pantocid 40",
-                "generic_guess": "Pantoprazole",
-                "dose": "40mg",
-                "frequency": freq
-            })
-        if "lasix" in text_lower:
-            freq = "twice daily" if "bd" in text_lower else ""
-            extracted["medications"].append({
-                "brand_name": "Lasix 40mg",
-                "generic_guess": "Furosemide",
-                "dose": "40mg",
-                "frequency": freq
-            })
-            
-        return extracted
-
-    def _run_regex_fallback(self, text_lower: str, extracted: Dict[str, Any]):
-        if "loose motion" in text_lower or "pet kharab" in text_lower:
+        # 1. Symptoms Detection
+        if re.search(r"\b(khansi|cough|dry cough|productive cough)\b", text_lower):
+            extracted["symptoms"].append("Cough")
+        if re.search(r"\b(chest tightness|chest heaviness|tightness in chest)\b", text_lower):
+            extracted["symptoms"].append("Chest tightness")
+        if re.search(r"\b(loose motion|loose motions|diarrhea|diarrhoea|pet kharab|dast)\b", text_lower):
             extracted["symptoms"].append("Diarrhoea")
-        if "sar dard" in text_lower:
+        if re.search(r"\b(sar dard|headache|sir dard)\b", text_lower):
             extracted["symptoms"].append("Headache")
-        if "soboe" in text_lower:
+        if re.search(r"\b(fever|bukhar|pyrexia|taap|101f|102f)\b", text_lower):
+            extracted["symptoms"].append("Fever")
+        if re.search(r"\b(ulti|vomiting|nausea|ulti jaisa)\b", text_lower):
+            extracted["symptoms"].append("Nausea and vomiting")
+        if re.search(r"\b(soboe|dyspnea|shortness of breath|breathlessness|dam fulna)\b", text_lower):
             extracted["symptoms"].append("Dyspnea on exertion")
-        if "pedal edema" in text_lower:
+        if re.search(r"\b(pedal edema|edema|foot swelling|pair me sujan)\b", text_lower):
             extracted["symptoms"].append("Edema of foot")
-        if "ap+" in text_lower or "ap positive" in text_lower or "abdominal pain" in text_lower:
+        if re.search(r"\b(ap\+|ap positive|abdominal pain|pet dard|pet me marod|stomach pain)\b", text_lower):
             extracted["symptoms"].append("Abdominal pain")
-        if "ulti" in text_lower:
-            extracted["symptoms"].append("Vomiting")
-        if "amavata" in text_lower:
+        if re.search(r"\b(heartburn|jalan|chest burning|acidity)\b", text_lower):
+            extracted["symptoms"].append("Heartburn")
+        if re.search(r"\b(amavata)\b", text_lower):
             extracted["symptoms"].append("Amavata")
-        if "vata vyadhi" in text_lower:
+        if re.search(r"\b(vata vyadhi)\b", text_lower):
             extracted["symptoms"].append("Vata vyadhi")
-        if "apd" in text_lower:
+
+        # 2. Diagnoses Detection
+        if re.search(r"\b(allergic rhinitis|rhinitis|sardi|sneezing)\b", text_lower):
+            extracted["diagnoses"].append("Allergic rhinitis")
+        if re.search(r"\b(hypertension|htn|high bp|bp high)\b", text_lower):
+            extracted["diagnoses"].append("Hypertension")
+        if re.search(r"\b(acute gastroenteritis|age|gastroenteritis)\b", text_lower):
+            extracted["diagnoses"].append("Acute gastroenteritis")
+        if re.search(r"\b(apd|acid peptic disease|gerd)\b", text_lower):
             extracted["diagnoses"].append("Acid peptic disease")
+        if re.search(r"\b(diabetes mellitus|diabetes|dm|t2dm|sugar)\b", text_lower):
+            extracted["diagnoses"].append("Diabetes mellitus")
+        if re.search(r"\b(rheumatoid arthritis|ra)\b", text_lower):
+            extracted["diagnoses"].append("Rheumatoid arthritis")
+
+        # 3. Medications Detection
+        for drug in self.KNOWN_DRUGS:
+            if re.search(drug["pattern"], text_lower):
+                # Extract surrounding frequency and dose
+                freq = ""
+                # Find if BD, OD, TDS, HS, SOS appears near the drug or in text
+                match_freq = re.search(rf"{drug['pattern']}.*?\b(bd|od|tds|hs|sos|qid|twice daily|once daily)\b", text_lower)
+                if match_freq and match_freq.group(1):
+                    freq = str(match_freq.group(1)).upper()
+                else:
+                    if "bd" in text_lower: freq = "BD"
+                    elif "tds" in text_lower: freq = "TDS"
+                    elif "hs" in text_lower: freq = "HS"
+                    elif "od" in text_lower: freq = "OD"
+                    elif "sos" in text_lower: freq = "SOS"
+
+                extracted["medications"].append({
+                    "brand_name": drug["brand"],
+                    "generic_guess": drug["generic"],
+                    "dose": drug["dose"],
+                    "frequency": freq
+                })
+
+        # 4. Generic Fallback Regex for Unlisted Medications (e.g. Tab XYZ 10mg BD)
+        generic_med_matches = re.finditer(r"(?:Tab|Cap|Syp|Inj|Oint|Drop)\.?\s+([A-Za-z0-9\-]+(?:\s+[A-Za-z0-9\-]+)?)\s*(?:(\d+(?:mg|mcg|gm|ml)?))?\s*(?:(\d+\s*(?:tsp|tablets?|caps?))|\b(OD|BD|TDS|QID|HS|SOS)\b)?", text, re.IGNORECASE)
+        for match in generic_med_matches:
+            name = match.group(1).strip()
+            # If not already added
+            if not any(name.lower() in m["brand_name"].lower() for m in extracted["medications"]):
+                dose = match.group(2) or ""
+                freq_match = match.group(4) or match.group(3) or "OD"
+                extracted["medications"].append({
+                    "brand_name": f"Tab {name.capitalize()}",
+                    "generic_guess": name.capitalize(),
+                    "dose": dose or "Standard",
+                    "frequency": str(freq_match).upper()
+                })
+
+        return extracted
 
 
 class LLMParser:
@@ -252,9 +269,9 @@ class LLMParser:
         
         system_prompt = (
             "You are a Clinical Named Entity Recognition (NER) assistant specialized in Indian health records.\n"
-            "The input notes are often written in a mix of English, clinical abbreviations, and Hinglish (Hindi words in English script).\n"
-            "Your task is to parse the note and extract symptoms, diagnoses, and medications.\n"
-            "If you find Hinglish terms, translate them to standard English clinical entities (e.g. 'sar dard' -> 'Headache', 'loose motion' -> 'Diarrhoea')."
+            "The input notes are often written in a mix of English, clinical abbreviations, and Hinglish.\n"
+            "Extract symptoms, diagnoses, and medications.\n"
+            "If you find Hinglish terms, translate them to standard English clinical entities (e.g. 'sar dard' -> 'Headache', 'khansi' -> 'Cough')."
         )
         
         user_prompt = f"Extract clinical entities from this note:\n\"\"\"\n{text}\n\"\"\""
@@ -262,10 +279,8 @@ class LLMParser:
         try:
             api_key = os.getenv("GEMINI_API_KEY")
             if not api_key:
-                logger.warning("GEMINI_API_KEY environment variable is not set. Falling back to local simulation.")
                 return {"symptoms": [], "diagnoses": [], "medications": []}
                 
-            # Request structured JSON format conforming to the Pydantic schema
             response = await litellm.acompletion(
                 model=self.model,
                 messages=[
@@ -293,7 +308,6 @@ class ClinicalParser:
         self.cache = ClinicalCache()
         
     async def parse(self, note: str) -> Dict[str, Any]:
-        # 1. Check cache first to avoid LLM & processing costs
         cached_result = self.cache.get(note)
         if cached_result:
             logger.info("Found clinical entities in local cache.")
@@ -301,25 +315,22 @@ class ClinicalParser:
             
         logger.info(f"Parsing clinical note: '{note}'")
         
-        # 2. Local Extraction via rules / medspacy
+        # 1. Local Extraction via comprehensive rule engine
         local_entities = self.rules.parse_locally(note)
         
-        # 3. Determine if LLM is required
-        # If there are Hinglish verb structures (e.g., 'ho raha', 'lag raha', 'tha')
-        # or unstructured text that rule engine missed, query LiteLLM.
+        # 2. Query LLM if unstructured and api key present
         unstructured_triggers = ["ho raha", "lag raha", "tha", "hai", "jaisa", "jalan"]
         needs_llm = any(trigger in note.lower() for trigger in unstructured_triggers)
         
         llm_entities = {"symptoms": [], "diagnoses": [], "medications": []}
-        if needs_llm:
-            logger.info("Unstructured content detected. Applying DPDP PHI de-identification and routing to LiteLLM.")
+        if needs_llm and os.getenv("GEMINI_API_KEY"):
             sanitized_note = PHISanitizer.sanitize(note)
             llm_entities = await self.llm.parse_narrative(sanitized_note)
             
-        # 4. Merge extractions and deduplicate
+        # 3. Merge extractions and deduplicate
         merged = self._merge_entities(local_entities, llm_entities)
         
-        # 5. Expand and normalize dosage frequencies
+        # 4. Expand and normalize dosage frequencies
         for med in merged.get("medications", []):
             freq = med.get("frequency", "")
             if freq:
@@ -327,10 +338,10 @@ class ClinicalParser:
                 if freq_clean:
                     med["frequency"] = list(freq_clean.values())[0]
 
-        # 6. Run Clinical Drug-Drug Interaction (DDI) & Safety Checker
+        # 5. Run Clinical Drug-Drug Interaction (DDI) & Safety Checker
         merged["ddi_alerts"] = DDIEngine.check_interactions(merged.get("medications", []))
 
-        # 7. Generate Multi-Lingual Vernacular Patient Dosage Cards
+        # 6. Generate Multi-Lingual Vernacular Patient Dosage Cards
         merged["vernacular_dosages"] = VernacularTranslator.generate_schedules(merged.get("medications", []))
                     
         # Update Cache
@@ -338,14 +349,12 @@ class ClinicalParser:
         return merged
 
     def _merge_entities(self, local: Dict[str, Any], llm: Dict[str, Any]) -> Dict[str, Any]:
-        """Combines locally extracted concepts with LLM entities, eliminating duplicates."""
         merged = {
             "symptoms": list(set(local["symptoms"] + llm.get("symptoms", []))),
             "diagnoses": list(set(local["diagnoses"] + llm.get("diagnoses", []))),
             "medications": []
         }
         
-        # Merge medications by brand name mapping
         med_map = {}
         for m in local["medications"] + llm.get("medications", []):
             brand = m.get("brand_name", "").strip().lower()
@@ -354,7 +363,6 @@ class ClinicalParser:
             if brand not in med_map:
                 med_map[brand] = m
             else:
-                # Merge missing keys
                 for key in ["generic_guess", "dose", "frequency"]:
                     if not med_map[brand].get(key) and m.get(key):
                         med_map[brand][key] = m[key]
@@ -416,8 +424,8 @@ class VernacularTranslator:
 
     SCHEDULES = {
         "od": {
-            "hi": "दिन में 1 बार (सुबह नाश्ते से पहले)",
-            "mr": "दिवसातून १ वेळ (सकाळी नाश्त्यापूर्वी)",
+            "hi": "दिन में 1 बार (सुबह नाश्ते से पहले / सुबह)",
+            "mr": "दिवसातून १ वेळ (सकाळी नाश्त्यापूर्वी / सकाळी)",
             "ta": "ஒரு நாளைக்கு 1 முறை (காலை உணவுக்கு முன்)",
             "te": "రోజుకు 1 సారి (ఉదయం టిఫిన్ ముందు)",
             "bn": "দিনে ১ বার (সকালে প্রাতঃরাশের আগে)"
@@ -442,6 +450,13 @@ class VernacularTranslator:
             "ta": "இரவு தூங்கும் முன் (வெதுவெதுப்பான நீருடன்)",
             "te": "రాత్రి పడుకునే ముందు (గోరువెచ్చని నీటితో)",
             "bn": "রাতে শোবার আগে (হালকা গরম জলের সাথে)"
+        },
+        "sos": {
+            "hi": "ज़रूरत पड़ने पर (जैसे बुखार या दर्द होने पर)",
+            "mr": "गरज असेल तेव्हा (ताप किंवा दुखणे असल्यास)",
+            "ta": "தேவைப்படும் போது மட்டும்",
+            "te": "అవసరం అయినప్పుడు మాత్రమే",
+            "bn": "প্রয়োজন হলে"
         }
     }
 
@@ -451,16 +466,17 @@ class VernacularTranslator:
         for m in medications:
             brand = m.get("brand_name", "Medication")
             dose = m.get("dose", "")
-            raw_freq = (m.get("frequency", "") + " " + dose).lower()
+            raw_freq = (m.get("frequency", "") + " " + brand).lower()
             
-            # Determine schedule key
             sch_key = "od"
             if "bd" in raw_freq or "twice" in raw_freq or "two" in raw_freq:
                 sch_key = "bd"
-            elif "tds" in raw_freq or "three" in raw_freq or "tid" in raw_freq:
+            elif "tds" in raw_freq or "three" in raw_freq or "tid" in raw_freq or "tsp" in raw_freq:
                 sch_key = "tds"
             elif "hs" in raw_freq or "bedtime" in raw_freq or "night" in raw_freq:
                 sch_key = "hs"
+            elif "sos" in raw_freq or "needed" in raw_freq:
+                sch_key = "sos"
                 
             trans = cls.SCHEDULES.get(sch_key, cls.SCHEDULES["od"])
             results.append({
@@ -469,4 +485,3 @@ class VernacularTranslator:
                 "translations": trans
             })
         return results
-

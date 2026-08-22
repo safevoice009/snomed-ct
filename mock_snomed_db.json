@@ -4,49 +4,91 @@
       "concept_id": "25064002",
       "preferred_name": "Headache (finding)",
       "semantic_tag": "finding",
-      "synonyms": ["headache", "head ache", "sar dard", "sar dard ho raha hai", "sar dard tha"]
+      "synonyms": ["headache", "head ache", "sar dard", "sar dard ho raha hai", "sar dard tha", "sir dard"]
     },
     {
       "concept_id": "62315008",
       "preferred_name": "Diarrhoea (finding)",
       "semantic_tag": "finding",
-      "synonyms": ["diarrhea", "diarrhoea", "loose motion", "loose motions", "pet kharab", "pet kharab hai"]
+      "synonyms": ["diarrhea", "diarrhoea", "loose motion", "loose motions", "pet kharab", "pet kharab hai", "dast"]
+    },
+    {
+      "concept_id": "49727002",
+      "preferred_name": "Cough (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["cough", "khansi", "dry cough", "severe khansi", "productive cough", "coughing"]
+    },
+    {
+      "concept_id": "23924001",
+      "preferred_name": "Chest tightness (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["chest tightness", "tightness in chest", "chest heaviness", "chest congestion"]
+    },
+    {
+      "concept_id": "61582004",
+      "preferred_name": "Allergic rhinitis (disorder)",
+      "semantic_tag": "disorder",
+      "synonyms": ["allergic rhinitis", "rhinitis", "sardi", "sneezing", "cheenk", "runny nose"]
+    },
+    {
+      "concept_id": "38341003",
+      "preferred_name": "Hypertension (disorder)",
+      "semantic_tag": "disorder",
+      "synonyms": ["hypertension", "HTN", "high blood pressure", "high BP", "BP high"]
+    },
+    {
+      "concept_id": "386661006",
+      "preferred_name": "Fever (finding)",
+      "semantic_tag": "finding",
+      "synonyms": ["fever", "bukhar", "pyrexia", "taap", "elevated temperature", "101F", "102F"]
+    },
+    {
+      "concept_id": "443681002",
+      "preferred_name": "Acute gastroenteritis (disorder)",
+      "semantic_tag": "disorder",
+      "synonyms": ["acute gastroenteritis", "AGE", "gastroenteritis", "infective diarrhea"]
+    },
+    {
+      "concept_id": "73211009",
+      "preferred_name": "Diabetes mellitus (disorder)",
+      "semantic_tag": "disorder",
+      "synonyms": ["diabetes mellitus", "diabetes", "DM", "T2DM", "sugar", "high sugar"]
     },
     {
       "concept_id": "60845006",
       "preferred_name": "Dyspnea on exertion (finding)",
       "semantic_tag": "finding",
-      "synonyms": ["SOBOE", "shortness of breath on exertion", "dyspnea on exertion", "breathlessness on walking"]
+      "synonyms": ["SOBOE", "shortness of breath on exertion", "dyspnea on exertion", "breathlessness on walking", "dam fulna"]
     },
     {
       "concept_id": "30711000",
       "preferred_name": "Edema of foot (finding)",
       "semantic_tag": "finding",
-      "synonyms": ["pedal edema", "pedal edema +", "foot swelling", "swelling in feet"]
+      "synonyms": ["pedal edema", "pedal edema +", "foot swelling", "swelling in feet", "pair me sujan"]
     },
     {
       "concept_id": "21522001",
       "preferred_name": "Abdominal pain (finding)",
       "semantic_tag": "finding",
-      "synonyms": ["abdominal pain", "AP+", "pain in abdomen", "AP positive", "stomach pain"]
+      "synonyms": ["abdominal pain", "AP+", "pain in abdomen", "AP positive", "stomach pain", "pet dard", "pet me marod"]
     },
     {
       "concept_id": "367389006",
       "preferred_name": "Acid peptic disease (disorder)",
       "semantic_tag": "disorder",
-      "synonyms": ["APD", "acid peptic disease", "acidity", "gastritis"]
+      "synonyms": ["APD", "acid peptic disease", "acidity", "gastritis", "GERD", "acid reflux"]
     },
     {
       "concept_id": "422400008",
-      "preferred_name": "Nausea (finding)",
+      "preferred_name": "Nausea and vomiting (finding)",
       "semantic_tag": "finding",
-      "synonyms": ["nausea", "ulti jaisa lag raha hai", "feeling like vomiting", "nauseous"]
+      "synonyms": ["nausea", "ulti jaisa lag raha hai", "feeling like vomiting", "nauseous", "vomiting", "ulti"]
     },
     {
       "concept_id": "9651007",
       "preferred_name": "Heartburn (finding)",
       "semantic_tag": "finding",
-      "synonyms": ["heartburn", "jalan in chest", "chest burning", "acidity in chest"]
+      "synonyms": ["heartburn", "jalan in chest", "chest burning", "acidity in chest", "jalan"]
     },
     {
       "concept_id": "37894001",
@@ -73,22 +115,76 @@
       "ayush_extension": true
     },
     {
+      "concept_id": "387063008",
+      "preferred_name": "Levocetirizine and montelukast (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["levocetirizine", "Levocet M", "Levocet-M", "Levocet", "montelukast", "Montair LC", "Montek LC"]
+    },
+    {
+      "concept_id": "372659007",
+      "preferred_name": "Dextromethorphan hydrobromide (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["dextromethorphan", "Ascoril D", "Ascoril-D", "Ascoril", "cough syrup", "Benadryl DR"]
+    },
+    {
+      "concept_id": "386852009",
+      "preferred_name": "Telmisartan (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["telmisartan", "Telma 40", "Telma-40", "Telma", "Telmikind", "Micardis"]
+    },
+    {
+      "concept_id": "386864002",
+      "preferred_name": "Amlodipine (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["amlodipine", "Amlong", "Amlo", "Norvasc"]
+    },
+    {
+      "concept_id": "387053003",
+      "preferred_name": "Norfloxacin and tinidazole (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["norfloxacin", "Norflox TZ", "Norflox-TZ", "Norflox", "tinidazole"]
+    },
+    {
       "concept_id": "322262002",
       "preferred_name": "Paracetamol (substance)",
       "semantic_tag": "substance",
-      "synonyms": ["paracetamol", "acetaminophen", "PCM", "Dolo 650", "Dolo-650", "Calpol"]
+      "synonyms": ["paracetamol", "acetaminophen", "PCM", "Dolo 650", "Dolo-650", "Calpol", "Crocin", "Pacimol"]
     },
     {
       "concept_id": "386864001",
       "preferred_name": "Pantoprazole (substance)",
       "semantic_tag": "substance",
-      "synonyms": ["pantoprazole", "Pantocid 40", "Pantocid", "Pantosec"]
+      "synonyms": ["pantoprazole", "Pantocid 40", "Pantocid", "Pantosec", "Pan 40", "Pan D", "Pantodac"]
     },
     {
       "concept_id": "387494008",
       "preferred_name": "Furosemide (substance)",
       "semantic_tag": "substance",
       "synonyms": ["furosemide", "frusemide", "Lasix 40mg", "Lasix", "Lasix 40"]
+    },
+    {
+      "concept_id": "372567009",
+      "preferred_name": "Metformin hydrochloride (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["metformin", "Glycomet", "Glycomet 500", "Glycomet GP", "Glucophage"]
+    },
+    {
+      "concept_id": "387532007",
+      "preferred_name": "Azithromycin (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["azithromycin", "Azithral", "Azithral 500", "Azee 500", "Zithromax"]
+    },
+    {
+      "concept_id": "372687004",
+      "preferred_name": "Amoxicillin and clavulanic acid (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["amoxicillin", "Augmentin", "Augmentin 625", "Clavam 625", "Moxikind CV"]
+    },
+    {
+      "concept_id": "386859000",
+      "preferred_name": "Atorvastatin (substance)",
+      "semantic_tag": "substance",
+      "synonyms": ["atorvastatin", "Atorva", "Atorva 10", "Atorlip", "Lipitor"]
     }
   ]
 }
