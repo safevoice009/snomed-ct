@@ -847,8 +847,9 @@ console.log('ABDM DocumentBundle:', response.data);`;
     });
   }
 
-  // Initialize
+  // Initialize with live sample parse
   bindBoundingBoxes();
   updateCodeSnippet();
+  loadSample('sample1');
 });
 
