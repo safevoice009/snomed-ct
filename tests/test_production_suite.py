@@ -208,7 +208,11 @@ class TestSICCEProductionSuite(unittest.TestCase):
             "doctor_name": "Dr. Rajesh Sharma",
             "message_text": "Pt c/o severe khansi & fever. Tab Pantocid 40 OD, Tab Dolo 650 BD."
         }
-        response = self.client.post("/api/v1/webhook/whatsapp", json=payload)
+        response = self.client.post(
+            "/api/v1/webhook/whatsapp",
+            headers={"X-API-KEY": self.api_key},
+            json=payload
+        )
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIn("message_body", data)

@@ -37,6 +37,7 @@ class ABHAGateway:
         
         logger.info(f"ABDM OTP generated for {auth_type} (Txn: {txn_id})")
         return {
+            "mode": "mock",
             "txn_id": txn_id,
             "status": "OTP_SENT",
             "message": f"ABDM verification OTP sent to registered number ending in ***{clean_id[-4:] if len(clean_id)>=4 else '0000'}.",
@@ -50,6 +51,7 @@ class ABHAGateway:
         session = self.active_sessions.get(txn_id)
         if not session:
             return {
+                "mode": "mock",
                 "status": "ERROR",
                 "message": "Invalid or expired ABDM transaction session."
             }
@@ -57,6 +59,7 @@ class ABHAGateway:
         if time.time() > session["expiry"]:
             self.active_sessions.pop(txn_id, None)
             return {
+                "mode": "mock",
                 "status": "ERROR",
                 "message": "ABDM OTP transaction expired. Please request a new OTP."
             }
@@ -65,6 +68,7 @@ class ABHAGateway:
         if otp not in ("123456", "778899") and (len(otp) != 6 or not otp.isdigit()):
             session["attempts"] += 1
             return {
+                "mode": "mock",
                 "status": "INVALID_OTP",
                 "message": "Incorrect ABDM OTP. (For sandbox testing, use: 123456)"
             }
@@ -96,6 +100,7 @@ class ABHAGateway:
         logger.info(f"ABHA verified and created: {abha_number} ({abha_address})")
         
         return {
+            "mode": "mock",
             "status": "SUCCESS",
             "message": "ABHA Number & ABDM Health ID verified successfully.",
             "profile": profile

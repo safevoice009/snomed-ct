@@ -71,16 +71,40 @@ async def global_all_exception_handler(request: Request, exc: Exception):
         content={"detail": f"Processing error: {str(exc)}", "status": "error"}
     )
 
-# CORS Middleware setup
+# CORS Middleware setup - locked down per MASTER_DIRECTIVE.md Task 1.4 & Law #9
+allowed_origins_raw = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:8000,http://127.0.0.1:8000,http://localhost:3000,https://snomed-ct-parser-1.onrender.com"
+)
+allowed_origins = [orig.strip() for orig in allowed_origins_raw.split(",") if orig.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
 # API Keys & Auth Dependency Injection
+async def verify_webhook_auth(
+    x_api_key: Optional[str] = Header(None, alias="X-API-KEY"),
+    x_webhook_secret: Optional[str] = Header(None, alias="X-WEBHOOK-SECRET")
+):
+    """Verifies WhatsApp / Telephony webhooks via API key or webhook secret."""
+    expected_secret = os.getenv("WHATSAPP_WEBHOOK_SECRET")
+    if expected_secret and x_webhook_secret:
+        import secrets
+        if secrets.compare_digest(x_webhook_secret, expected_secret):
+            return "webhook_secret_authenticated"
+    if x_api_key:
+        is_valid = await auth_service.validate_api_key(x_api_key)
+        if is_valid:
+            return x_api_key
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Forbidden: Webhook authentication failed. Provide valid X-API-KEY or X-WEBHOOK-SECRET."
+    )
 async def verify_api_key(x_api_key: str = Header(None, alias="X-API-KEY")):
     """Validates API keys against environment variables and Supabase dynamic keys."""
     if not x_api_key:
@@ -565,7 +589,8 @@ class WhatsAppMessageRequest(BaseModel):
 @limiter.limit("60/minute")
 async def whatsapp_clinical_webhook(
     request: Request,
-    payload: WhatsAppMessageRequest
+    payload: WhatsAppMessageRequest,
+    auth: str = Depends(verify_webhook_auth)
 ):
     """WhatsApp & Telephony Clinical Scribe webhook. Ingests raw doctor messages, parses clinical findings, checks CDSS, and returns instant bilingual WhatsApp reply."""
     text_content = payload.message_text or "Pt c/o severe headache & nausea. APD Positive. Tab Pantocid 40mg OD Before Food, Tab Dolo 650mg BD."
@@ -632,8 +657,9 @@ async def get_billing_packages():
 
 @app.get("/api/v1/billing/balance")
 async def get_api_credit_balance(x_api_key: str = Header("test-dev-key", alias="X-API-KEY")):
-    """Returns current active credit quota and balance for an API key."""
+    """Returns current active credit quota and balance for an API key (Sandbox Mock Mode)."""
     return {
+        "mode": "mock",
         "api_key": x_api_key,
         "plan": "Developer Enterprise Sandbox",
         "credits_total": 5000,
@@ -712,16 +738,26 @@ async def health_check():
     gemini_api_configured = bool(os.getenv("GEMINI_API_KEY") and os.getenv("GEMINI_API_KEY") != "your-gemini-api-key")
     supabase_db_configured = bool(os.getenv("SUPABASE_URL") and os.getenv("SUPABASE_KEY"))
     
+    concepts_count = 0
+    if resolver and resolver.sqlite_conn:
+        try:
+            cur = resolver.sqlite_conn.cursor()
+            cur.execute("SELECT count(*) FROM concepts")
+            concepts_count = cur.fetchone()[0]
+        except Exception:
+            pass
+
     return {
         "status": "healthy",
         "version": "2.0.0",
         "services": {
             "gemini_multimodal_api": "active" if gemini_api_configured else "fallback_mode",
             "sqlite_fts5_terminology": "connected",
+            "terminology_concepts": concepts_count,
             "cdss_safety_engine": "active",
             "nhcx_claim_engine": "active",
             "supabase_db": "connected" if (auth_service.supabase_client or supabase_db_configured) else "local_mode",
-            "auth_engine": "better-auth-ready"
+            "auth_engine": "argon2id-ready"
         }
     }
 

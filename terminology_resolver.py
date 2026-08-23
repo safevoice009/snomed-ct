@@ -85,23 +85,39 @@ class TerminologyResolver:
             logger.error(f"Error loading JSON fallback: {e}")
             self.concepts = []
 
+    def _log_unresolved_term(self, term: str):
+        """Logs unresolved clinical terms to logs/unresolved_terms.jsonl for lexicon curation."""
+        try:
+            log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+            os.makedirs(log_dir, exist_ok=True)
+            log_file = os.path.join(log_dir, "unresolved_terms.jsonl")
+            with open(log_file, "a", encoding="utf-8") as f:
+                import datetime
+                payload = {
+                    "term": term,
+                    "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
+                }
+                f.write(json.dumps(payload) + "\n")
+        except Exception:
+            pass
+
     def _search_sqlite(self, term_clean: str) -> Optional[Dict[str, Any]]:
-        """Queries SQLite FTS5 tables for pharma brands and SNOMED concepts."""
+        """Queries SQLite FTS5 tables for pharma brands, descriptions, and SNOMED concepts."""
         if not self.sqlite_conn:
             return None
         try:
             cur = self.sqlite_conn.cursor()
             
-            # A. Search brands table (Exact & Substring match first)
+            # A. Search brands table (Exact match on brand or generic)
             cur.execute("""
-                SELECT brand_name, generic_name, category, snomed_id, typical_doses_json
+                SELECT brand_name, generic_name, category, snomed_id
                 FROM brands
                 WHERE lower(brand_name) = ? OR lower(generic_name) = ?
             """, (term_clean, term_clean))
             row = cur.fetchone()
             if row:
                 return {
-                    "concept_id": row[3],
+                    "concept_id": row[3] or "387517004",
                     "preferred_name": f"{row[0]} ({row[1]})",
                     "generic_name": row[1],
                     "semantic_tag": "substance",
@@ -109,7 +125,7 @@ class TerminologyResolver:
                     "coded": True
                 }
 
-            # B. Search concepts table (Exact match)
+            # B. Search concepts table (Exact match on preferred name)
             cur.execute("""
                 SELECT concept_id, preferred_name, semantic_tag
                 FROM concepts
@@ -129,14 +145,14 @@ class TerminologyResolver:
             cur.execute("""
                 SELECT b.brand_name, b.generic_name, b.category, b.snomed_id
                 FROM brands_fts f
-                JOIN brands b ON f.rowid = b.id
+                JOIN brands b ON f.rowid = b.rowid
                 WHERE brands_fts MATCH ?
                 LIMIT 1
             """, (fts_query,))
             row = cur.fetchone()
             if row:
                 return {
-                    "concept_id": row[3],
+                    "concept_id": row[3] or "387517004",
                     "preferred_name": f"{row[0]} ({row[1]})",
                     "generic_name": row[1],
                     "semantic_tag": "substance",
@@ -148,8 +164,26 @@ class TerminologyResolver:
             cur.execute("""
                 SELECT c.concept_id, c.preferred_name, c.semantic_tag
                 FROM concepts_fts f
-                JOIN concepts c ON f.rowid = c.id
+                JOIN concepts c ON f.rowid = c.rowid
                 WHERE concepts_fts MATCH ?
+                LIMIT 1
+            """, (fts_query,))
+            row = cur.fetchone()
+            if row:
+                return {
+                    "concept_id": row[0],
+                    "preferred_name": row[1],
+                    "semantic_tag": row[2],
+                    "coded": True
+                }
+
+            # E. FTS5 Search on descriptions / synonyms
+            cur.execute("""
+                SELECT c.concept_id, c.preferred_name, c.semantic_tag
+                FROM descriptions_fts df
+                JOIN descriptions d ON df.rowid = d.rowid
+                JOIN concepts c ON d.concept_id = c.concept_id
+                WHERE descriptions_fts MATCH ?
                 LIMIT 1
             """, (fts_query,))
             row = cur.fetchone()
@@ -200,7 +234,7 @@ class TerminologyResolver:
             self.load_json_database()
 
         for concept in self.concepts:
-            if concept["preferred_name"].lower() == term_clean:
+            if concept.get("preferred_name", "").lower() == term_clean:
                 return concept
             for synonym in concept.get("synonyms", []):
                 if synonym.lower() == term_clean or term_clean in synonym.lower():
@@ -210,7 +244,7 @@ class TerminologyResolver:
         best_ratio = 0.0
         best_match = None
         for concept in self.concepts:
-            candidates = [concept["preferred_name"].lower()] + [s.lower() for s in concept.get("synonyms", [])]
+            candidates = [concept.get("preferred_name", "").lower()] + [s.lower() for s in concept.get("synonyms", [])]
             for cand in candidates:
                 ratio = difflib.SequenceMatcher(None, term_clean, cand).ratio()
                 if ratio > best_ratio and ratio > 0.6:
@@ -221,7 +255,9 @@ class TerminologyResolver:
             logger.info(f"Fuzzy resolved '{term}' -> '{best_match['preferred_name']}' (confidence: {best_ratio:.2f})")
             return best_match
 
-        logger.warning(f"Could not resolve terminology for term: '{term}'")
+        # Log unresolved term for lexicon curation (never guess silently)
+        self._log_unresolved_term(term)
+        logger.warning(f"Could not resolve terminology for term: '{term}' - logged to unresolved_terms.jsonl")
         return None
 
     def resolve_extraction(self, extraction_results: Dict[str, Any]) -> Dict[str, Any]:

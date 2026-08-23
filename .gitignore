@@ -1,7 +1,15 @@
-# Python virtual environment
+# Environment and dependencies
 venv/
+.venv/
 ENV/
 .env
+.env*
+
+# Data files (RF2 releases)
+data/
+data/rf2/
+*.zip
+*.tar.gz
 
 # Compiled python files
 __pycache__/
@@ -13,4 +21,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 .vercel
-.env*
+
+# Logs and runtime artifacts
+logs/
+eval/results/
