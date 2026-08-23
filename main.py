@@ -254,16 +254,23 @@ def _normalize_med_list(meds: Any) -> List[Dict[str, Any]]:
             # Clean brand name
             brand = re.sub(r"\([^)]*\)", "", clean).strip()
             brand = re.sub(r"\bx\s*\d+\s*(?:days|tabs|bottle)?.*$", "", brand, flags=re.IGNORECASE).strip()
+            brand = re.sub(r"\s+\d+$", "", brand).strip()
             
-            key = (brand.lower(), clean.lower())
-            if key not in seen:
-                seen.add(key)
-                out.append({
-                    "brand_name": brand,
-                    "generic_guess": brand,
-                    "dose": dose,
-                    "frequency": freq or "As directed"
-                })
+            # Skip if brand is too short or just numbers
+            if len(brand) < 3 or brand.isdigit():
+                continue
+                
+            base_key = re.sub(r"^(tab|cap|syp|inj)[\.\s]+", "", brand, flags=re.IGNORECASE).strip().lower()
+            if base_key in seen:
+                continue
+            seen.add(base_key)
+            
+            out.append({
+                "brand_name": brand,
+                "generic_guess": brand,
+                "dose": dose,
+                "frequency": freq or "As directed"
+            })
     return out
 
 

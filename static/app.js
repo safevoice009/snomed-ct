@@ -974,8 +974,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const row = document.createElement('tr');
         row.className = 'rx-table-row';
         row.id = `rx-row-${idx + 1}`;
+        
+        const brand = m.brand_name || m.original_query || m.display;
+        const generic = m.generic_name || (m.display && m.display !== brand ? m.display : '');
+        const displayLabel = generic && generic.toLowerCase() !== brand.toLowerCase()
+          ? `<strong>${brand}</strong><br><span style="color: #64748b; font-size: 0.76rem; font-weight: 500;">Active Molecule: ${generic}</span>`
+          : `<strong>${brand}</strong>`;
+
         row.innerHTML = `
-          <td><strong>${m.display || m.original_query}</strong></td>
+          <td>${displayLabel}</td>
           <td>${m.dose || '—'}</td>
           <td>${m.frequency || '—'}</td>
           <td><code style="font-family: var(--font-mono); font-size: 0.78rem; background: #f1f5f9; padding: 0.15rem 0.45rem; border-radius: 4px;">${m.concept_id || 'Uncoded'}</code></td>
@@ -983,7 +990,7 @@ document.addEventListener('DOMContentLoaded', () => {
         medicationsTableBody.appendChild(row);
       });
     } else {
-      medicationsTableBody.innerHTML = '<tr><td colspan="4" style="color: var(--text-tertiary); font-style: italic;">No medications prescribed</td></tr>';
+      medicationsTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-tertiary); font-style: italic;">No medications detected</td></tr>';
     }
   }
 
