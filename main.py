@@ -180,38 +180,55 @@ async def parse_clinical_text(
         )
 
 
+import re
+
+def _to_list(val: Any) -> list:
+    """Safely converts any value (string, list, dict, None) into a flat list."""
+    if val is None:
+        return []
+    if isinstance(val, list):
+        return val
+    if isinstance(val, str):
+        # Split on commas, semicolons, or newlines if it's a multi-phrase sentence
+        parts = [p.strip() for p in re.split(r"[\n;,]+", val) if p.strip()]
+        return parts if parts else [val.strip()]
+    if isinstance(val, dict):
+        return [val]
+    return [str(val)]
+
+
 def _normalize_string_list(items: Any) -> List[str]:
     """Safely normalizes symptoms or diagnoses from strings, dicts, or mixed structures."""
-    if not items:
-        return []
-    if isinstance(items, str):
-        items = [items]
+    raw_list = _to_list(items)
     out = []
-    for item in items:
+    for item in raw_list:
         if isinstance(item, str):
             clean = item.strip()
-            if clean and clean not in out:
+            # Clean leading numbering like "1. ", "2. "
+            clean = re.sub(r"^\d+[\.\)]\s*", "", clean).strip()
+            if clean and clean.lower() not in [x.lower() for x in out]:
                 out.append(clean)
         elif isinstance(item, dict):
             val = item.get("name") or item.get("display") or item.get("term") or item.get("finding") or item.get("diagnosis") or ""
             clean = str(val).strip()
-            if clean and clean not in out:
+            clean = re.sub(r"^\d+[\.\)]\s*", "", clean).strip()
+            if clean and clean.lower() not in [x.lower() for x in out]:
                 out.append(clean)
     return out
 
 
 def _normalize_med_list(meds: Any) -> List[Dict[str, Any]]:
-    """Safely normalizes medication list from dictionaries or strings."""
-    if not meds:
-        return []
+    """Safely normalizes medication list from dictionaries or raw prescription strings."""
+    raw_list = _to_list(meds)
     out = []
     seen = set()
-    for med in meds:
+    for med in raw_list:
         if isinstance(med, dict):
             brand = str(med.get("brand_name") or med.get("name") or med.get("display") or "").strip()
             generic = str(med.get("generic_guess") or med.get("generic_name") or "").strip()
             dose = str(med.get("dose") or "").strip()
             freq = str(med.get("frequency") or "").strip()
+            brand = re.sub(r"^\d+[\.\)]\s*", "", brand).strip()
             key = (brand.lower(), generic.lower())
             if key not in seen and (brand or generic):
                 seen.add(key)
@@ -223,13 +240,29 @@ def _normalize_med_list(meds: Any) -> List[Dict[str, Any]]:
                 })
         elif isinstance(med, str) and med.strip():
             clean = med.strip()
-            if clean.lower() not in seen:
-                seen.add(clean.lower())
+            clean = re.sub(r"^\d+[\.\)]\s*", "", clean).strip()
+            if not clean or clean.lower() in ("drink plenty of water", "avoid spicy/oily food", "drink plenty of water."):
+                continue
+            # Extract dosage like 40mg, 650mg, 2 tsp
+            dose_match = re.search(r"(\d+\s*(?:mg|gm|mcg|ml|tsp|tab|cap|sachet))", clean, re.IGNORECASE)
+            dose = dose_match.group(1) if dose_match else ""
+            
+            # Extract frequency like OD, BD, TDS, HS, QID, Before Food, After Food
+            freq_match = re.search(r"\b(OD|BD|TDS|TID|HS|QID|SOS|Before Food|After Food|pc|ac)\b", clean, re.IGNORECASE)
+            freq = freq_match.group(1).upper() if freq_match else ""
+            
+            # Clean brand name
+            brand = re.sub(r"\([^)]*\)", "", clean).strip()
+            brand = re.sub(r"\bx\s*\d+\s*(?:days|tabs|bottle)?.*$", "", brand, flags=re.IGNORECASE).strip()
+            
+            key = (brand.lower(), clean.lower())
+            if key not in seen:
+                seen.add(key)
                 out.append({
-                    "brand_name": clean,
-                    "generic_guess": clean,
-                    "dose": "",
-                    "frequency": ""
+                    "brand_name": brand,
+                    "generic_guess": brand,
+                    "dose": dose,
+                    "frequency": freq or "As directed"
                 })
     return out
 
@@ -257,9 +290,17 @@ async def ocr_parse_prescription(
         raw_text = ocr_result.get("raw_text", "")
         nlp_extractions = await parser.parse(raw_text) if raw_text else {}
         
-        merged_symptoms = _normalize_string_list(ocr_result.get("symptoms", []) + nlp_extractions.get("symptoms", []))
-        merged_diagnoses = _normalize_string_list(ocr_result.get("diagnoses", []) + nlp_extractions.get("diagnoses", []))
-        merged_meds = _normalize_med_list(ocr_result.get("medications", []) or nlp_extractions.get("medications", []))
+        ocr_sym = _to_list(ocr_result.get("symptoms"))
+        nlp_sym = _to_list(nlp_extractions.get("symptoms"))
+        merged_symptoms = _normalize_string_list(ocr_sym + nlp_sym)
+        
+        ocr_diag = _to_list(ocr_result.get("diagnoses"))
+        nlp_diag = _to_list(nlp_extractions.get("diagnoses"))
+        merged_diagnoses = _normalize_string_list(ocr_diag + nlp_diag)
+        
+        ocr_meds = _to_list(ocr_result.get("medications"))
+        nlp_meds = _to_list(nlp_extractions.get("medications"))
+        merged_meds = _normalize_med_list(ocr_meds + nlp_meds)
         vernacular_dosages = VernacularTranslator.generate_schedules(merged_meds)
         
         raw_extraction = {
