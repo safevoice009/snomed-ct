@@ -623,29 +623,208 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Inspector 4-Way Tabs
+  // Inspector Multi-Way Tabs
+  const inspectorViewAdjudication = document.getElementById('inspector-view-adjudication');
+  const inspectorViewAbha = document.getElementById('inspector-view-abha');
+  const btnRunAdjudication = document.getElementById('btn-run-adjudication');
+  const adjProbScore = document.getElementById('adj-prob-score');
+  const adjStatusBadge = document.getElementById('adj-status-badge');
+  const adjChecksList = document.getElementById('adj-checks-list');
+  const adjFlagsContainer = document.getElementById('adj-flags-container');
+  const adjFlagsList = document.getElementById('adj-flags-list');
+
+  const btnGenerateAbhaOtp = document.getElementById('btn-generate-abha-otp');
+  const btnVerifyAbhaOtp = document.getElementById('btn-verify-abha-otp');
+  const abhaMobileInput = document.getElementById('abha-mobile-input');
+  const abhaOtpBox = document.getElementById('abha-otp-box');
+  const abhaOtpInput = document.getElementById('abha-otp-input');
+  const abhaCardNum = document.getElementById('abha-card-num');
+  const abhaCardAddress = document.getElementById('abha-card-address');
+  let currentAbhaTxnId = null;
+
   inspectorTabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       inspectorTabBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       
       const tab = btn.getAttribute('data-tab');
-      inspectorViewClinical.classList.add('hidden');
+      if (inspectorViewClinical) inspectorViewClinical.classList.add('hidden');
       if (inspectorViewVernacular) inspectorViewVernacular.classList.add('hidden');
-      inspectorViewJson.classList.add('hidden');
-      inspectorViewPipeline.classList.add('hidden');
+      if (inspectorViewJson) inspectorViewJson.classList.add('hidden');
+      if (inspectorViewNhcx) inspectorViewNhcx.classList.add('hidden');
+      if (inspectorViewAdjudication) inspectorViewAdjudication.classList.add('hidden');
+      if (inspectorViewAbha) inspectorViewAbha.classList.add('hidden');
+      if (inspectorViewPipeline) inspectorViewPipeline.classList.add('hidden');
 
-      if (tab === 'clinical') {
+      if (tab === 'clinical' && inspectorViewClinical) {
         inspectorViewClinical.classList.remove('hidden');
-      } else if (tab === 'vernacular') {
-        if (inspectorViewVernacular) inspectorViewVernacular.classList.remove('hidden');
-      } else if (tab === 'json') {
+      } else if (tab === 'vernacular' && inspectorViewVernacular) {
+        inspectorViewVernacular.classList.remove('hidden');
+      } else if (tab === 'json' && inspectorViewJson) {
         inspectorViewJson.classList.remove('hidden');
-      } else if (tab === 'pipeline') {
+      } else if (tab === 'nhcx' && inspectorViewNhcx) {
+        inspectorViewNhcx.classList.remove('hidden');
+      } else if (tab === 'adjudication' && inspectorViewAdjudication) {
+        inspectorViewAdjudication.classList.remove('hidden');
+      } else if (tab === 'abha' && inspectorViewAbha) {
+        inspectorViewAbha.classList.remove('hidden');
+      } else if (tab === 'pipeline' && inspectorViewPipeline) {
         inspectorViewPipeline.classList.remove('hidden');
       }
     });
   });
+
+  // NHCX Pre-Adjudication Simulation Handler
+  if (btnRunAdjudication) {
+    btnRunAdjudication.addEventListener('click', async () => {
+      const apiKey = activeKeySelect ? activeKeySelect.value : 'test-dev-key';
+      const bundleToEvaluate = lastGeneratedNhcxBundle || {
+        resourceType: "Bundle",
+        type: "collection",
+        entry: [
+          {
+            resource: {
+              resourceType: "Claim",
+              id: "CLM-2026-SANDBOX",
+              status: "active",
+              type: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/claim-type", code: "professional" }] },
+              use: "claim",
+              patient: { display: "Mr. Rahul Verma" },
+              created: new Date().toISOString(),
+              insurance: [{ sequence: 1, focal: true, coverage: { display: "Star Health Premier - POL-998877" } }],
+              item: [
+                { sequence: 1, productOrService: { text: "OPD Consultation & SNOMED CT Resolution" }, net: { value: 500, currency: "INR" } },
+                { sequence: 2, productOrService: { text: "Pharmacy Prescription Dispensation" }, net: { value: 450, currency: "INR" } }
+              ],
+              total: { value: 950, currency: "INR" },
+              diagnosis: [
+                { sequence: 1, diagnosisCodeableConcept: { coding: [{ system: "http://hl7.org/fhir/sid/icd-10", code: "K29.70", display: "Gastritis, unspecified" }] } }
+              ]
+            }
+          }
+        ]
+      };
+
+      try {
+        btnRunAdjudication.disabled = true;
+        btnRunAdjudication.textContent = 'Analyzing...';
+        
+        const res = await fetch('/api/v1/nhcx/pre-adjudicate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-KEY': apiKey,
+            'X-STUDIO-CLIENT': 'true'
+          },
+          body: JSON.stringify({ claim_bundle: bundleToEvaluate })
+        });
+
+        const raw = await res.text();
+        const data = JSON.parse(raw);
+
+        if (adjProbScore) adjProbScore.textContent = `${data.score}% — ${data.risk_level === 'LOW' ? 'HIGH APPROVAL' : data.risk_level}`;
+        if (adjStatusBadge) {
+          adjStatusBadge.textContent = data.status;
+          adjStatusBadge.style.color = data.risk_level === 'LOW' ? '#059669' : '#b91c1c';
+          adjStatusBadge.style.background = data.risk_level === 'LOW' ? '#ecfdf5' : '#fef2f2';
+        }
+
+        if (adjChecksList && data.checks_passed) {
+          adjChecksList.innerHTML = data.checks_passed.map(c => `<div>✅ ${c}</div>`).join('');
+        }
+
+        if (adjFlagsContainer && adjFlagsList) {
+          if (data.flags && data.flags.length > 0) {
+            adjFlagsContainer.classList.remove('hidden');
+            adjFlagsList.innerHTML = data.flags.map(f => `
+              <div style="background: #fff; padding: 0.5rem; border-radius: 6px; border: 1px solid #fca5a5;">
+                <strong>${f.severity}:</strong> ${f.message}<br>
+                <span style="color: #475569;">💡 Remediation: ${f.remediation || 'Review policy.'}</span>
+              </div>
+            `).join('');
+          } else {
+            adjFlagsContainer.classList.add('hidden');
+          }
+        }
+      } catch (err) {
+        alert(`Adjudication pre-check error: ${err.message}`);
+      } finally {
+        btnRunAdjudication.disabled = false;
+        btnRunAdjudication.textContent = 'Run Pre-Check';
+      }
+    });
+  }
+
+  // ABHA M1/M2 OTP Simulation Handlers
+  if (btnGenerateAbhaOtp) {
+    btnGenerateAbhaOtp.addEventListener('click', async () => {
+      const apiKey = activeKeySelect ? activeKeySelect.value : 'test-dev-key';
+      const idVal = abhaMobileInput ? abhaMobileInput.value.trim() : '9876543210';
+      try {
+        btnGenerateAbhaOtp.disabled = true;
+        btnGenerateAbhaOtp.textContent = 'Sending...';
+
+        const res = await fetch('/api/v1/abdm/abha/generate-otp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-KEY': apiKey,
+            'X-STUDIO-CLIENT': 'true'
+          },
+          body: JSON.stringify({ identifier: idVal, auth_type: 'MOBILE_OTP' })
+        });
+        const raw = await res.text();
+        const data = JSON.parse(raw);
+        
+        currentAbhaTxnId = data.txn_id;
+        if (abhaOtpBox) abhaOtpBox.classList.remove('hidden');
+        alert(data.message || 'ABDM OTP sent.');
+      } catch (err) {
+        alert(`ABHA OTP error: ${err.message}`);
+      } finally {
+        btnGenerateAbhaOtp.disabled = false;
+        btnGenerateAbhaOtp.textContent = 'Send OTP';
+      }
+    });
+  }
+
+  if (btnVerifyAbhaOtp) {
+    btnVerifyAbhaOtp.addEventListener('click', async () => {
+      const apiKey = activeKeySelect ? activeKeySelect.value : 'test-dev-key';
+      const otpVal = abhaOtpInput ? abhaOtpInput.value.trim() : '123456';
+      const txnId = currentAbhaTxnId || 'txn-sandbox-1234';
+
+      try {
+        btnVerifyAbhaOtp.disabled = true;
+        btnVerifyAbhaOtp.textContent = 'Verifying...';
+
+        const res = await fetch('/api/v1/abdm/abha/verify-otp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-KEY': apiKey,
+            'X-STUDIO-CLIENT': 'true'
+          },
+          body: JSON.stringify({ txn_id: txnId, otp: otpVal, preferred_abha_name: 'rahul.verma' })
+        });
+        const raw = await res.text();
+        const data = JSON.parse(raw);
+
+        if (data.status === 'SUCCESS') {
+          if (abhaCardNum) abhaCardNum.textContent = data.profile.abha_number;
+          if (abhaCardAddress) abhaCardAddress.textContent = data.profile.abha_address;
+          alert(`✅ ABHA Verified! M2 Care Context linked to ${data.profile.abha_address}`);
+        } else {
+          alert(`ABHA Verification: ${data.message}`);
+        }
+      } catch (err) {
+        alert(`ABHA verification error: ${err.message}`);
+      } finally {
+        btnVerifyAbhaOtp.disabled = false;
+        btnVerifyAbhaOtp.textContent = 'Verify & Link M2';
+      }
+    });
+  }
 
   // Vernacular Language Pills
   vernacularPills.forEach(pill => {

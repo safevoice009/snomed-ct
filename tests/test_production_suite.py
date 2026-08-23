@@ -159,5 +159,61 @@ class TestSICCEProductionSuite(unittest.TestCase):
         data = response.json()
         self.assertEqual(data["status"], "CRITICAL_ALERTS_DETECTED")
 
+    # --- 5. Enterprise Health Moat Tests (SICCE Phase 2) ---
+    def test_nhcx_pre_adjudication_engine(self):
+        """Verifies NHCX Claim Pre-Adjudication scoring and IRDAI necessity checks."""
+        headers = {"X-API-KEY": self.api_key, "X-STUDIO-CLIENT": "true"}
+        claim_bundle = {
+            "resourceType": "Bundle",
+            "entry": [
+                {
+                    "resource": {
+                        "resourceType": "Claim",
+                        "id": "CLM-TEST-001",
+                        "insurance": [{"coverage": {"display": "National Insurance - POL-123"}}],
+                        "provider": {"display": "Apollo Clinic"},
+                        "diagnosis": [{"diagnosisCodeableConcept": {"coding": [{"system": "http://hl7.org/fhir/sid/icd-10", "code": "I10", "display": "Essential hypertension"}]}}],
+                        "item": [{"net": {"value": 500}}, {"net": {"value": 450}}],
+                        "total": {"value": 950}
+                    }
+                }
+            ]
+        }
+        response = self.client.post("/api/v1/nhcx/pre-adjudicate", json={"claim_bundle": claim_bundle}, headers=headers)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertGreaterEqual(data["score"], 80)
+        self.assertEqual(data["status"], "READY_FOR_AUTO_ADJUDICATION")
+
+    def test_abdm_m1_m2_abha_gateway(self):
+        """Verifies ABHA M1 OTP Generation & Verification and M2 Care Context Linkage."""
+        headers = {"X-API-KEY": self.api_key}
+        # 1. Generate OTP
+        gen_res = self.client.post("/api/v1/abdm/abha/generate-otp", json={"identifier": "9876543210", "auth_type": "MOBILE_OTP"}, headers=headers)
+        self.assertEqual(gen_res.status_code, 200)
+        txn_id = gen_res.json()["txn_id"]
+        
+        # 2. Verify OTP
+        ver_res = self.client.post("/api/v1/abdm/abha/verify-otp", json={"txn_id": txn_id, "otp": "123456", "preferred_abha_name": "rahul.verma"}, headers=headers)
+        self.assertEqual(ver_res.status_code, 200)
+        profile = ver_res.json()["profile"]
+        self.assertTrue(profile["abha_number"].startswith("91-"))
+        self.assertEqual(profile["abha_address"], "rahul.verma@abdm")
+
+    def test_whatsapp_clinical_webhook(self):
+        """Verifies WhatsApp clinical webhook message processing."""
+        payload = {
+            "from_phone": "+919876543210",
+            "clinic_name": "Apollo Clinic",
+            "doctor_name": "Dr. Rajesh Sharma",
+            "message_text": "Pt c/o severe khansi & fever. Tab Pantocid 40 OD, Tab Dolo 650 BD."
+        }
+        response = self.client.post("/api/v1/webhook/whatsapp", json=payload)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("message_body", data)
+        self.assertIn("SNOMED CT", data["message_body"])
+        self.assertIn("PATIENT DOSAGE CARD", data["message_body"])
+
 if __name__ == "__main__":
     unittest.main()

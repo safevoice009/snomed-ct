@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  sicce-enterprise-appliance:
+    build:
+      context: .
+      dockerfile: Dockerfile.onprem
+    container_name: sicce_hospital_appliance
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - SICCE_DEPLOYMENT_MODE=ON_PREMISE_AIR_GAPPED
+      - DPDP_DATA_RETENTION_HOURS=24
+      - RATE_LIMIT_PER_MINUTE=600
+      - ABDM_ENVIRONMENT=PRODUCTION_SANDBOX
+    volumes:
+      - ./data/audit_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
