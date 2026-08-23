@@ -21,7 +21,7 @@ from slowapi.errors import RateLimitExceeded
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
-from nlp_parser import ClinicalParser
+from nlp_parser import ClinicalParser, VernacularTranslator
 from terminology_resolver import TerminologyResolver
 from fhir_generator import FHIRGenerator
 from vision_parser import VisionOCRParser
@@ -254,13 +254,14 @@ async def ocr_parse_prescription(
         merged_symptoms = _normalize_string_list(ocr_result.get("symptoms", []) + nlp_extractions.get("symptoms", []))
         merged_diagnoses = _normalize_string_list(ocr_result.get("diagnoses", []) + nlp_extractions.get("diagnoses", []))
         merged_meds = _normalize_med_list(ocr_result.get("medications", []) or nlp_extractions.get("medications", []))
+        vernacular_dosages = VernacularTranslator.generate_schedules(merged_meds)
         
         raw_extraction = {
             "symptoms": merged_symptoms,
             "diagnoses": merged_diagnoses,
             "medications": merged_meds,
             "ddi_alerts": nlp_extractions.get("ddi_alerts", []),
-            "vernacular_dosages": nlp_extractions.get("vernacular_dosages", [])
+            "vernacular_dosages": vernacular_dosages
         }
         
         resolved_profile = resolver.resolve_extraction(raw_extraction)
