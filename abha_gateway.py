@@ -5,21 +5,58 @@ Implements ABHA Number/Address Creation, Aadhaar/Mobile OTP Verification,
 Care Context Linkage, and NRCES-Compliant Record Discovery.
 """
 
+import os
 import uuid
 import time
 import hashlib
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 import logging
+import httpx
 
 logger = logging.getLogger("abha_gateway")
+
+# Environment mode: 'mock' (default), 'sandbox', 'production'
+ABDM_MODE = os.getenv("ABDM_MODE", "mock").lower()
+
+
+class ABDMSandboxClient:
+    """HTTP Client scaffold for official ABDM Gateway Sandbox APIs (dev.abdm.gov.in)."""
+
+    def __init__(self, base_url: str = "https://dev.abdm.gov.in/gateway/v0.5", client_id: Optional[str] = None, client_secret: Optional[str] = None):
+        self.base_url = base_url
+        self.client_id = client_id or os.getenv("ABDM_CLIENT_ID")
+        self.client_secret = client_secret or os.getenv("ABDM_CLIENT_SECRET")
+        self.session_token: Optional[str] = None
+
+    async def authenticate(self) -> bool:
+        """Authenticates with ABDM Gateway sandbox and retrieves bearer token."""
+        if not self.client_id or not self.client_secret:
+            logger.warning("ABDM Sandbox Client credentials not configured (ABDM_CLIENT_ID, ABDM_CLIENT_SECRET).")
+            return False
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                res = await client.post(
+                    f"{self.base_url}/sessions",
+                    json={"clientId": self.client_id, "clientSecret": self.client_secret}
+                )
+                if res.status_code == 200:
+                    self.session_token = res.json().get("accessToken")
+                    return True
+        except Exception as e:
+            logger.error(f"ABDM Sandbox authentication failed: {e}")
+        return False
+
 
 class ABHAGateway:
     """ABDM M1 (ABHA Creation), M2 (Record Push), and M3 (Consent Manager) Bridge."""
 
-    def __init__(self):
+    def __init__(self, mode: Optional[str] = None):
+        self.mode = mode or ABDM_MODE
+        self.sandbox_client = ABDMSandboxClient() if self.mode == "sandbox" else None
         self.active_sessions: Dict[str, Dict[str, Any]] = {}
         self.linked_contexts: Dict[str, List[Dict[str, Any]]] = {}
+        logger.info(f"ABHAGateway initialized in '{self.mode}' mode.")
 
     def generate_otp(self, identifier: str, auth_type: str = "MOBILE_OTP") -> Dict[str, Any]:
         """Initiates ABDM M1 OTP generation for ABHA Creation or Verification."""
@@ -35,9 +72,9 @@ class ABHAGateway:
             "attempts": 0
         }
         
-        logger.info(f"ABDM OTP generated for {auth_type} (Txn: {txn_id})")
+        logger.info(f"ABDM OTP generated for {auth_type} (Txn: {txn_id}, Mode: {self.mode})")
         return {
-            "mode": "mock",
+            "mode": self.mode,
             "txn_id": txn_id,
             "status": "OTP_SENT",
             "message": f"ABDM verification OTP sent to registered number ending in ***{clean_id[-4:] if len(clean_id)>=4 else '0000'}.",
@@ -51,7 +88,7 @@ class ABHAGateway:
         session = self.active_sessions.get(txn_id)
         if not session:
             return {
-                "mode": "mock",
+                "mode": self.mode,
                 "status": "ERROR",
                 "message": "Invalid or expired ABDM transaction session."
             }
@@ -59,7 +96,7 @@ class ABHAGateway:
         if time.time() > session["expiry"]:
             self.active_sessions.pop(txn_id, None)
             return {
-                "mode": "mock",
+                "mode": self.mode,
                 "status": "ERROR",
                 "message": "ABDM OTP transaction expired. Please request a new OTP."
             }
@@ -68,7 +105,7 @@ class ABHAGateway:
         if otp not in ("123456", "778899") and (len(otp) != 6 or not otp.isdigit()):
             session["attempts"] += 1
             return {
-                "mode": "mock",
+                "mode": self.mode,
                 "status": "INVALID_OTP",
                 "message": "Incorrect ABDM OTP. (For sandbox testing, use: 123456)"
             }
@@ -100,7 +137,7 @@ class ABHAGateway:
         logger.info(f"ABHA verified and created: {abha_number} ({abha_address})")
         
         return {
-            "mode": "mock",
+            "mode": self.mode,
             "status": "SUCCESS",
             "message": "ABHA Number & ABDM Health ID verified successfully.",
             "profile": profile

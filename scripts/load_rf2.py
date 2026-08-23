@@ -112,9 +112,37 @@ def init_schema(conn: sqlite3.Connection):
         VALUES (new.rowid, new.concept_id, new.preferred_name, new.semantic_tag);
     END;
     """)
+    cursor.execute("""
+    CREATE TRIGGER IF NOT EXISTS concepts_ad AFTER DELETE ON concepts BEGIN
+        INSERT INTO concepts_fts(concepts_fts, rowid, concept_id, preferred_name, semantic_tag)
+        VALUES('delete', old.rowid, old.concept_id, old.preferred_name, old.semantic_tag);
+    END;
+    """)
+    cursor.execute("""
+    CREATE TRIGGER IF NOT EXISTS concepts_au AFTER UPDATE ON concepts BEGIN
+        INSERT INTO concepts_fts(concepts_fts, rowid, concept_id, preferred_name, semantic_tag)
+        VALUES('delete', old.rowid, old.concept_id, old.preferred_name, old.semantic_tag);
+        INSERT INTO concepts_fts(rowid, concept_id, preferred_name, semantic_tag)
+        VALUES (new.rowid, new.concept_id, new.preferred_name, new.semantic_tag);
+    END;
+    """)
 
     cursor.execute("""
     CREATE TRIGGER IF NOT EXISTS descriptions_ai AFTER INSERT ON descriptions BEGIN
+        INSERT INTO descriptions_fts(rowid, term, concept_id)
+        VALUES (new.rowid, new.term, new.concept_id);
+    END;
+    """)
+    cursor.execute("""
+    CREATE TRIGGER IF NOT EXISTS descriptions_ad AFTER DELETE ON descriptions BEGIN
+        INSERT INTO descriptions_fts(descriptions_fts, rowid, term, concept_id)
+        VALUES('delete', old.rowid, old.term, old.concept_id);
+    END;
+    """)
+    cursor.execute("""
+    CREATE TRIGGER IF NOT EXISTS descriptions_au AFTER UPDATE ON descriptions BEGIN
+        INSERT INTO descriptions_fts(descriptions_fts, rowid, term, concept_id)
+        VALUES('delete', old.rowid, old.term, old.concept_id);
         INSERT INTO descriptions_fts(rowid, term, concept_id)
         VALUES (new.rowid, new.term, new.concept_id);
     END;
@@ -126,9 +154,23 @@ def init_schema(conn: sqlite3.Connection):
         VALUES (new.rowid, new.brand_name, new.generic_name, new.synonyms, new.snomed_id);
     END;
     """)
+    cursor.execute("""
+    CREATE TRIGGER IF NOT EXISTS brands_ad AFTER DELETE ON brands BEGIN
+        INSERT INTO brands_fts(brands_fts, rowid, brand_name, generic_name, synonyms, snomed_id)
+        VALUES('delete', old.rowid, old.brand_name, old.generic_name, old.synonyms, old.snomed_id);
+    END;
+    """)
+    cursor.execute("""
+    CREATE TRIGGER IF NOT EXISTS brands_au AFTER UPDATE ON brands BEGIN
+        INSERT INTO brands_fts(brands_fts, rowid, brand_name, generic_name, synonyms, snomed_id)
+        VALUES('delete', old.rowid, old.brand_name, old.generic_name, old.synonyms, old.snomed_id);
+        INSERT INTO brands_fts(rowid, brand_name, generic_name, synonyms, snomed_id)
+        VALUES (new.rowid, new.brand_name, new.generic_name, new.synonyms, new.snomed_id);
+    END;
+    """)
 
     conn.commit()
-    logger.info("Initialized SQLite FTS5 schema successfully.")
+    logger.info("Initialized SQLite FTS5 schema with complete synchronization triggers.")
 
 
 # --- Rich Indian Clinical Seeds (Standard OPD Findings, Disorders & Brands) ---

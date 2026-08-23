@@ -6,8 +6,10 @@ ENV/
 .env*
 
 # Data files (RF2 releases)
-data/
-data/rf2/
+data/*
+!data/rf2/
+data/rf2/*
+!data/rf2/_format_test/
 *.zip
 *.tar.gz
 

@@ -75,9 +75,17 @@ class TestFullTerminologyResolver(unittest.TestCase):
         self.assertEqual(res_soboe["concept_id"], "267036007")
 
     def test_uncoded_handling_no_hallucination(self):
-        """Verify that unknown nonsense terms return None without hallucinating codes."""
-        res_unknown = self.resolver.resolve_term("NonexistentUnicornDisease999")
+        """Verify that unknown nonsense terms return None without hallucinating codes and log to logs/unresolved_terms.jsonl."""
+        test_term = f"NonexistentUnicornDisease{os.getpid()}"
+        res_unknown = self.resolver.resolve_term(test_term)
         self.assertIsNone(res_unknown)
+
+        # Assert logged to unresolved_terms.jsonl per Task D
+        log_path = os.path.join(PROJECT_ROOT, "logs", "unresolved_terms.jsonl")
+        self.assertTrue(os.path.exists(log_path), "logs/unresolved_terms.jsonl was not created.")
+        with open(log_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            self.assertIn(test_term, content)
 
 
 if __name__ == "__main__":
