@@ -506,6 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         renderStructuredOutput(resolved);
         renderCDSSAlerts(cdss);
+        renderVernacularCards(data.extraction ? data.extraction.vernacular_dosages || [] : []);
 
         if (fhirJsonCode) fhirJsonCode.textContent = JSON.stringify(bundle, null, 2);
         if (nhcxJsonCode) nhcxJsonCode.textContent = JSON.stringify(nhcxBundle, null, 2);
