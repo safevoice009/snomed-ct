@@ -828,10 +828,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Vernacular Language Pills
   vernacularPills.forEach(pill => {
-    pill.addEventListener('click', () => {
+    pill.addEventListener('click', (e) => {
+      e.preventDefault();
       vernacularPills.forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
-      activeVernacularLang = pill.getAttribute('data-vlang');
+      activeVernacularLang = pill.getAttribute('data-vlang') || 'hi';
       renderVernacularCards(currentVernacularData);
     });
   });
@@ -851,9 +852,13 @@ document.addEventListener('DOMContentLoaded', () => {
     currentVernacularData.forEach(item => {
       const card = document.createElement('div');
       card.className = 'vernacular-card';
-      const transText = item.translations ? (item.translations[activeVernacularLang] || item.translations['hi']) : 'Take as directed';
+      const transObj = item.translations || item.schedule || {};
+      const transText = transObj[activeVernacularLang] || transObj['hi'] || transObj['te'] || 'Take as directed by physician';
+      const medName = item.medication || item.brand_name || 'Medication';
+      const medDose = item.dose || '';
+
       card.innerHTML = `
-        <div class="vernacular-med-name">💊 ${item.medication} ${item.dose ? `(${item.dose})` : ''}</div>
+        <div class="vernacular-med-name">💊 ${medName} ${medDose ? `(${medDose})` : ''}</div>
         <div class="vernacular-schedule-text">${transText}</div>
       `;
       vernacularCardsContainer.appendChild(card);
