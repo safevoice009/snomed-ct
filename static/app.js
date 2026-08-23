@@ -236,7 +236,151 @@ document.addEventListener('DOMContentLoaded', () => {
   const inspectorViewClinical = document.getElementById('inspector-view-clinical');
   const inspectorViewVernacular = document.getElementById('inspector-view-vernacular');
   const inspectorViewJson = document.getElementById('inspector-view-json');
+  const inspectorViewNhcx = document.getElementById('inspector-view-nhcx');
   const inspectorViewPipeline = document.getElementById('inspector-view-pipeline');
+  const nhcxJsonCode = document.getElementById('nhcx-json-code');
+  let lastGeneratedNhcxBundle = null;
+
+  // Voice Scribe Recording Setup
+  const btnVoiceDictate = document.getElementById('btn-voice-dictate');
+  const voiceIcon = document.getElementById('voice-icon');
+  const voiceLabel = document.getElementById('voice-label');
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let isRecording = false;
+
+  if (btnVoiceDictate) {
+    btnVoiceDictate.addEventListener('click', async () => {
+      if (!isRecording) {
+        // Start recording
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          audioChunks = [];
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) audioChunks.push(e.data);
+          };
+          mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            stream.getTracks().forEach(t => t.stop());
+            await submitVoiceAudio(audioBlob);
+          };
+          mediaRecorder.start();
+          isRecording = true;
+          if (voiceIcon) voiceIcon.textContent = '🔴';
+          if (voiceLabel) voiceLabel.textContent = 'Stop Dictating';
+          btnVoiceDictate.style.background = '#fee2e2';
+          btnVoiceDictate.style.borderColor = '#fca5a5';
+          btnVoiceDictate.style.color = '#991b1b';
+        } catch (err) {
+          alert(`Microphone access error: ${err.message}. Please enable microphone permissions.`);
+        }
+      } else {
+        // Stop recording
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+        isRecording = false;
+        if (voiceIcon) voiceIcon.textContent = '🎙️';
+        if (voiceLabel) voiceLabel.textContent = 'Voice Scribe';
+        btnVoiceDictate.style.background = '#f0fdf4';
+        btnVoiceDictate.style.borderColor = '#bbf7d0';
+        btnVoiceDictate.style.color = '#166534';
+      }
+    });
+  }
+
+  async function submitVoiceAudio(audioBlob) {
+    const apiKey = activeKeySelect ? activeKeySelect.value : 'test-dev-key';
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'doctor_dictation.webm');
+
+    if (btnParseNote) {
+      btnParseNote.disabled = true;
+      btnParseNote.innerHTML = 'Transcribing Voice Scribe...';
+    }
+
+    try {
+      const response = await fetch('/api/v1/voice-scribe', {
+        method: 'POST',
+        headers: {
+          'X-API-KEY': apiKey,
+          'X-STUDIO-CLIENT': 'true'
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.detail || 'Voice scribe transcription failed');
+      }
+
+      const data = await response.json();
+      
+      // Update transcript note
+      if (noteInput) {
+        noteInput.value = data.raw_transcript || 'Voice transcript extracted.';
+      }
+      if (tabBtnTextMode) {
+        tabBtnTextMode.click();
+      }
+
+      const resolved = data.resolved || {};
+      const bundle = data.bundle || {};
+      const nhcxBundle = data.nhcx_bundle || {};
+      const cdss = data.cdss || {};
+
+      lastGeneratedBundle = bundle;
+      lastGeneratedNhcxBundle = nhcxBundle;
+
+      renderStructuredOutput(resolved);
+      renderCDSSAlerts(cdss);
+
+      if (fhirJsonCode) fhirJsonCode.textContent = JSON.stringify(bundle, null, 2);
+      if (nhcxJsonCode) nhcxJsonCode.textContent = JSON.stringify(nhcxBundle, null, 2);
+
+    } catch (err) {
+      alert(`Voice Dictation Error: ${err.message}`);
+    } finally {
+      if (btnParseNote) {
+        btnParseNote.disabled = false;
+        btnParseNote.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Parse &amp; Extract Entities
+        `;
+      }
+    }
+  }
+
+  function renderCDSSAlerts(cdss) {
+    if (!ddiAlertContainer) return;
+    const alerts = cdss.alerts || [];
+    
+    if (alerts.length > 0) {
+      const firstAlert = alerts[0];
+      const isCritical = firstAlert.severity === 'CRITICAL';
+      ddiAlertContainer.className = `ddi-alert-box ${isCritical ? 'critical' : 'warning'}`;
+      if (ddiAlertTitle) {
+        ddiAlertTitle.textContent = `${isCritical ? '🚨 CRITICAL' : '⚠️ WARNING'}: ${firstAlert.title}`;
+      }
+      if (ddiAlertMessage) {
+        ddiAlertMessage.innerHTML = `
+          <strong>Mechanism:</strong> ${firstAlert.mechanism}<br>
+          <strong>Recommended Action:</strong> ${firstAlert.recommended_action || firstAlert.action || 'Review therapy.'}
+        `;
+      }
+      ddiAlertContainer.classList.remove('hidden');
+    } else {
+      ddiAlertContainer.className = 'ddi-alert-box clear';
+      if (ddiAlertTitle) {
+        ddiAlertTitle.textContent = '🛡️ CDSS Clinical Safety: Clear';
+      }
+      if (ddiAlertMessage) {
+        ddiAlertMessage.textContent = 'Zero lethal drug-drug interactions, duplicate therapies, or allergen contraindications detected.';
+      }
+      ddiAlertContainer.classList.remove('hidden');
+    }
+  }
 
   // Custom File Upload (Real Multimodal Vision OCR)
   const rxFileInput = document.getElementById('rx-file-input');
@@ -343,28 +487,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Render structured outputs
         const resolved = data.resolved || {};
-        const extraction = data.extraction || {};
         const bundle = data.bundle || {};
+        const nhcxBundle = data.nhcx_bundle || {};
+        const cdss = data.cdss || {};
 
         lastGeneratedBundle = bundle;
+        lastGeneratedNhcxBundle = nhcxBundle;
+        
         renderStructuredOutput(resolved);
+        renderCDSSAlerts(cdss);
 
-        const ddiAlerts = extraction.ddi_alerts || [];
-        if (ddiAlerts.length > 0 && ddiAlertContainer) {
-          ddiAlertTitle.textContent = ddiAlerts[0].title;
-          ddiAlertMessage.textContent = ddiAlerts[0].message;
-          ddiAlertContainer.classList.remove('hidden');
-        } else if (ddiAlertContainer) {
-          ddiAlertContainer.classList.add('hidden');
-        }
-
-        renderVernacularCards(extraction.vernacular_dosages || []);
-        if (fhirJsonCode) {
-          fhirJsonCode.textContent = JSON.stringify(bundle, null, 2);
-        }
+        if (fhirJsonCode) fhirJsonCode.textContent = JSON.stringify(bundle, null, 2);
+        if (nhcxJsonCode) nhcxJsonCode.textContent = JSON.stringify(nhcxBundle, null, 2);
 
       } catch (err) {
-        alert(`Vision OCR Error: ${err.message}`);
+        alert(`OCR Parsing error: ${err.message}`);
         const overlay = document.getElementById('ocr-loading-overlay');
         if (overlay) overlay.remove();
       }
@@ -570,25 +707,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const extraction = result.extraction || {};
 
         lastGeneratedBundle = bundle;
+        lastGeneratedNhcxBundle = result.nhcx_bundle || {};
         
         // Render Concept Chips & Tables
         renderStructuredOutput(resolved);
 
-        // Check DDI Alerts
-        const ddiAlerts = extraction.ddi_alerts || [];
-        if (ddiAlerts.length > 0 && ddiAlertContainer) {
-          ddiAlertTitle.textContent = ddiAlerts[0].title;
-          ddiAlertMessage.textContent = ddiAlerts[0].message;
-          ddiAlertContainer.classList.remove('hidden');
-        } else if (ddiAlertContainer) {
-          ddiAlertContainer.classList.add('hidden');
-        }
+        // Check CDSS & DDI Alerts
+        renderCDSSAlerts(result.cdss || {});
 
         // Render Vernacular Cards
         renderVernacularCards(extraction.vernacular_dosages || []);
 
-        // Render FHIR JSON
-        fhirJsonCode.textContent = JSON.stringify(bundle, null, 2);
+        // Render FHIR JSON & NHCX Claim JSON
+        if (fhirJsonCode) fhirJsonCode.textContent = JSON.stringify(bundle, null, 2);
+        if (nhcxJsonCode) nhcxJsonCode.textContent = JSON.stringify(lastGeneratedNhcxBundle, null, 2);
 
       } catch (err) {
         alert(`Parsing error: ${err.message}`);

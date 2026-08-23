@@ -4,7 +4,7 @@ import json
 import logging
 import asyncio
 from datetime import datetime, timezone
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List, Optional
 
 # Ensure workspace packages can be executed
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -18,13 +18,16 @@ from fastapi.responses import FileResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
 from nlp_parser import ClinicalParser
 from terminology_resolver import TerminologyResolver
 from fhir_generator import FHIRGenerator
 from vision_parser import VisionOCRParser
+from voice_parser import VoiceScribeParser
+from cdss_engine import CDSSEngine
+from nhcx_claim_generator import NHCXClaimGenerator
 from auth_service import AuthService, SignUpRequest, SignInRequest, APIKeyCreateRequest
 
 # Load configuration
@@ -34,18 +37,22 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("main")
 
-# Initialize components
+# Initialize enterprise components
 parser = ClinicalParser()
-resolver = TerminologyResolver("mock_snomed_db.json")
+resolver = TerminologyResolver("clinical_knowledge.db")
 generator = FHIRGenerator()
+vision_engine = VisionOCRParser()
+voice_engine = VoiceScribeParser()
+cdss_engine = CDSSEngine()
+nhcx_generator = NHCXClaimGenerator()
 auth_service = AuthService()
 
 # Rate limiting setup
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(
     title="SICCE API Gateway",
-    version="1.0.0",
-    description="SNOMED-India Clinical Coding Engine - Secure B2B Clinical NLP & FHIR Translation Service"
+    version="2.0.0",
+    description="SNOMED-India Clinical Coding Engine - Enterprise B2B Clinical NLP, FHIR R4, Voice Scribe, CDSS, and NHCX Insurance Gateway"
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -92,20 +99,32 @@ async def get_current_user(authorization: str = Header(None)):
         )
     return sess["user"]
 
-# Request payload validation
+# Request payload validation models
 class ParseRequest(BaseModel):
     text: str
+    patient_allergies: Optional[List[str]] = Field(default_factory=list)
+
+class CDSSCheckRequest(BaseModel):
+    medications: List[Dict[str, Any]]
+    patient_allergies: Optional[List[str]] = Field(default_factory=list)
+    patient_conditions: Optional[List[str]] = Field(default_factory=list)
+
+class NHCXClaimRequest(BaseModel):
+    consultation_bundle: Dict[str, Any]
+    patient_info: Optional[Dict[str, Any]] = None
+    policy_info: Optional[Dict[str, Any]] = None
+    bill_items: Optional[List[Dict[str, Any]]] = None
 
 
-# --- Core Clinical Parsing Endpoint ---
+# --- 1. Core Clinical Text Parsing Endpoint ---
 @app.post("/api/v1/parse")
 @limiter.limit("60/minute")
 async def parse_clinical_text(
     payload: ParseRequest, 
-    request: Request, # required by slowapi
+    request: Request,
     api_key: str = Depends(verify_api_key)
 ):
-    """Processes clinical text input and returns a validated FHIR R4 Bundle."""
+    """Processes clinical text note, resolves SNOMED CT / LOINC, evaluates CDSS safety, and returns FHIR R4 Bundle."""
     if not payload.text.strip():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -116,16 +135,28 @@ async def parse_clinical_text(
         # 1. Local/LLM NLP entity extraction
         raw_extraction = await parser.parse(payload.text)
         
-        # 2. Terminology resolution (Synonyms/Fuzzy SNOMED CT lookup)
+        # 2. SQLite FTS5 / Supabase Terminology resolution
         resolved_profile = resolver.resolve_extraction(raw_extraction)
         
-        # 3. ABDM FHIR bundle generation
+        # 3. CDSS Drug Safety & Interaction Evaluation
+        cdss_report = cdss_engine.evaluate_safety(
+            medications=resolved_profile.get("medications", []),
+            patient_allergies=payload.patient_allergies,
+            patient_conditions=raw_extraction.get("symptoms", []) + raw_extraction.get("diagnoses", [])
+        )
+        
+        # 4. ABDM FHIR R4 bundle generation
         fhir_bundle = generator.create_op_consultation_bundle(resolved_profile)
+        
+        # 5. Pre-generate NHCX Claim package
+        nhcx_bundle = nhcx_generator.generate_claim_bundle(fhir_bundle)
         
         return {
             "bundle": fhir_bundle,
+            "nhcx_bundle": nhcx_bundle,
             "extraction": raw_extraction,
-            "resolved": resolved_profile
+            "resolved": resolved_profile,
+            "cdss": cdss_report
         } if request.headers.get("X-STUDIO-CLIENT") == "true" else fhir_bundle
     except Exception as e:
         logger.error(f"Error processing clinical parse request: {e}")
@@ -135,6 +166,7 @@ async def parse_clinical_text(
         )
 
 
+# --- 2. Multimodal Prescription Vision OCR Endpoint ---
 @app.post("/api/v1/ocr-parse")
 @limiter.limit("30/minute")
 async def ocr_parse_prescription(
@@ -142,7 +174,7 @@ async def ocr_parse_prescription(
     file: UploadFile = File(...),
     api_key: str = Depends(verify_api_key)
 ):
-    """Ingests raw prescription images/scans, executes Document Vision OCR, resolves SNOMED CT, and returns ABDM FHIR R4 Bundle."""
+    """Ingests raw prescription images/scans, executes Document Vision OCR, resolves SNOMED CT, checks CDSS, and returns ABDM & NHCX Bundles."""
     if not (file.content_type.startswith("image/") or file.content_type == "application/pdf"):
         raise HTTPException(status_code=400, detail="Invalid file type. Please upload a JPEG, PNG, WebP or PDF image.")
         
@@ -150,7 +182,6 @@ async def ocr_parse_prescription(
     if len(image_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
         
-    vision_engine = VisionOCRParser()
     ocr_result = await vision_engine.parse_image(image_bytes, mime_type=file.content_type)
     
     # Run local extraction & safety rules on raw text
@@ -169,7 +200,15 @@ async def ocr_parse_prescription(
     }
     
     resolved_profile = resolver.resolve_extraction(raw_extraction)
+    
+    # CDSS Safety Evaluation
+    cdss_report = cdss_engine.evaluate_safety(
+        medications=resolved_profile.get("medications", []),
+        patient_conditions=merged_symptoms + merged_diagnoses
+    )
+    
     fhir_bundle = generator.create_op_consultation_bundle(resolved_profile)
+    nhcx_bundle = nhcx_generator.generate_claim_bundle(fhir_bundle)
     
     return {
         "raw_text": ocr_result.get("raw_text", ""),
@@ -178,8 +217,83 @@ async def ocr_parse_prescription(
         "bounding_boxes": ocr_result.get("bounding_boxes", []),
         "extraction": raw_extraction,
         "resolved": resolved_profile,
-        "bundle": fhir_bundle
+        "cdss": cdss_report,
+        "bundle": fhir_bundle,
+        "nhcx_bundle": nhcx_bundle
     }
+
+
+# --- 3. Ambient Clinical Voice Scribe Endpoint ---
+@app.post("/api/v1/voice-scribe")
+@limiter.limit("30/minute")
+async def voice_scribe_endpoint(
+    request: Request,
+    file: UploadFile = File(...),
+    api_key: str = Depends(verify_api_key)
+):
+    """Ingests doctor voice dictation (English, Hindi, Hinglish), transcribes speech, extracts entities, and outputs FHIR R4."""
+    audio_bytes = await file.read()
+    if len(audio_bytes) == 0:
+        raise HTTPException(status_code=400, detail="Uploaded audio file is empty.")
+
+    scribe_result = await voice_engine.parse_audio(audio_bytes, mime_type=file.content_type)
+    
+    raw_extraction = {
+        "symptoms": scribe_result.get("symptoms", []),
+        "diagnoses": scribe_result.get("diagnoses", []),
+        "medications": scribe_result.get("medications", []),
+        "vitals": scribe_result.get("vitals", {}),
+        "allergies": scribe_result.get("allergies", []),
+        "advice": scribe_result.get("advice", [])
+    }
+    
+    resolved_profile = resolver.resolve_extraction(raw_extraction)
+    
+    # CDSS Safety Evaluation
+    cdss_report = cdss_engine.evaluate_safety(
+        medications=resolved_profile.get("medications", []),
+        patient_allergies=scribe_result.get("allergies", []),
+        patient_conditions=scribe_result.get("symptoms", []) + scribe_result.get("diagnoses", [])
+    )
+    
+    fhir_bundle = generator.create_op_consultation_bundle(resolved_profile)
+    nhcx_bundle = nhcx_generator.generate_claim_bundle(fhir_bundle)
+    
+    return {
+        "raw_transcript": scribe_result.get("raw_transcript", ""),
+        "vitals": scribe_result.get("vitals", {}),
+        "advice": scribe_result.get("advice", []),
+        "extraction": raw_extraction,
+        "resolved": resolved_profile,
+        "cdss": cdss_report,
+        "bundle": fhir_bundle,
+        "nhcx_bundle": nhcx_bundle
+    }
+
+
+# --- 4. CDSS Drug Interaction & Allergy Checker ---
+@app.post("/api/v1/check-interactions")
+async def check_drug_interactions(req: CDSSCheckRequest, api_key: str = Depends(verify_api_key)):
+    """Runs instant pharmacology checks across prescribed medications and allergies."""
+    report = cdss_engine.evaluate_safety(
+        medications=req.medications,
+        patient_allergies=req.patient_allergies,
+        patient_conditions=req.patient_conditions
+    )
+    return report
+
+
+# --- 5. NHCX Insurance Claim Formatter ---
+@app.post("/api/v1/nhcx-claim")
+async def generate_nhcx_claim(req: NHCXClaimRequest, api_key: str = Depends(verify_api_key)):
+    """Converts a FHIR consultation bundle into an NHCX-compliant ICD-10 Insurance Claim bundle."""
+    claim_bundle = nhcx_generator.generate_claim_bundle(
+        consultation_bundle=req.consultation_bundle,
+        patient_info=req.patient_info,
+        policy_info=req.policy_info,
+        bill_items=req.bill_items
+    )
+    return claim_bundle
 
 
 # --- Better Auth Endpoints ---
@@ -225,7 +339,7 @@ async def list_api_keys(user = Depends(get_current_user)):
     return {"keys": keys}
 
 
-# --- DPDP Act 2023 Section 12: Cryptographic Data Erasure & Audit Purge ---
+# --- DPDP Act 2023 Section 12: Cryptographic Data Erasure ---
 class PurgeRequest(BaseModel):
     confirmation: str = "PURGE_AUDIT_LOGS"
 
@@ -246,7 +360,6 @@ async def purge_compliance_records(req: PurgeRequest, user = Depends(get_current
     }
 
 
-
 # --- Developer API Billing & Credit Packages ---
 @app.get("/api/v1/billing/packages")
 async def get_billing_packages():
@@ -260,7 +373,7 @@ async def get_billing_packages():
                 "price": 499,
                 "credits": 3000,
                 "rate_per_call": "₹0.166",
-                "features": ["3,000 OCR & FHIR calls", "Hinglish NLP", "Supabase Trigram", "Valid 1 Year"]
+                "features": ["3,000 OCR, Voice & FHIR calls", "Hinglish NLP", "SQLite FTS5 + Supabase", "CDSS Safety Alerts"]
             },
             {
                 "id": "pack_pro",
@@ -268,7 +381,7 @@ async def get_billing_packages():
                 "price": 1999,
                 "credits": 15000,
                 "rate_per_call": "₹0.133",
-                "features": ["15,000 OCR & FHIR calls", "AYUSH NAMASTE Bridge", "DDI Safety Engine", "Priority Support"]
+                "features": ["15,000 Multimodal calls", "Ambient Voice Scribe", "Full CDSS DDI Matrix", "NHCX Claim Formatter"]
             },
             {
                 "id": "pack_scale",
@@ -276,7 +389,7 @@ async def get_billing_packages():
                 "price": 4999,
                 "credits": 45000,
                 "rate_per_call": "₹0.111",
-                "features": ["45,000 OCR & FHIR calls", "Dedicated ABDM Bridge", "Custom SLA", "24/7 Support"]
+                "features": ["45,000 Calls", "Dedicated ABDM/NHCX Bridge", "Custom SLAs", "24/7 Support"]
             }
         ]
     }
@@ -286,85 +399,15 @@ async def get_api_credit_balance(x_api_key: str = Header("test-dev-key", alias="
     """Returns current active credit quota and balance for an API key."""
     return {
         "api_key": x_api_key,
-        "plan": "Developer Free Sandbox",
-        "credits_total": 1000,
-        "credits_remaining": 982,
-        "credits_used": 18,
+        "plan": "Developer Enterprise Sandbox",
+        "credits_total": 5000,
+        "credits_remaining": 4980,
+        "credits_used": 20,
         "auto_recharge": False
     }
 
 
-# --- Postman Collection & Developer OpenAPI Export ---
-@app.get("/api/v1/postman-collection")
-async def get_postman_collection():
-    """Returns a ready-to-import Postman v2.1 Collection JSON for instant developer testing."""
-    return {
-        "info": {
-            "name": "SICCE Clinical OCR & ABDM FHIR Gateway",
-            "description": "Production B2B Postman Collection for SNOMED CT and FHIR R4 Ingestion",
-            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-        },
-        "item": [
-            {
-                "name": "1. Parse Clinical Note (Hinglish / Indian OPD)",
-                "request": {
-                    "method": "POST",
-                    "header": [
-                        {"key": "Content-Type", "value": "application/json"},
-                        {"key": "X-API-KEY", "value": "test-dev-key"}
-                    ],
-                    "body": {
-                        "mode": "raw",
-                        "raw": "{\"text\": \"Sar dard ho raha hai and ulti jaisa lag raha hai. APD positive. Pantocid 40 OD.\"}"
-                    },
-                    "url": {
-                        "raw": "http://localhost:8000/api/v1/parse",
-                        "protocol": "http",
-                        "host": ["localhost"],
-                        "port": "8000",
-                        "path": ["api", "v1", "parse"]
-                    }
-                }
-            },
-            {
-                "name": "2. Health & System Telemetry",
-                "request": {
-                    "method": "GET",
-                    "url": {
-                        "raw": "http://localhost:8000/health",
-                        "protocol": "http",
-                        "host": ["localhost"],
-                        "port": "8000",
-                        "path": ["health"]
-                    }
-                }
-            },
-            {
-                "name": "3. DPDP Section 12 Cryptographic Purge",
-                "request": {
-                    "method": "POST",
-                    "header": [
-                        {"key": "Content-Type", "value": "application/json"},
-                        {"key": "Authorization", "value": "Bearer YOUR_SESSION_TOKEN"}
-                    ],
-                    "body": {
-                        "mode": "raw",
-                        "raw": "{\"confirmation\": \"PURGE_AUDIT_LOGS\"}"
-                    },
-                    "url": {
-                        "raw": "http://localhost:8000/api/v1/compliance/purge-records",
-                        "protocol": "http",
-                        "host": ["localhost"],
-                        "port": "8000",
-                        "path": ["api", "v1", "compliance", "purge-records"]
-                    }
-                }
-            }
-        ]
-    }
-
-
-# --- Health Check ---
+# --- Health & Telemetry Check ---
 @app.get("/health")
 async def health_check():
     """Connectivity health check for backend services."""
@@ -373,10 +416,13 @@ async def health_check():
     
     return {
         "status": "healthy",
-        "version": "1.0.0",
+        "version": "2.0.0",
         "services": {
-            "gemini_api": "configured" if gemini_api_configured else "fallback_mode",
-            "supabase_db": "connected" if (auth_service.supabase_client or supabase_db_configured) else "local_mock_mode",
+            "gemini_multimodal_api": "active" if gemini_api_configured else "fallback_mode",
+            "sqlite_fts5_terminology": "connected",
+            "cdss_safety_engine": "active",
+            "nhcx_claim_engine": "active",
+            "supabase_db": "connected" if (auth_service.supabase_client or supabase_db_configured) else "local_mode",
             "auth_engine": "better-auth-ready"
         }
     }
@@ -402,37 +448,7 @@ async def serve_index():
     return {"message": "SICCE Clinical Gateway running. Open /docs for API schema."}
 
 
-async def run_cli_tests():
-    """Runs a dry CLI translation test case loop."""
-    print("Running local CLI pipeline demonstration...")
-    test_cases = [
-        "Pt c/o loose motion x 3 days, AP+, Dolo 650 BD",
-        "Sar dard ho raha hai and ulti jaisa lag raha hai. APD positive. Pantocid 40 OD.",
-        "Pt has h/o Amavata. c/o SOBOE on walking. pedal edema + B/L. Rx Lasix 40mg BD."
-    ]
-    for case in test_cases:
-        print("="*60)
-        print(f"INPUT NOTE: \"{case}\"")
-        print("="*60)
-        
-        raw_extraction = await parser.parse(case)
-        print("\n[Step 1: NLP Entity Extraction]")
-        print(json.dumps(raw_extraction, indent=2))
-        
-        resolved_profile = resolver.resolve_extraction(raw_extraction)
-        print("\n[Step 2: SNOMED CT / LOINC Code Mapping]")
-        print(json.dumps(resolved_profile, indent=2))
-        
-        fhir_bundle = generator.create_op_consultation_bundle(resolved_profile)
-        print("\n[Step 3: Generated ABDM FHIR R4 OPConsultation Bundle]")
-        print(json.dumps(fhir_bundle, indent=2))
-        print("="*60 + "\n")
-
-
 if __name__ == "__main__":
-    if "--cli" in sys.argv or "--test" in sys.argv:
-        asyncio.run(run_cli_tests())
-    else:
-        import uvicorn
-        port = int(os.getenv("PORT", 8000))
-        uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
