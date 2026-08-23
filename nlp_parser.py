@@ -220,24 +220,28 @@ class RuleParser:
         # 3. Medications Detection
         for drug in self.KNOWN_DRUGS:
             if re.search(drug["pattern"], text_lower):
-                # Extract surrounding frequency and dose
-                freq = ""
-                # Find if BD, OD, TDS, HS, SOS appears near the drug or in text
-                match_freq = re.search(rf"{drug['pattern']}.*?\b(bd|od|tds|hs|sos|qid|twice daily|once daily)\b", text_lower)
+                # Find if BD, OD, TDS, HS, SOS appears near the drug
+                match_freq = re.search(rf"(?:{drug['pattern']})[^\n\.\,]*?\b(bd|od|tds|hs|sos|qid|twice daily|once daily|three times daily)\b", text_lower)
                 if match_freq and match_freq.group(1):
                     freq = str(match_freq.group(1)).upper()
                 else:
-                    if "bd" in text_lower: freq = "BD"
-                    elif "tds" in text_lower: freq = "TDS"
-                    elif "hs" in text_lower: freq = "HS"
-                    elif "od" in text_lower: freq = "OD"
-                    elif "sos" in text_lower: freq = "SOS"
+                    freq = "OD"
+
+                freq_map = {
+                    "BD": "twice daily",
+                    "OD": "once daily",
+                    "TDS": "three times daily",
+                    "QID": "four times daily",
+                    "HS": "at bedtime",
+                    "SOS": "as needed"
+                }
+                freq_clean = freq_map.get(freq.upper(), freq)
 
                 extracted["medications"].append({
                     "brand_name": drug["brand"],
                     "generic_guess": drug["generic"],
                     "dose": drug["dose"],
-                    "frequency": freq
+                    "frequency": freq_clean
                 })
 
         # 4. Generic Fallback Regex for Unlisted Medications (e.g. Tab XYZ 10mg BD)
