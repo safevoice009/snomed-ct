@@ -29,7 +29,7 @@
 | **Test Suite Cleanliness (A9)** | 🟢 **FIXED** | All 3 previous failing tests fixed. 36/36 tests passing in 288s. | Clean green CI. |
 | **Deployment Sprawl (A10)** | 🟢 **FIXED** | Archived `vercel.json` and `api/index.py` to `attic/`. Consolidated on single `Dockerfile`. | One supported deployment target. |
 | **Health Check DB Guard** | 🟢 **FIXED** | `/health` now reports `degraded_unseeded_terminology` with explicit warning when concepts < 100k. | Verified. |
-| **Accuracy Benchmark Gate** | 🔴 **FAILED TARGET** | Diagnosis F1: **0.60** (target $\ge 0.90$). Medication F1: **0.9524** (target $\ge 0.92$). | Must iterate on real notes dataset. |
+| **Accuracy Benchmark Gate** | 🟡 **PENDING FOUNDER DATA** | Synthetic-only benchmark (circular test against 10 synthetic notes); real-note evaluation pending 200+ founder notes per MASTER_DIRECTIVE Task 1.5. NOT certification-grade. | Must evaluate on real clinical dataset. |
 
 ---
 

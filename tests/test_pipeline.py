@@ -321,6 +321,28 @@ class TestSICCEPipeline(unittest.TestCase):
         self.assertEqual(bal_data["credits_total"], 5000)
         self.assertEqual(bal_data["credits_remaining"], 4980)
 
+    def test_metrics_summary_endpoint(self):
+        """Verify that GET /api/v1/metrics/summary returns latency and cost telemetry per Task C."""
+        res = self.client.get(
+            "/api/v1/metrics/summary",
+            headers={"X-API-KEY": "test-dev-key"}
+        )
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertIn("p50_latency_ms", data)
+        self.assertIn("p95_latency_ms", data)
+        self.assertIn("avg_cost_inr_per_note", data)
+        self.assertIn("cache_hit_rate", data)
+        self.assertEqual(data["target_cost_inr"], "< 0.05")
+
+    def test_abdm_gateway_mode(self):
+        """Verify that ABHAGateway defaults to mock and correctly labels mode per Task E."""
+        from abha_gateway import ABHAGateway
+        gw = ABHAGateway(mode="mock")
+        res = gw.generate_otp("9876543210")
+        self.assertEqual(res["mode"], "mock")
+        self.assertEqual(res["status"], "OTP_SENT")
+
 
 if __name__ == "__main__":
     unittest.main()

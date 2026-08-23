@@ -345,3 +345,22 @@ class TerminologyResolver:
             "semantic_tag": default_tag,
             "coded": False
         }
+
+    def _log_unresolved_term(self, term: str, context: Optional[str] = "unresolved_clinical_query"):
+        """Logs unresolved term to logs/unresolved_terms.jsonl to feed future open-source lexicon."""
+        try:
+            from datetime import datetime, timezone
+            file_dir = os.path.dirname(os.path.abspath(__file__))
+            log_dir = os.path.join(file_dir, "logs")
+            os.makedirs(log_dir, exist_ok=True)
+            log_path = os.path.join(log_dir, "unresolved_terms.jsonl")
+
+            entry = {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "term": term,
+                "context": context
+            }
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(entry) + "\n")
+        except Exception as e:
+            logger.warning(f"Failed to log unresolved term: {e}")

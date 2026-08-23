@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import time
 import logging
 import asyncio
 from datetime import datetime, timezone
@@ -85,6 +86,43 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# Cost & Latency Metrics Logger per Task C (KPI: <₹0.05/note)
+METRICS_LOG_PATH = os.path.join(PROJECT_ROOT, "logs", "metrics.jsonl")
+os.makedirs(os.path.dirname(METRICS_LOG_PATH), exist_ok=True)
+
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    duration_ms = round((time.time() - start_time) * 1000, 2)
+    
+    # Only record /api/v1/ clinical endpoints
+    if request.url.path.startswith("/api/v1/"):
+        cache_hit = response.headers.get("X-Cache-Hit") == "true"
+        tokens_in = int(response.headers.get("X-Tokens-In") or 0)
+        tokens_out = int(response.headers.get("X-Tokens-Out") or 0)
+        # Gemini 1.5 Flash estimate: ~0.0062 INR/1k in, 0.025 INR/1k out
+        cost_inr = round(((tokens_in * 0.0062) + (tokens_out * 0.025)) / 1000.0, 5) if (tokens_in or tokens_out) else (0.00000 if cache_hit else 0.00150)
+        
+        record = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "endpoint": request.url.path,
+            "method": request.method,
+            "status_code": response.status_code,
+            "duration_ms": duration_ms,
+            "llm_tokens_in": tokens_in,
+            "llm_tokens_out": tokens_out,
+            "llm_cost_inr_estimate": cost_inr,
+            "cache_hit": cache_hit
+        }
+        try:
+            with open(METRICS_LOG_PATH, "a", encoding="utf-8") as f:
+                f.write(json.dumps(record) + "\n")
+        except Exception as e:
+            logger.warning(f"Failed to append metrics: {e}")
+
+    return response
 
 # API Keys & Auth Dependency Injection
 async def verify_webhook_auth(
@@ -666,6 +704,55 @@ async def get_api_credit_balance(x_api_key: str = Header("test-dev-key", alias="
         "credits_remaining": 4980,
         "credits_used": 20,
         "auto_recharge": False
+    }
+
+
+# --- Cost & Latency Metrics Summary per Task C ---
+@app.get("/api/v1/metrics/summary")
+async def get_metrics_summary(limit: int = 100, api_key: str = Depends(verify_api_key)):
+    """Returns latency percentiles (p50, p95), average cost per note, and cache hit rate over last N requests."""
+    records = []
+    if os.path.exists(METRICS_LOG_PATH):
+        try:
+            with open(METRICS_LOG_PATH, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+                for line in lines[-limit:]:
+                    if line.strip():
+                        records.append(json.loads(line.strip()))
+        except Exception as e:
+            logger.warning(f"Error reading metrics log: {e}")
+
+    if not records:
+        return {
+            "total_requests_recorded": 0,
+            "p50_latency_ms": 0.0,
+            "p95_latency_ms": 0.0,
+            "avg_cost_inr_per_note": 0.0,
+            "target_cost_inr": "< 0.05",
+            "cache_hit_rate": 0.0,
+            "recent_records_analyzed": 0
+        }
+
+    durations = sorted([r.get("duration_ms", 0.0) for r in records])
+    costs = [r.get("llm_cost_inr_estimate", 0.0) for r in records]
+    cache_hits = [r for r in records if r.get("cache_hit") is True]
+
+    p50_idx = int(len(durations) * 0.50)
+    p95_idx = int(len(durations) * 0.95)
+
+    p50 = durations[min(p50_idx, len(durations) - 1)]
+    p95 = durations[min(p95_idx, len(durations) - 1)]
+    avg_cost = round(sum(costs) / len(costs), 5) if costs else 0.0
+    hit_rate = round(len(cache_hits) / len(records), 4)
+
+    return {
+        "total_requests_recorded": len(records),
+        "p50_latency_ms": p50,
+        "p95_latency_ms": p95,
+        "avg_cost_inr_per_note": avg_cost,
+        "target_cost_inr": "< 0.05",
+        "cache_hit_rate": hit_rate,
+        "recent_records_analyzed": len(records)
     }
 
 
