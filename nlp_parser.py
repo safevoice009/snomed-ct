@@ -113,19 +113,28 @@ class RuleParser:
     }
 
     KNOWN_DRUGS = [
-        {"pattern": r"levocet[\s\-]m", "brand": "Tab Levocet M", "generic": "Levocetirizine and montelukast", "dose": "5mg/10mg"},
-        {"pattern": r"ascoril[\s\-]d", "brand": "Syp Ascoril D", "generic": "Dextromethorphan hydrobromide", "dose": "100ml"},
+        {"pattern": r"levocet[\s\-]m|montek[\s\-]lc|montair[\s\-]lc", "brand": "Tab Montair LC", "generic": "Montelukast and levocetirizine", "dose": "10mg/5mg"},
+        {"pattern": r"ascoril[\s\-]d", "brand": "Syp Ascoril D", "generic": "Dextromethorphan", "dose": "100ml"},
         {"pattern": r"telma[\s\-]40|telma\b", "brand": "Tab Telma 40", "generic": "Telmisartan", "dose": "40mg"},
-        {"pattern": r"amlo(dipine|ng)?\s*(5|10)?", "brand": "Tab Amlodipine 5mg", "generic": "Amlodipine", "dose": "5mg"},
-        {"pattern": r"dolo[\s\-]650|dolo\b", "brand": "Tab Dolo 650", "generic": "Paracetamol", "dose": "650mg"},
+        {"pattern": r"amlong[\s\-]5|amlong\b|amlodipine\b", "brand": "Tab Amlong 5mg", "generic": "Amlodipine", "dose": "5mg"},
+        {"pattern": r"dolo[\s\-]650|dolo\b|calpol\b", "brand": "Tab Dolo 650", "generic": "Paracetamol", "dose": "650mg"},
         {"pattern": r"pantocid[\s\-]40|pantocid\b|pan[\s\-]40", "brand": "Cap Pantocid 40", "generic": "Pantoprazole", "dose": "40mg"},
+        {"pattern": r"pan[\s\-]d\b", "brand": "Tab Pan-D", "generic": "Pantoprazole and domperidone", "dose": "40mg/30mg"},
+        {"pattern": r"zerodol[\s\-]sp|zerodol\b", "brand": "Tab Zerodol-SP", "generic": "Aceclofenac, paracetamol and serratiopeptidase", "dose": "100mg/325mg/15mg"},
+        {"pattern": r"meftal[\s\-]spas|meftal\b", "brand": "Tab Meftal-Spas", "generic": "Mefenamic acid and dicyclomine", "dose": "250mg/10mg"},
+        {"pattern": r"allegra[\s\-]120|allegra\b", "brand": "Tab Allegra 120", "generic": "Fexofenadine", "dose": "120mg"},
+        {"pattern": r"omez[\s\-]20|omez\b", "brand": "Cap Omez 20", "generic": "Omeprazole", "dose": "20mg"},
+        {"pattern": r"foracort[\s\-]200|foracort\b", "brand": "Inhaler Foracort 200", "generic": "Formoterol and budesonide", "dose": "200mcg"},
+        {"pattern": r"deriphyllin\b", "brand": "Tab Deriphyllin Retard 150", "generic": "Etofylline and theophylline", "dose": "150mg"},
+        {"pattern": r"ondem[\s\-]4|ondem\b|inj ondem", "brand": "Inj Ondem 4mg", "generic": "Ondansetron", "dose": "4mg"},
         {"pattern": r"norflox[\s\-]tz|norflox\b", "brand": "Tab Norflox TZ", "generic": "Norfloxacin and tinidazole", "dose": "400mg/600mg"},
         {"pattern": r"lasix[\s\-]40|lasix\b", "brand": "Tab Lasix 40mg", "generic": "Furosemide", "dose": "40mg"},
-        {"pattern": r"glycomet[\s\-]500|glycomet\b|metformin\b", "brand": "Tab Glycomet 500", "generic": "Metformin hydrochloride", "dose": "500mg"},
+        {"pattern": r"glycomet[\s\-]500|glycomet\b|metformin\b", "brand": "Tab Glycomet 500", "generic": "Metformin", "dose": "500mg"},
         {"pattern": r"azithral[\s\-]500|azithral\b|azithromycin\b", "brand": "Tab Azithral 500", "generic": "Azithromycin", "dose": "500mg"},
         {"pattern": r"augmentin[\s\-]625|augmentin\b|clavam\b", "brand": "Tab Augmentin 625", "generic": "Amoxicillin and clavulanic acid", "dose": "625mg"},
-        {"pattern": r"atorva[\s\-]10|atorva\b|atorvastatin\b", "brand": "Tab Atorva 10", "generic": "Atorvastatin", "dose": "10mg"},
-        {"pattern": r"ors\b|electral\b", "brand": "ORS Electral Sachet", "generic": "Oral rehydration salts", "dose": "1 sachet in 1L"},
+        {"pattern": r"atorva[\s\-]10|atorva\b|atorvastatin\b", "brand": "Tab Atorva 10mg", "generic": "Atorvastatin", "dose": "10mg"},
+        {"pattern": r"ors\b|electral\b", "brand": "ORS Electral", "generic": "Oral rehydration salts", "dose": "1 sachet in 1L"},
+        {"pattern": r"shelcal[\s\-]500|shelcal\b", "brand": "Tab Shelcal 500", "generic": "Calcium and vitamin D3", "dose": "500mg/250IU"},
         {"pattern": r"steam(\s+inhalation)?", "brand": "Steam Inhalation", "generic": "Steam inhalation", "dose": "10 mins"}
     ]
 
@@ -188,14 +197,26 @@ class RuleParser:
             extracted["symptoms"].append("Headache")
         if re.search(r"\b(fever|bukhar|pyrexia|taap|101f|102f)\b", text_lower):
             extracted["symptoms"].append("Fever")
-        if re.search(r"\b(ulti|vomiting|nausea|ulti jaisa)\b", text_lower):
-            extracted["symptoms"].append("Nausea and vomiting")
-        if re.search(r"\b(soboe|dyspnea|shortness of breath|breathlessness|dam fulna)\b", text_lower):
+        if re.search(r"\b(nausea|ulti jaisa|nauseated)\b", text_lower):
+            extracted["symptoms"].append("Nausea")
+        if re.search(r"\b(ulti|vomiting|emesis)\b", text_lower):
+            extracted["symptoms"].append("Vomiting")
+        if re.search(r"\b(soboe|saas phoolna|dyspnea|shortness of breath|breathlessness|dam fulna)\b", text_lower):
             extracted["symptoms"].append("Dyspnea on exertion")
         if re.search(r"\b(pedal edema|edema|foot swelling|pair me sujan)\b", text_lower):
             extracted["symptoms"].append("Edema of foot")
-        if re.search(r"\b(ap\+|ap positive|abdominal pain|pet dard|pet me marod|stomach pain)\b", text_lower):
+        if re.search(r"\b(ap\+|ap positive|abdominal pain|pet dard|pet me marod|stomach pain|pet mein tez dard)\b", text_lower):
             extracted["symptoms"].append("Abdominal pain")
+        if re.search(r"\b(joint pain|sandhi shoola|ghutno me dard|arthralgia)\b", text_lower):
+            extracted["symptoms"].append("Joint pain")
+        if re.search(r"\b(sneezing|chhink|sardi)\b", text_lower):
+            extracted["symptoms"].append("Sneezing")
+        if re.search(r"\b(running nose|rhinorrhea|watery nose)\b", text_lower):
+            extracted["symptoms"].append("Rhinorrhea")
+        if re.search(r"\b(wheezing|wheeze)\b", text_lower):
+            extracted["symptoms"].append("Wheezing")
+        if re.search(r"\b(periods pain|period pain|dysmenorrhea|cramps)\b", text_lower):
+            extracted["symptoms"].append("Dysmenorrhea")
         if re.search(r"\b(heartburn|jalan|chest burning|acidity)\b", text_lower):
             extracted["symptoms"].append("Heartburn")
         if re.search(r"\b(amavata)\b", text_lower):
@@ -204,16 +225,24 @@ class RuleParser:
             extracted["symptoms"].append("Vata vyadhi")
 
         # 2. Diagnoses Detection
-        if re.search(r"\b(allergic rhinitis|rhinitis|sardi|sneezing)\b", text_lower):
+        if re.search(r"\b(allergic rhinitis|rhinitis)\b", text_lower):
             extracted["diagnoses"].append("Allergic rhinitis")
         if re.search(r"\b(hypertension|htn|high bp|bp high)\b", text_lower):
             extracted["diagnoses"].append("Hypertension")
+        if re.search(r"\b(dyslipidemia|high cholesterol|hyperlipidemia)\b", text_lower):
+            extracted["diagnoses"].append("Dyslipidemia")
+        if re.search(r"\b(asthma|bronchial asthma)\b", text_lower):
+            extracted["diagnoses"].append("Asthma")
+        if re.search(r"\b(dysmenorrhea)\b", text_lower):
+            extracted["diagnoses"].append("Dysmenorrhea")
         if re.search(r"\b(acute gastroenteritis|age|gastroenteritis)\b", text_lower):
             extracted["diagnoses"].append("Acute gastroenteritis")
+        if re.search(r"\b(acute bronchitis|bronchitis)\b", text_lower):
+            extracted["diagnoses"].append("Acute bronchitis")
         if re.search(r"\b(apd|acid peptic disease|gerd)\b", text_lower):
             extracted["diagnoses"].append("Acid peptic disease")
         if re.search(r"\b(diabetes mellitus|diabetes|dm|t2dm|sugar)\b", text_lower):
-            extracted["diagnoses"].append("Diabetes mellitus")
+            extracted["diagnoses"].append("Type 2 diabetes mellitus")
         if re.search(r"\b(rheumatoid arthritis|ra)\b", text_lower):
             extracted["diagnoses"].append("Rheumatoid arthritis")
 
@@ -221,7 +250,7 @@ class RuleParser:
         for drug in self.KNOWN_DRUGS:
             if re.search(drug["pattern"], text_lower):
                 # Find if BD, OD, TDS, HS, SOS appears near the drug
-                match_freq = re.search(rf"(?:{drug['pattern']})[^\n\.\,]*?\b(bd|od|tds|hs|sos|qid|twice daily|once daily|three times daily)\b", text_lower)
+                match_freq = re.search(rf"(?:{drug['pattern']})[^\n\.\,]*?\b(bd|od|tds|hs|sos|qid|stat|twice daily|once daily|three times daily|once daily at night)\b", text_lower)
                 if match_freq and match_freq.group(1):
                     freq = str(match_freq.group(1)).upper()
                 else:
@@ -232,10 +261,11 @@ class RuleParser:
                     "OD": "once daily",
                     "TDS": "three times daily",
                     "QID": "four times daily",
-                    "HS": "at bedtime",
-                    "SOS": "as needed"
+                    "HS": "once daily at night",
+                    "SOS": "as needed",
+                    "STAT": "once as needed"
                 }
-                freq_clean = freq_map.get(freq.upper(), freq)
+                freq_clean = freq_map.get(freq.upper(), freq.lower())
 
                 extracted["medications"].append({
                     "brand_name": drug["brand"],
