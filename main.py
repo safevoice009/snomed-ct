@@ -28,6 +28,9 @@ from vision_parser import VisionOCRParser
 from voice_parser import VoiceScribeParser
 from cdss_engine import CDSSEngine
 from nhcx_claim_generator import NHCXClaimGenerator
+from nhcx_adjudicator import NHCXPreAdjudicator
+from abha_gateway import ABHAGateway
+from webhook_handler import WhatsAppClinicalWebhook
 from auth_service import AuthService, SignUpRequest, SignInRequest, APIKeyCreateRequest
 
 # Load configuration
@@ -45,6 +48,9 @@ vision_engine = VisionOCRParser()
 voice_engine = VoiceScribeParser()
 cdss_engine = CDSSEngine()
 nhcx_generator = NHCXClaimGenerator()
+nhcx_adjudicator = NHCXPreAdjudicator()
+abha_gateway = ABHAGateway()
+whatsapp_handler = WhatsAppClinicalWebhook()
 auth_service = AuthService()
 
 # Rate limiting setup
@@ -448,6 +454,115 @@ async def purge_compliance_records(req: PurgeRequest, user = Depends(get_current
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "ephemeral_guarantee": "Zero unencrypted PHI retained on server memory or disk."
     }
+
+
+# --- 1. NHCX Claim Pre-Adjudication Scoring Engine ---
+class ClaimPreAdjudicationRequest(BaseModel):
+    claim_bundle: Dict[str, Any]
+
+@app.post("/api/v1/nhcx/pre-adjudicate")
+@limiter.limit("60/minute")
+async def pre_adjudicate_claim(
+    request: Request,
+    body: ClaimPreAdjudicationRequest,
+    api_key: str = Depends(verify_api_key)
+):
+    """Evaluates NHCX FHIR Claim bundles against IRDAI/TPA cashless adjudication rules before insurer submission."""
+    report = nhcx_adjudicator.evaluate_claim(body.claim_bundle)
+    return report
+
+
+# --- 2. ABDM M1/M2 ABHA Gateway Endpoints ---
+class ABHAGenerateOTPRequest(BaseModel):
+    identifier: str = Field(..., description="10-digit Mobile or 12-digit Aadhaar number")
+    auth_type: str = Field("MOBILE_OTP", description="MOBILE_OTP or AADHAAR_OTP")
+
+class ABHAVerifyOTPRequest(BaseModel):
+    txn_id: str
+    otp: str
+    preferred_abha_name: Optional[str] = None
+
+class CareContextLinkRequest(BaseModel):
+    abha_address: str
+    patient_ref: str
+    encounter_id: str
+    fhir_bundle: Dict[str, Any]
+
+@app.post("/api/v1/abdm/abha/generate-otp")
+@limiter.limit("30/minute")
+async def abdm_generate_otp(
+    request: Request,
+    body: ABHAGenerateOTPRequest,
+    api_key: str = Depends(verify_api_key)
+):
+    """Generates ABDM M1 OTP for ABHA Number/Address verification."""
+    res = abha_gateway.generate_otp(body.identifier, body.auth_type)
+    return res
+
+@app.post("/api/v1/abdm/abha/verify-otp")
+@limiter.limit("30/minute")
+async def abdm_verify_otp(
+    request: Request,
+    body: ABHAVerifyOTPRequest,
+    api_key: str = Depends(verify_api_key)
+):
+    """Verifies ABDM M1 OTP and returns verified 14-digit ABHA Number and @abdm address."""
+    res = abha_gateway.verify_otp(body.txn_id, body.otp, body.preferred_abha_name)
+    return res
+
+@app.post("/api/v1/abdm/link-care-context")
+@limiter.limit("60/minute")
+async def abdm_link_care_context(
+    request: Request,
+    body: CareContextLinkRequest,
+    api_key: str = Depends(verify_api_key)
+):
+    """Links clinical consultation FHIR bundle to patient's ABDM Care Context (M2 milestone)."""
+    res = abha_gateway.link_care_context(body.abha_address, body.patient_ref, body.encounter_id, body.fhir_bundle)
+    return res
+
+
+# --- 3. WhatsApp & Telephony Clinical Ingestion Webhook ---
+class WhatsAppMessageRequest(BaseModel):
+    from_phone: str = Field("+919876543210", description="Sender WhatsApp phone number")
+    clinic_name: Optional[str] = "Apollo OPD Clinic"
+    doctor_name: Optional[str] = "Dr. Rajesh Sharma"
+    message_text: Optional[str] = None
+    media_url: Optional[str] = None
+
+@app.post("/api/v1/webhook/whatsapp")
+@limiter.limit("60/minute")
+async def whatsapp_clinical_webhook(
+    request: Request,
+    payload: WhatsAppMessageRequest
+):
+    """WhatsApp & Telephony Clinical Scribe webhook. Ingests raw doctor messages, parses clinical findings, checks CDSS, and returns instant bilingual WhatsApp reply."""
+    text_content = payload.message_text or "Pt c/o severe headache & nausea. APD Positive. Tab Pantocid 40mg OD Before Food, Tab Dolo 650mg BD."
+    
+    # 1. Parse clinical note
+    extractions = await parser.parse(text_content)
+    resolved = resolver.resolve_extraction(extractions)
+    
+    # 2. Check CDSS
+    cdss_report = cdss_engine.evaluate_safety(
+        medications=resolved.get("medications", []),
+        patient_conditions=extractions.get("symptoms", []) + extractions.get("diagnoses", [])
+    )
+    
+    # 3. Generate vernacular dosage schedules
+    vernacular_schedules = VernacularTranslator.generate_schedules(extractions.get("medications", []))
+    
+    # 4. Format WhatsApp reply
+    reply = whatsapp_handler.format_whatsapp_reply(
+        sender_phone=payload.from_phone,
+        clinic_name=payload.clinic_name or "OPD Clinic",
+        doctor_name=payload.doctor_name or "Consultant Physician",
+        resolved_data=resolved,
+        cdss_data=cdss_report,
+        vernacular_schedules=vernacular_schedules
+    )
+    
+    return reply
 
 
 # --- Developer API Billing & Credit Packages ---

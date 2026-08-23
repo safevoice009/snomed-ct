@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>SICCE — Enterprise Clinical OCR, ABDM Gateway &amp; Healthcare AI Suite</title>
-  <link rel="stylesheet" href="/static/style.css?v=20260823_v17">
+  <link rel="stylesheet" href="/static/style.css?v=20260823_v18">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;850&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -342,6 +342,8 @@
                 <button class="inspector-tab-btn" data-tab="vernacular">🗣️ Patient Card</button>
                 <button class="inspector-tab-btn" data-tab="json">FHIR R4 Bundle</button>
                 <button class="inspector-tab-btn" data-tab="nhcx">🛡️ NHCX Claim</button>
+                <button class="inspector-tab-btn" data-tab="adjudication">⚡ Pre-Adjudicate</button>
+                <button class="inspector-tab-btn" data-tab="abha">🇮🇳 ABHA M1/M2</button>
                 <button class="inspector-tab-btn" data-tab="pipeline">DPDP Audit</button>
               </div>
               <div style="display: flex; gap: 0.45rem;">
@@ -512,6 +514,87 @@
                     <div>
                       <div class="step-info-title">ABDM NRCES FHIR R4 Document Assembly</div>
                       <div class="step-info-desc">Generates a validated <code>OPConsultation</code> document bundle with Composition, Patient, Condition, and Observation resources.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 6: NHCX PRE-ADJUDICATION SCORING (ENTERPRISE MOAT 1) -->
+              <div id="inspector-view-adjudication" class="hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                  <div>
+                    <h3 style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 0.2rem;">⚡ NHCX 0% Rejection Pre-Adjudication Shield</h3>
+                    <p style="font-size: 0.78rem; color: #64748b;">Simulates IRDAI &amp; TPA medical necessity rules before insurer submission.</p>
+                  </div>
+                  <button id="btn-run-adjudication" class="btn-tool" style="background: var(--brand-primary); color: #fff; font-weight: 700; padding: 0.35rem 0.75rem;">
+                    Run Pre-Check
+                  </button>
+                </div>
+
+                <div id="adjudication-results-card" style="background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.25rem; margin-bottom: 1rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                      <span style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Approval Probability</span>
+                      <div id="adj-prob-score" style="font-size: 1.75rem; font-weight: 850; color: #059669; font-family: var(--font-mono);">98% — HIGH</div>
+                    </div>
+                    <div id="adj-status-badge" style="padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.78rem; font-weight: 800; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
+                      READY_FOR_AUTO_ADJUDICATION
+                    </div>
+                  </div>
+
+                  <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 0.8rem; font-weight: 750; color: #0f172a; margin-bottom: 0.4rem;">Passed Statutory &amp; Necessity Checks:</div>
+                    <div id="adj-checks-list" style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.78rem; color: #334155;">
+                      <div>✅ Primary ICD-10 Diagnosis Specificity Validated</div>
+                      <div>✅ Pharmacy itemization matches prescribed medication count</div>
+                      <div>✅ OPD billing within IRDAI benchmark sub-limits</div>
+                    </div>
+                  </div>
+
+                  <div id="adj-flags-container" class="hidden">
+                    <div style="font-size: 0.8rem; font-weight: 750; color: #b91c1c; margin-bottom: 0.4rem;">⚠️ Pre-Submission Flags &amp; Action Items:</div>
+                    <div id="adj-flags-list" style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.78rem; color: #991b1b;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 7: ABDM M1/M2 ABHA GATEWAY (ENTERPRISE MOAT 2) -->
+              <div id="inspector-view-abha" class="hidden">
+                <div style="margin-bottom: 1.25rem;">
+                  <h3 style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 0.2rem;">🇮🇳 ABDM M1 &amp; M2 Ayushman Bharat Gateway</h3>
+                  <p style="font-size: 0.78rem; color: #64748b;">Instant ABHA ID Creation, KYC Verification &amp; Care Context Linkage.</p>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff; padding: 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; position: relative; overflow: hidden;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                      <div style="font-size: 0.72rem; color: #94a3b8; letter-spacing: 0.08em; text-transform: uppercase;">National Health Authority (NHA)</div>
+                      <div style="font-size: 1.1rem; font-weight: 800; letter-spacing: 0.02em;">ABHA DIGITAL HEALTH CARD</div>
+                    </div>
+                    <span style="font-size: 0.7rem; background: #059669; color: #fff; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700;">M1/M2 VERIFIED</span>
+                  </div>
+
+                  <div style="font-family: var(--font-mono); font-size: 1.15rem; font-weight: 800; letter-spacing: 0.1em; color: #38bdf8; margin-bottom: 0.75rem;" id="abha-card-num">
+                    91-8842-1093-5521
+                  </div>
+
+                  <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #cbd5e1;">
+                    <div>Name: <strong id="abha-card-name" style="color: #fff;">Mr. Rahul Verma</strong></div>
+                    <div>ABHA Address: <strong id="abha-card-address" style="color: #38bdf8;">rahul.verma@abdm</strong></div>
+                  </div>
+                </div>
+
+                <div style="background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; padding: 1rem;">
+                  <div style="font-size: 0.82rem; font-weight: 750; color: #0f172a; margin-bottom: 0.5rem;">Simulate ABHA OTP Generation / Linkage:</div>
+                  <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+                    <input type="text" id="abha-mobile-input" placeholder="Mobile / Aadhaar (e.g. 9876543210)" value="9876543210" style="flex: 1; padding: 0.45rem 0.65rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem;">
+                    <button id="btn-generate-abha-otp" class="btn-tool" style="background: #0f172a; color: #fff; font-weight: 700; white-space: nowrap;">Send OTP</button>
+                  </div>
+
+                  <div id="abha-otp-box" class="hidden" style="margin-top: 0.5rem; padding-top: 0.75rem; border-top: 1px dashed #cbd5e1;">
+                    <div style="display: flex; gap: 0.5rem;">
+                      <input type="text" id="abha-otp-input" placeholder="Enter 6-digit OTP (123456)" value="123456" style="width: 140px; padding: 0.45rem 0.65rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; font-family: var(--font-mono);">
+                      <button id="btn-verify-abha-otp" class="btn-tool" style="background: #059669; color: #fff; font-weight: 700;">Verify &amp; Link M2</button>
                     </div>
                   </div>
                 </div>
@@ -1018,7 +1101,7 @@
     </div>
   </div>
 
-  <script src="/static/scrub-engine.js?v=20260823_v17"></script>
-  <script src="/static/app.js?v=20260823_v17"></script>
+  <script src="/static/scrub-engine.js?v=20260823_v18"></script>
+  <script src="/static/app.js?v=20260823_v18"></script>
 </body>
 </html>
