@@ -232,27 +232,28 @@ class TerminologyResolver:
             "medications": []
         }
         
-        # Resolve symptoms
+        seen_symptoms = set()
         for symptom in extraction_results.get("symptoms", []):
             match = self.resolve_term(symptom)
-            if match:
-                resolved["symptoms"].append(self._format_concept(match, symptom))
-            else:
-                resolved["symptoms"].append(self._format_uncoded(symptom, "finding"))
+            item = self._format_concept(match, symptom) if match else self._format_uncoded(symptom, "finding")
+            key = (item.get("concept_id"), (item.get("display") or item.get("original_query", "")).lower())
+            if key not in seen_symptoms:
+                seen_symptoms.add(key)
+                resolved["symptoms"].append(item)
                 
-        # Resolve diagnoses
+        seen_diagnoses = set()
         for diagnosis in extraction_results.get("diagnoses", []):
             match = self.resolve_term(diagnosis)
-            if match:
-                resolved["diagnoses"].append(self._format_concept(match, diagnosis))
-            else:
-                resolved["diagnoses"].append(self._format_uncoded(diagnosis, "disorder"))
+            item = self._format_concept(match, diagnosis) if match else self._format_uncoded(diagnosis, "disorder")
+            key = (item.get("concept_id"), (item.get("display") or item.get("original_query", "")).lower())
+            if key not in seen_diagnoses:
+                seen_diagnoses.add(key)
+                resolved["diagnoses"].append(item)
                 
-        # Resolve medications
+        seen_meds = set()
         for med in extraction_results.get("medications", []):
             brand_name = med.get("brand_name", "")
             generic_guess = med.get("generic_guess", "")
-            
             match = self.resolve_term(brand_name) or self.resolve_term(generic_guess)
             
             if match:
@@ -263,16 +264,20 @@ class TerminologyResolver:
                     resolved_med["generic_name"] = match["generic_name"]
                 if "category" in match:
                     resolved_med["category"] = match["category"]
-                resolved["medications"].append(resolved_med)
             else:
-                resolved["medications"].append({
+                resolved_med = {
                     "concept_id": None,
                     "display": brand_name or generic_guess,
                     "semantic_tag": "substance",
                     "dose": med.get("dose", ""),
                     "frequency": med.get("frequency", ""),
                     "coded": False
-                })
+                }
+                
+            med_key = (resolved_med.get("concept_id"), (resolved_med.get("display") or brand_name).lower())
+            if med_key not in seen_meds:
+                seen_meds.add(med_key)
+                resolved["medications"].append(resolved_med)
                 
         return resolved
 
