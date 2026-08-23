@@ -258,16 +258,18 @@ class TerminologyResolver:
             
             if match:
                 resolved_med = self._format_concept(match, brand_name or generic_guess)
+                resolved_med["brand_name"] = brand_name or generic_guess
+                resolved_med["generic_name"] = match.get("generic_name") or match.get("preferred_name")
                 resolved_med["dose"] = med.get("dose", "")
                 resolved_med["frequency"] = med.get("frequency", "")
-                if "generic_name" in match:
-                    resolved_med["generic_name"] = match["generic_name"]
                 if "category" in match:
                     resolved_med["category"] = match["category"]
             else:
                 resolved_med = {
                     "concept_id": None,
                     "display": brand_name or generic_guess,
+                    "brand_name": brand_name or generic_guess,
+                    "generic_name": brand_name or generic_guess,
                     "semantic_tag": "substance",
                     "dose": med.get("dose", ""),
                     "frequency": med.get("frequency", ""),
