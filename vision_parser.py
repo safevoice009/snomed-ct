@@ -51,10 +51,10 @@ class VisionOCRParser:
         b64_data = base64.b64encode(opt_bytes).decode("utf-8")
         
         models_to_try = [
-            os.getenv("LLM_MODEL", "gemini-2.0-flash"),
-            "gemini-1.5-flash",
-            "gemini-2.0-flash-lite",
-            "gemini-1.5-pro"
+            os.getenv("LLM_MODEL", "gemini-2.5-flash"),
+            "gemini-2.5-pro",
+            "gemini-2.0-flash",
+            "gemini-1.5-flash"
         ]
         
         system_instruction = (
