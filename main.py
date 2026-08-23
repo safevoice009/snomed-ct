@@ -734,9 +734,10 @@ async def get_postman_collection():
 # --- Health & Telemetry Check ---
 @app.get("/health")
 async def health_check():
-    """Connectivity health check for backend services."""
+    """Connectivity and knowledge base readiness health check."""
     gemini_api_configured = bool(os.getenv("GEMINI_API_KEY") and os.getenv("GEMINI_API_KEY") != "your-gemini-api-key")
     supabase_db_configured = bool(os.getenv("SUPABASE_URL") and os.getenv("SUPABASE_KEY"))
+    min_required_concepts = int(os.getenv("MIN_TERMINOLOGY_CONCEPTS", "100000"))
     
     concepts_count = 0
     if resolver and resolver.sqlite_conn:
@@ -747,12 +748,18 @@ async def health_check():
         except Exception:
             pass
 
-    return {
-        "status": "healthy",
+    is_terminology_complete = concepts_count >= min_required_concepts
+    status_str = "healthy" if is_terminology_complete else "degraded_unseeded_terminology"
+
+    response_payload = {
+        "status": status_str,
         "version": "2.0.0",
+        "terminology_ready": is_terminology_complete,
+        "concepts_loaded": concepts_count,
+        "concepts_threshold": min_required_concepts,
         "services": {
             "gemini_multimodal_api": "active" if gemini_api_configured else "fallback_mode",
-            "sqlite_fts5_terminology": "connected",
+            "sqlite_fts5_terminology": "connected" if is_terminology_complete else "incomplete_bootstrap_seed_only",
             "terminology_concepts": concepts_count,
             "cdss_safety_engine": "active",
             "nhcx_claim_engine": "active",
@@ -760,6 +767,15 @@ async def health_check():
             "auth_engine": "argon2id-ready"
         }
     }
+
+    if not is_terminology_complete:
+        response_payload["warning"] = (
+            f"Terminology database contains only {concepts_count} concepts (expected >= {min_required_concepts}). "
+            "Please obtain NRCeS SNOMED CT India Edition release from nrces.in, place Snapshot in data/rf2/, "
+            "and run scripts/load_rf2.py."
+        )
+
+    return response_payload
 
 
 # Mount static files for Clinical Studio Web UI
