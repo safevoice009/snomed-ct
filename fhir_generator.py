@@ -125,11 +125,12 @@ class FHIRGenerator:
             
             # Code structure
             coding = []
-            if item["coded"]:
+            is_coded = item.get("coded", bool(item.get("concept_id")))
+            if is_coded and item.get("concept_id"):
                 coding.append({
                     "system": "http://snomed.info/sct",
-                    "code": item["concept_id"],
-                    "display": item["display"]
+                    "code": str(item.get("concept_id")),
+                    "display": item.get("display", "Clinical Disorder")
                 })
             
             condition_resource = {
@@ -148,7 +149,7 @@ class FHIRGenerator:
                 },
                 "code": {
                     "coding": coding,
-                    "text": item["original_query"]
+                    "text": item.get("original_query") or item.get("display") or "Clinical Diagnosis"
                 },
                 "subject": {
                     "reference": f"Patient/{patient_details['id']}"
@@ -162,13 +163,14 @@ class FHIRGenerator:
             obs_id = f"obs-{idx+1}"
             
             coding = []
-            if item["coded"]:
+            is_coded = item.get("coded", bool(item.get("concept_id")))
+            if is_coded and item.get("concept_id"):
                 # Check system (Standard SNOMED vs India AYUSH National Extension)
                 system = "http://snomed.info/sct"
                 coding_node = {
                     "system": system,
-                    "code": item["concept_id"],
-                    "display": item["display"]
+                    "code": str(item.get("concept_id")),
+                    "display": item.get("display", "Clinical Finding")
                 }
                 
                 # Highlight if it has AYUSH metadata
@@ -188,7 +190,7 @@ class FHIRGenerator:
                 "status": "final",
                 "code": {
                     "coding": coding,
-                    "text": item["original_query"]
+                    "text": item.get("original_query") or item.get("display") or "Clinical Finding"
                 },
                 "subject": {
                     "reference": f"Patient/{patient_details['id']}"
@@ -217,11 +219,12 @@ class FHIRGenerator:
             med_id = f"med-req-{idx+1}"
             
             coding = []
-            if item["coded"]:
+            is_coded = item.get("coded", bool(item.get("concept_id")))
+            if is_coded and item.get("concept_id"):
                 coding.append({
                     "system": "http://snomed.info/sct",
-                    "code": item["concept_id"],
-                    "display": item["display"]
+                    "code": str(item.get("concept_id")),
+                    "display": item.get("display", "Medication")
                 })
                 
             medication_resource = {
@@ -235,7 +238,7 @@ class FHIRGenerator:
                 "medication": {
                     "concept": {
                         "coding": coding,
-                        "text": item["display"]  # The Brand Name/Generic guess text
+                        "text": item.get("display") or item.get("brand_name") or item.get("original_query") or "Medication"
                     }
                 },
                 "subject": {
