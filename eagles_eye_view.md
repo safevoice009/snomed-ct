@@ -45,11 +45,11 @@ flowchart TD
 
 | Subsystem | Status | Verification Detail |
 | :--- | :--- | :--- |
-| **Test Suite** | 🟢 **100% PASSING** | 31 tests passing across `test_pipeline.py`, `test_production_suite.py`, `test_terminology_full.py`, `test_security.py`. |
+| **Test Suite** | 🟢 **100% PASSING** | 36 tests passing across `test_pipeline.py`, `test_production_suite.py`, `test_terminology_full.py`, `test_security.py`. |
 | **Fabricated Fallbacks** | 🟢 **PURGED** | Zero synthetic data invented on error; unreadable OCR returns explicit `HTTP 502`. |
-| **Terminology Server** | 🟢 **SQLITE FTS5** | Ingests RF2 Snapshot tables (`concepts`, `descriptions`, `brands`) with `scripts/load_rf2.py`. |
+| **Terminology Server** | 🟡 **UNSEEDED (63 CONCEPTS)** | Loader script ready (`scripts/load_rf2.py`), but real RF2 snapshot files pending founder download from `nrces.in`. `/health` warns `degraded_unseeded_terminology`. |
 | **Auth & Security** | 🟢 **ARGON2ID** | Argon2id password hashing, locked CORS origin whitelist, and authenticated WhatsApp webhooks. |
-| **Evaluation Harness** | 🟢 **BENCHMARKED** | `eval/run_eval.py` computes precision, recall, and F1 on clinical test notes. |
+| **Evaluation Benchmark** | 🔴 **GATE FAILED** | Diagnosis F1 is **0.60** (target $\ge 0.90$) on 5 synthetic notes. Blocked on 200+ real de-identified notes from founder. |
 | **Cloud Deployment** | 🟢 **DOCKER** | Single container deployment story (`Dockerfile` / Render / Docker Compose). |
 | **CI Automation** | 🟢 **GITHUB ACTIONS** | `.github/workflows/ci.yml` validates all pushes and pull requests. |
 

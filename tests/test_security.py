@@ -92,6 +92,18 @@ class TestSecurityHardening(unittest.TestCase):
         self.assertEqual(res_bal.status_code, 200)
         self.assertEqual(res_bal.json().get("mode"), "mock")
 
+    def test_empty_terminology_db_guard(self):
+        """Verify that /health reports degraded_unseeded_terminology and warning when DB is below 100k concepts."""
+        res = self.client.get("/health")
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertIn("concepts_loaded", data)
+        self.assertIn("concepts_threshold", data)
+        if data["concepts_loaded"] < data["concepts_threshold"]:
+            self.assertEqual(data["status"], "degraded_unseeded_terminology")
+            self.assertFalse(data["terminology_ready"])
+            self.assertIn("warning", data)
+
 
 if __name__ == "__main__":
     unittest.main()
