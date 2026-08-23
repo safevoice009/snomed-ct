@@ -281,26 +281,26 @@ class LLMParser:
         prompt = f"{system_instruction}\n\nClinical Note:\n\"\"\"\n{text}\n\"\"\"\n\nReturn pure JSON matching the schema."
         
         try:
-            import httpx
+            import requests
+            import asyncio
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={api_key}"
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                res = await client.post(
-                    url,
-                    headers={"Content-Type": "application/json"},
-                    json={
-                        "contents": [{"parts": [{"text": prompt}]}],
-                        "generationConfig": {"response_mime_type": "application/json"}
-                    }
-                )
-                if res.status_code == 200:
-                    data = res.json()
-                    content = data["candidates"][0]["content"]["parts"][0]["text"]
-                    parsed = json.loads(content)
-                    return {
-                        "symptoms": parsed.get("symptoms", []),
-                        "diagnoses": parsed.get("diagnoses", []),
-                        "medications": parsed.get("medications", [])
-                    }
+            payload = {
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {"response_mime_type": "application/json", "temperature": 0.1}
+            }
+            def _call():
+                return requests.post(url, headers={"Content-Type": "application/json"}, json=payload, timeout=12)
+            
+            res = await asyncio.to_thread(_call)
+            if res.status_code == 200:
+                data = res.json()
+                content = data["candidates"][0]["content"]["parts"][0]["text"]
+                parsed = json.loads(content)
+                return {
+                    "symptoms": parsed.get("symptoms", []),
+                    "diagnoses": parsed.get("diagnoses", []),
+                    "medications": parsed.get("medications", [])
+                }
         except Exception as e:
             logger.error(f"Gemini 2.5 Flash clinical extraction error: {e}")
             

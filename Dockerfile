@@ -1,7 +1,6 @@
 # Multi-stage lightweight production Dockerfile for SICCE Enterprise Gateway
-FROM python:3.14-slim AS base
+FROM python:3.11-slim AS base
 
-# Prevent Python from writing .pyc files and enable unbuffered output
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
@@ -20,8 +19,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application source code
 COPY . .
 
-# Expose default port
+# Expose ports
 EXPOSE 8000 10000
 
-# Start production server dynamically binding to Render's $PORT
-CMD ["sh", "-c", "python -m uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 4"]
+# Start production server binding to 0.0.0.0:$PORT
+CMD ["sh", "-c", "python -m uvicorn main:app --host 0.0.0.0 --port ${PORT:-10000}"]

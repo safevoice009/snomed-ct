@@ -2306,3 +2306,75 @@ pre.code-block-viewer {
   display: none !important;
 }
 
+/* ==========================================================================
+   CDSS CLINICAL SAFETY ALERT BOXES & BADGES
+   ========================================================================== */
+.ddi-alert-box {
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.ddi-alert-box.critical {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.ddi-alert-box.critical .ddi-alert-badge {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.ddi-alert-box.warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.ddi-alert-box.warning .ddi-alert-badge {
+  background: #d97706;
+  color: #ffffff;
+}
+
+.ddi-alert-box.clear {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.ddi-alert-box.clear .ddi-alert-badge {
+  background: #059669;
+  color: #ffffff;
+}
+
+.ddi-alert-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.4rem;
+}
+
+.ddi-alert-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+}
+
+.ddi-alert-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.ddi-alert-body {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+

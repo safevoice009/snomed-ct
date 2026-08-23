@@ -250,6 +250,9 @@
               <span class="credit-topup-btn">Top-Up</span>
             </div>
 
+            <button type="button" id="btn-voice-dictate" class="custom-file-upload-btn" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; cursor: pointer;">
+              <span id="voice-icon">🎙️</span> <span id="voice-label">Voice Scribe</span>
+            </button>
             <label class="custom-file-upload-btn" for="rx-file-input">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               Upload Rx Photo
@@ -331,13 +334,14 @@
 
           </div>
 
-          <!-- RIGHT PANE: 4-WAY INSPECTOR -->
+          <!-- RIGHT PANE: 5-WAY INSPECTOR -->
           <div class="sandbox-right">
             <div class="inspector-tab-row">
               <div class="inspector-tabs">
                 <button class="inspector-tab-btn active" data-tab="clinical">Clinical Entities</button>
                 <button class="inspector-tab-btn" data-tab="vernacular">🗣️ Patient Card</button>
                 <button class="inspector-tab-btn" data-tab="json">FHIR R4 Bundle</button>
+                <button class="inspector-tab-btn" data-tab="nhcx">🛡️ NHCX Claim</button>
                 <button class="inspector-tab-btn" data-tab="pipeline">DPDP Audit</button>
               </div>
               <div style="display: flex; gap: 0.45rem;">
@@ -464,7 +468,19 @@
                 <pre id="fhir-json-code" style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5; overflow-x: auto; background: var(--bg-code); color: #f1f5f9; padding: 1rem; border-radius: 8px;">{\n  "resourceType": "Bundle",\n  "type": "document",\n  "id": "ABDM-OPD-2026-991"\n}</pre>
               </div>
 
-              <!-- TAB 4: MULTI-PASS AUDIT PIPELINE -->
+              <!-- TAB 4: NHCX INSURANCE CASHLESS CLAIM PACKAGE -->
+              <div id="inspector-view-nhcx" class="hidden">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; background: #fffbeb; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #fde68a;">
+                  <div>
+                    <div style="font-size: 0.85rem; font-weight: 800; color: #92400e;">⚡ NHCX Automated Cashless Claim Package</div>
+                    <div style="font-size: 0.75rem; color: #b45309;">Pre-mapped to ICD-10-CM diagnostic codes &amp; GIPSA policy format for 3-second cashless approval.</div>
+                  </div>
+                  <span class="tpa-status-badge" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 6px;">● CLAIM READY</span>
+                </div>
+                <pre id="nhcx-json-code" style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5; overflow-x: auto; background: var(--bg-code); color: #f1f5f9; padding: 1rem; border-radius: 8px;">{\n  "resourceType": "Bundle",\n  "type": "collection",\n  "profile": ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"]\n}</pre>
+              </div>
+
+              <!-- TAB 5: MULTI-PASS AUDIT PIPELINE -->
               <div id="inspector-view-pipeline" class="hidden">
                 <div class="pipeline-step-list">
                   <div class="pipeline-step-item">
