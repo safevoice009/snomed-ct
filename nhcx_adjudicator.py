@@ -68,6 +68,7 @@ class NHCXPreAdjudicator:
                 
         if not claim_res:
             return {
+                "mode": "mock",
                 "approval_probability": 0,
                 "status": "REJECTED_FORMAT_ERROR",
                 "risk_level": "CRITICAL",
@@ -186,6 +187,7 @@ class NHCXPreAdjudicator:
             approval_prob = "< 70%"
 
         return {
+            "mode": "mock",
             "score": score,
             "status": status,
             "risk_level": risk_level,

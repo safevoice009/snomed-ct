@@ -7,6 +7,14 @@ from typing import Optional, Dict, Any, List
 from pydantic import BaseModel, EmailStr
 
 try:
+    from argon2 import PasswordHasher
+    from argon2.exceptions import VerifyMismatchError
+    ARGON2_AVAILABLE = True
+except ImportError:
+    ARGON2_AVAILABLE = False
+    logger.warning("argon2-cffi not installed, falling back to secure hashing.")
+
+try:
     from supabase import create_client, Client
     SUPABASE_AVAILABLE = True
 except ImportError:
@@ -29,12 +37,13 @@ class APIKeyCreateRequest(BaseModel):
 
 
 class AuthService:
-    """Manages user registration, session tokens, and dynamic B2B API keys using Supabase."""
+    """Manages user registration, session tokens, and dynamic B2B API keys using Argon2id & Supabase."""
     
     def __init__(self):
         self.supabase_url = os.getenv("SUPABASE_URL")
         self.supabase_key = os.getenv("SUPABASE_KEY")
         self.supabase_client = None
+        self.ph = PasswordHasher() if ARGON2_AVAILABLE else None
         
         # Local fallback in-memory stores if Supabase is offline/mocked
         self._local_users: Dict[str, Dict[str, Any]] = {}
@@ -52,8 +61,57 @@ class AuthService:
                 logger.error(f"AuthService failed to init Supabase client: {e}")
 
     def _hash_password(self, password: str) -> str:
-        """Secure SHA-256 password hash."""
-        return hashlib.sha256(password.encode("utf-8")).hexdigest()
+        """Secure Argon2id password hash (per MASTER_DIRECTIVE.md Law #8)."""
+        if self.ph:
+            return self.ph.hash(password)
+        # Fallback only if argon2 is not loaded
+        salt = uuid.uuid4().hex
+        return f"sha256${salt}${hashlib.sha256((salt + password).encode('utf-8')).hexdigest()}"
+
+    def _verify_password(self, password: str, stored_hash: str) -> tuple[bool, Optional[str]]:
+        """
+        Verifies password against stored hash.
+        Supports transparent migration from legacy SHA-256 to Argon2id.
+        Returns (is_valid, new_hash_to_save_if_migrated).
+        """
+        if not stored_hash:
+            return False, None
+
+        # 1. Argon2id Hash Check
+        if stored_hash.startswith("$argon2"):
+            if self.ph:
+                try:
+                    self.ph.verify(stored_hash, password)
+                    # Check if hash needs rehash due to parameter change
+                    if self.ph.check_needs_rehash(stored_hash):
+                        return True, self._hash_password(password)
+                    return True, None
+                except VerifyMismatchError:
+                    return False, None
+                except Exception as e:
+                    logger.error(f"Argon2 verification error: {e}")
+                    return False, None
+
+        # 2. Legacy Plain SHA-256 (64 hex characters) migration
+        if len(stored_hash) == 64 and all(c in "0123456789abcdefABCDEF" for c in stored_hash):
+            candidate = hashlib.sha256(password.encode("utf-8")).hexdigest()
+            if candidate.lower() == stored_hash.lower():
+                logger.info("Migrating legacy SHA-256 hash to Argon2id.")
+                new_hash = self._hash_password(password)
+                return True, new_hash
+            return False, None
+
+        # 3. Salted SHA-256 fallback
+        if stored_hash.startswith("sha256$"):
+            parts = stored_hash.split("$")
+            if len(parts) == 3:
+                salt, expected = parts[1], parts[2]
+                candidate = hashlib.sha256((salt + password).encode("utf-8")).hexdigest()
+                if candidate == expected:
+                    new_hash = self._hash_password(password)
+                    return True, new_hash
+
+        return False, None
 
     async def sign_up(self, req: SignUpRequest) -> Dict[str, Any]:
         """Registers a new user and returns user profile + session token."""
@@ -98,12 +156,11 @@ class AuthService:
                     "id": f"key_{uuid.uuid4().hex[:12]}",
                     "user_id": user_id,
                     "key_value": default_key,
-                    "name": "Default EMR Gateway Key",
-                    "requests_count": 0,
+                    "name": "Default API Key",
                     "is_active": True
                 }).execute()
             except Exception as e:
-                logger.error(f"Supabase sign-up error: {e}. Falling back to local state.")
+                logger.error(f"Supabase user insert failed: {e}. Falling back to local store.")
                 self._save_local_user(user_data, password_hash, token, expires_at)
         else:
             self._save_local_user(user_data, password_hash, token, expires_at)
@@ -123,9 +180,8 @@ class AuthService:
         }
 
     async def sign_in(self, req: SignInRequest) -> Dict[str, Any]:
-        """Validates credentials and issues a fresh session token."""
+        """Validates credentials via Argon2id and issues a fresh session token."""
         clean_email = req.email.strip().lower()
-        password_hash = self._hash_password(req.password)
         token = f"sess_{uuid.uuid4().hex}"
         expires_at = (datetime.now(timezone.utc) + timedelta(days=30)).isoformat()
         
@@ -133,29 +189,42 @@ class AuthService:
         if self.supabase_client:
             try:
                 acc_res = self.supabase_client.table("accounts").select("*").eq("account_id", clean_email).execute()
-                if acc_res.data and acc_res.data[0]["password"] == password_hash:
-                    usr_res = self.supabase_client.table("users").select("*").eq("id", acc_res.data[0]["user_id"]).execute()
-                    if usr_res.data:
-                        user_record = usr_res.data[0]
-                        # Store new session
-                        self.supabase_client.table("sessions").insert({
-                            "id": f"sess_id_{uuid.uuid4().hex[:12]}",
-                            "user_id": user_record["id"],
-                            "token": token,
-                            "expires_at": expires_at
-                        }).execute()
+                if acc_res.data:
+                    account = acc_res.data[0]
+                    stored_hash = account["password"]
+                    is_valid, new_hash = self._verify_password(req.password, stored_hash)
+                    
+                    if is_valid:
+                        usr_res = self.supabase_client.table("users").select("*").eq("id", account["user_id"]).execute()
+                        if usr_res.data:
+                            user_record = usr_res.data[0]
+                            # Migrate hash in DB if needed
+                            if new_hash:
+                                self.supabase_client.table("accounts").update({"password": new_hash}).eq("id", account["id"]).execute()
+                            # Store new session
+                            self.supabase_client.table("sessions").insert({
+                                "id": f"sess_id_{uuid.uuid4().hex[:12]}",
+                                "user_id": user_record["id"],
+                                "token": token,
+                                "expires_at": expires_at
+                            }).execute()
             except Exception as e:
                 logger.error(f"Supabase sign-in query failed: {e}")
                 
         if not user_record:
             # Fallback to local user
-            if self._local_accounts.get(clean_email) == password_hash:
-                user_record = self._local_users.get(clean_email)
-                self._local_sessions[token] = {
-                    "user": user_record,
-                    "token": token,
-                    "expires_at": expires_at
-                }
+            stored_local_hash = self._local_accounts.get(clean_email)
+            if stored_local_hash:
+                is_valid, new_hash = self._verify_password(req.password, stored_local_hash)
+                if is_valid:
+                    user_record = self._local_users.get(clean_email)
+                    if new_hash:
+                        self._local_accounts[clean_email] = new_hash
+                    self._local_sessions[token] = {
+                        "user": user_record,
+                        "token": token,
+                        "expires_at": expires_at
+                    }
 
         if not user_record:
             raise ValueError("Invalid email or password")
