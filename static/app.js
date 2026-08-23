@@ -311,8 +311,15 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail || 'Voice scribe transcription failed');
+        let errDetail = 'Voice scribe transcription failed';
+        try {
+          const err = await response.json();
+          errDetail = err.detail || err.message || errDetail;
+        } catch (_) {
+          const textErr = await response.text();
+          errDetail = textErr || errDetail;
+        }
+        throw new Error(errDetail);
       }
 
       const data = await response.json();
@@ -422,8 +429,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!response.ok) {
-          const err = await response.json();
-          throw new Error(err.detail || 'Vision OCR failed');
+          let errDetail = 'Vision OCR failed';
+          try {
+            const err = await response.json();
+            errDetail = err.detail || err.message || errDetail;
+          } catch (_) {
+            const textErr = await response.text();
+            errDetail = textErr || errDetail;
+          }
+          throw new Error(errDetail);
         }
 
         const data = await response.json();
