@@ -126,22 +126,14 @@ class VisionOCRParser:
                 
         return self._fallback_response()
 
-    def _fallback_response(self) -> Dict[str, Any]:
+    def _fallback_response(self, error_msg: str = "OCR Extraction Failed") -> Dict[str, Any]:
         return {
-            "raw_text": "Prescription Ingested: Tab Pantocid 40mg OD Before Food, Tab Dolo 650mg BD After Food, Syp Mucaine 2 tsp TDS.",
-            "clinic_name": "Apollo Clinic, Pune",
-            "doctor_name": "Dr. Rajesh Sharma, MD",
-            "symptoms": ["Severe Headache", "Nausea", "Acidic Taste"],
-            "diagnoses": ["Acid Peptic Disease / Gastritis"],
-            "medications": [
-                {"brand_name": "Tab Pantocid 40", "generic_guess": "Pantoprazole", "dose": "40mg", "frequency": "once daily"},
-                {"brand_name": "Tab Dolo 650", "generic_guess": "Paracetamol", "dose": "650mg", "frequency": "twice daily"},
-                {"brand_name": "Syp Mucaine", "generic_guess": "Oxetacaine Gel", "dose": "2 tsp", "frequency": "three times daily"}
-            ],
-            "bounding_boxes": [
-                {"box_2d": [80, 240, 160, 720], "label": "CLINIC_ENTITY", "confidence": 0.998},
-                {"box_2d": [380, 250, 480, 770], "label": "SYMPTOMS_ARRAY", "confidence": 0.992},
-                {"box_2d": [480, 250, 560, 770], "label": "DIAGNOSIS_FINDINGS", "confidence": 0.995},
-                {"box_2d": [570, 250, 720, 770], "label": "MEDICATION_SCHEDULES", "confidence": 0.997}
-            ]
+            "raw_text": "",
+            "clinic_name": "",
+            "doctor_name": "",
+            "symptoms": [],
+            "diagnoses": [],
+            "medications": [],
+            "bounding_boxes": [],
+            "error": error_msg
         }

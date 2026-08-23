@@ -344,27 +344,10 @@ async def ocr_parse_prescription(
         raise
     except Exception as e:
         logger.error(f"Error processing OCR prescription: {e}", exc_info=True)
-        # Resilient fallback returning structured data instead of 500
-        fallback_profile = {
-            "symptoms": [{"concept_id": "25064002", "display": "Headache", "semantic_tag": "finding", "confidence": 0.95}],
-            "diagnoses": [{"concept_id": "386661006", "display": "Fever", "semantic_tag": "finding", "confidence": 0.95}],
-            "medications": [{"concept_id": "387584000", "display": "Paracetamol 650mg", "dose": "650mg", "frequency": "BD", "coded": True}]
-        }
-        fallback_fhir = generator.create_op_consultation_bundle(fallback_profile)
-        return {
-            "raw_text": "Prescription scanned: Tab Paracetamol 650mg BD, symptomatic relief.",
-            "clinic_name": "OPD Consultation Clinic",
-            "doctor_name": "Consultant Physician",
-            "bounding_boxes": [
-                {"box_2d": [150, 100, 300, 900], "label": "CLINICAL_SYMPTOMS", "confidence": 0.98},
-                {"box_2d": [350, 100, 600, 900], "label": "MEDICATION_ORDERS", "confidence": 0.99}
-            ],
-            "extraction": {"symptoms": ["Headache"], "diagnoses": ["Fever"], "medications": [{"brand_name": "Paracetamol 650mg"}]},
-            "resolved": fallback_profile,
-            "cdss": {"status": "CLEAR", "alerts": [], "alerts_count": 0},
-            "bundle": fallback_fhir,
-            "nhcx_bundle": nhcx_generator.generate_claim_bundle(fallback_fhir)
-        }
+        raise HTTPException(
+            status_code=502,
+            detail=f"Clinical OCR Extraction Failed: Unable to extract valid medical concepts from the image ({str(e)}). No patient data was fabricated."
+        )
 
 
 # --- 3. Ambient Clinical Voice Scribe Endpoint ---
@@ -657,6 +640,68 @@ async def get_api_credit_balance(x_api_key: str = Header("test-dev-key", alias="
         "credits_remaining": 4980,
         "credits_used": 20,
         "auto_recharge": False
+    }
+
+
+# --- Postman Collection Export ---
+@app.get("/api/v1/postman-collection")
+async def get_postman_collection():
+    """Returns a ready-to-import Postman v2.1 Collection JSON for instant developer testing."""
+    return {
+        "info": {
+            "name": "SICCE Clinical OCR & ABDM FHIR Gateway",
+            "description": "Production B2B Postman Collection for SNOMED CT and FHIR R4 Ingestion",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        },
+        "item": [
+            {
+                "name": "1. Parse Clinical Note",
+                "request": {
+                    "method": "POST",
+                    "header": [
+                        {"key": "Content-Type", "value": "application/json"},
+                        {"key": "X-API-KEY", "value": "test-dev-key"}
+                    ],
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\"text\": \"Sar dard ho raha hai and ulti jaisa lag raha hai. APD positive. Pantocid 40 OD.\"}"
+                    },
+                    "url": {
+                        "raw": "http://localhost:8000/api/v1/parse",
+                        "protocol": "http",
+                        "host": ["localhost"],
+                        "port": "8000",
+                        "path": ["api", "v1", "parse"]
+                    }
+                }
+            },
+            {
+                "name": "2. Health Telemetry",
+                "request": {
+                    "method": "GET",
+                    "url": {
+                        "raw": "http://localhost:8000/health",
+                        "protocol": "http",
+                        "host": ["localhost"],
+                        "port": "8000",
+                        "path": ["health"]
+                    }
+                }
+            },
+            {
+                "name": "3. Billing Packages",
+                "request": {
+                    "method": "GET",
+                    "url": {
+                        "raw": "http://localhost:8000/api/v1/billing/packages",
+                        "protocol": "http",
+                        "host": ["localhost"],
+                        "port": "8000",
+                        "path": ["api", "v1", "billing", "packages"]
+                    }
+                }
+            }
+        ]
     }
 
 

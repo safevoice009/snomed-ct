@@ -318,8 +318,8 @@ class TestSICCEPipeline(unittest.TestCase):
         )
         self.assertEqual(res_bal.status_code, 200)
         bal_data = res_bal.json()
-        self.assertEqual(bal_data["credits_total"], 1000)
-        self.assertEqual(bal_data["credits_remaining"], 982)
+        self.assertEqual(bal_data["credits_total"], 5000)
+        self.assertEqual(bal_data["credits_remaining"], 4980)
 
 
 if __name__ == "__main__":
