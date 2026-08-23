@@ -264,7 +264,31 @@ CORE_SEEDS = {
         ("Flagyl 400", "Metronidazole", "Antiprotozoal/Antibiotic", "387403001", "400mg", "flagyl, flagyl 400, metrogyl, metrogyl 400"),
         ("Norflox-TZ", "Norfloxacin and tinidazole", "Gastrointestinal Antibiotic", "387508007", "400mg/600mg", "norflox tz, norflox-tz, norbactin-tz"),
         ("Lasix 40", "Furosemide", "Loop Diuretic", "387158000", "40mg", "lasix, lasix 40, fruselac"),
-        ("ORS Electral", "Oral rehydration salts", "Electrolyte Solution", "387325003", "1 sachet in 1L", "electral, ors, ors electral, reliance ors, walyte")
+        ("ORS Electral", "Oral rehydration salts", "Electrolyte Solution", "387325003", "1 sachet in 1L", "electral, ors, ors electral, reliance ors, walyte"),
+        ("Meftal-Spas", "Mefenamic acid and dicyclomine", "Antispasmodic", "387494007", "250mg/10mg", "meftal spas, meftal-spas, meftal, cyclopam, colimex"),
+        ("Allegra 120", "Fexofenadine", "Antihistamine", "387342004", "120mg", "allegra, allegra 120, fexova, fexy, histafree"),
+        ("Omez 20", "Omeprazole", "Proton Pump Inhibitor", "386864001", "20mg", "omez, omez 20, omez-d, omecip, omee"),
+        ("Rantac 150", "Ranitidine", "H2 Blocker", "387584000", "150mg", "rantac, rantac 150, aciloc, zinetac, histac"),
+        ("Montek-LC", "Montelukast and levocetirizine", "Antiasthmatic/Antiallergic", "387342004", "10mg/5mg", "montek lc, montek-lc, montair lc, monticope"),
+        ("Asthalin 100", "Salbutamol", "Bronchodilator Inhaler", "387247003", "100mcg", "asthalin, asthalin 100, ventorlin, aerocort"),
+        ("Foracort 200", "Formoterol and budesonide", "Inhaler Combo", "387247003", "6mcg/200mcg", "foracort, foracort 200, foracort 400, budecort, seroflo"),
+        ("Jardiance 10", "Empagliflozin", "SGLT2 Inhibitor", "387145002", "10mg", "jardiance, jardiance 10, jardiance 25, gibtulio"),
+        ("Galvus Met", "Vildagliptin and metformin", "Antidiabetic Combo", "387145002", "50mg/500mg", "galvus met, galvus-met, jalra-m, vilget-m"),
+        ("Januvia 100", "Sitagliptin", "DPP-4 Inhibitor", "387145002", "100mg", "januvia, januvia 100, istavel, sitaglyn"),
+        ("Ecosprin 75", "Aspirin", "Antiplatelet", "387494007", "75mg", "ecosprin, ecosprin 75, ecosprin 150, asa 75, disprin"),
+        ("Clopilet 75", "Clopidogrel", "Antiplatelet", "387494007", "75mg", "clopilet, clopilet 75, deplatt, ceruvit, plavix"),
+        ("Thyronorm 50", "Levothyroxine", "Thyroid Hormone", "40930008", "50mcg", "thyronorm, thyronorm 50, thyronorm 25, thyronorm 100, eltroxin"),
+        ("Febutaz 40", "Febuxostat", "Antigout", "387494007", "40mg", "febutaz, febutaz 40, febuxor, urikind"),
+        ("Urimax 0.4", "Tamsulosin", "Alpha Blocker (BPH)", "387158000", "0.4mg", "urimax, urimax 0.4, veltam, tamflo, urimax-d"),
+        ("Folvite 5", "Folic acid", "Vitamin Supplement", "715879001", "5mg", "folvite, folvite 5, fol 5, vitafol"),
+        ("Becosules", "Vitamin B Complex with Vitamin C", "Multivitamin", "715879001", "Capsule", "becosules, becosule, b-complex, cobadex forte"),
+        ("Neurobion Forte", "Vitamin B1, B6, B12", "Neurotropic Vitamin", "715879001", "Tablet", "neurobion, neurobion forte, nervz-b, optineuron"),
+        ("Liv-52", "Ayurvedic Hepatoprotective Herbal formulation", "Liver Supplement", "44971000119106", "Tablet/Syrup", "liv 52, liv-52, liv52, amlycure"),
+        ("Digene", "Magnesium hydroxide, aluminium hydroxide and simethicone", "Antacid", "399211009", "Tablet/Gel", "digene, gelusil, mucaine, rennie"),
+        ("Cremaffin", "Liquid paraffin and milk of magnesia", "Laxative", "62315008", "Syrup", "cremaffin, cremaffin plus, dulcoflex, kayam churna"),
+        ("Ondem 4", "Ondansetron", "Antiemetic", "422400008", "4mg", "ondem, ondem 4, emeset, emeset 4, vomikind"),
+        ("Limcee 500", "Ascorbic acid (Vitamin C)", "Antioxidant / Vitamin", "715879001", "500mg", "limcee, limcee 500, celin, celin 500, suckcee"),
+        ("Zincovit", "Multivitamin with Zinc", "Immunity Supplement", "715879001", "Tablet/Syrup", "zincovit, zincovit cl, a to z, supradyn")
     ]
 }
 
