@@ -310,19 +310,17 @@ document.addEventListener('DOMContentLoaded', () => {
         body: formData
       });
 
-      if (!response.ok) {
-        let errDetail = 'Voice scribe transcription failed';
-        try {
-          const err = await response.json();
-          errDetail = err.detail || err.message || errDetail;
-        } catch (_) {
-          const textErr = await response.text();
-          errDetail = textErr || errDetail;
-        }
-        throw new Error(errDetail);
+      const rawText = await response.text();
+      let data = {};
+      try {
+        data = JSON.parse(rawText);
+      } catch (_) {
+        data = { detail: rawText };
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || data.message || `Voice scribe failed with status ${response.status}`);
+      }
       
       // Update transcript note
       if (noteInput) {
@@ -428,19 +426,17 @@ document.addEventListener('DOMContentLoaded', () => {
           body: formData
         });
 
-        if (!response.ok) {
-          let errDetail = 'Vision OCR failed';
-          try {
-            const err = await response.json();
-            errDetail = err.detail || err.message || errDetail;
-          } catch (_) {
-            const textErr = await response.text();
-            errDetail = textErr || errDetail;
-          }
-          throw new Error(errDetail);
+        const rawText = await response.text();
+        let data = {};
+        try {
+          data = JSON.parse(rawText);
+        } catch (_) {
+          data = { detail: rawText };
         }
 
-        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || data.message || `Vision OCR failed with status ${response.status}`);
+        }
         
         // Remove loading overlay and draw real bounding boxes
         const overlay = document.getElementById('ocr-loading-overlay');
@@ -710,12 +706,18 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify({ text })
         });
 
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.detail || 'Failed to parse note');
+        const rawText = await response.text();
+        let result = {};
+        try {
+          result = JSON.parse(rawText);
+        } catch (_) {
+          result = { detail: rawText };
         }
 
-        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.detail || result.message || `Failed to parse note (HTTP ${response.status})`);
+        }
+
         const bundle = result.bundle || result;
         const resolved = result.resolved || {};
         const extraction = result.extraction || {};
