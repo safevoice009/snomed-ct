@@ -81,7 +81,8 @@ class NHCXClaimGenerator:
         for entry in consultation_bundle.get("entry", []):
             resource = entry.get("resource", {})
             if resource.get("resourceType") == "Condition":
-                code_obj = resource.get("code", {}).get("coding", [{}])[0]
+                codings = resource.get("code", {}).get("coding") or []
+                code_obj = codings[0] if codings else {}
                 display_text = code_obj.get("display") or resource.get("code", {}).get("text", "Condition")
                 snomed_code = code_obj.get("code", "Unknown")
                 
