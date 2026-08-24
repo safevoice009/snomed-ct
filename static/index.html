@@ -9,7 +9,7 @@
   <meta property="og:description" content="Messy Indian prescriptions in. Coded, compliant FHIR out. Live demo — no signup.">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="/static/style.css?v=20260824_v40">
-  <link rel="stylesheet" href="/static/style-v3.css?v=20260824_v41">
+  <link rel="stylesheet" href="/static/style-v3.css?v=20260824_v42">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -77,6 +77,10 @@
     <div class="workbench-tag">
       <span class="live-dot"></span>
       LIVE SANDBOX — every result comes from the real running API. Mock features are labeled as mock.
+      <span style="margin-left:auto; display:inline-flex; gap:8px; flex-wrap:wrap;">
+        <span class="mini-chip mini-chip--accent">No signup required</span>
+        <span class="mini-chip">1,000 free calls</span>
+      </span>
     </div>
     <div class="sandbox-container">
 
@@ -185,6 +189,7 @@
               <button class="inspector-tab-btn" data-tab="pipeline">DPDP Audit</button>
             </div>
             <div style="display: flex; gap: 0.45rem;">
+              <button id="btn-copy-curl" class="btn-tool" title="Export the last parse request as a runnable cURL command">Copy as cURL</button>
               <button id="btn-copy-json" class="btn-tool">Copy JSON</button>
               <button id="btn-download-json" class="btn-tool">Download</button>
             </div>
@@ -534,25 +539,52 @@
   <section id="developers" class="v3-section">
     <div class="v3-kicker">Developers</div>
     <h2 class="v3-h2">Integrate in an afternoon</h2>
-    <p class="v3-sub">REST + JSON. Interactive OpenAPI docs, Postman collection, and copy-paste snippets.</p>
-    <div class="code-gen-card">
-      <div class="code-gen-header">
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <span style="font-size: 0.88rem; font-weight: 750; color: #fff;">Developer Integration Hub</span>
-          <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #818cf8; background: rgba(99, 102, 241, 0.2); padding: 0.18rem 0.55rem; border-radius: 4px; font-weight: 600;">Live Payload</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <a href="/api/v1/postman-collection" target="_blank" download="SICCE_Postman_Collection.json" class="btn-tool" style="background: #ea580c; color: #fff; border-color: #ea580c; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-            🚀 Download Postman Collection
-          </a>
-          <div class="lang-tabs">
-            <button class="lang-btn active" data-lang="python">Python</button>
-            <button class="lang-btn" data-lang="curl">cURL</button>
-            <button class="lang-btn" data-lang="node">Node.js</button>
+    <p class="v3-sub">REST + JSON. Interactive OpenAPI docs, Postman collection, and copy-paste snippets. Parse a note in the workbench above and the live response appears here.</p>
+
+    <div class="devhub-grid">
+      <div class="code-gen-card">
+        <div class="code-gen-header">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span style="font-size: 0.88rem; font-weight: 750; color: #fff;">Request</span>
+            <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #818cf8; background: rgba(99, 102, 241, 0.2); padding: 0.18rem 0.55rem; border-radius: 4px; font-weight: 600;">POST /api/v1/parse</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <a href="/api/v1/postman-collection" target="_blank" download="SICCE_Postman_Collection.json" class="btn-tool" style="background: #ea580c; color: #fff; border-color: #ea580c; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+              🚀 Postman
+            </a>
+            <div class="lang-tabs">
+              <button class="lang-btn active" data-lang="python">Python</button>
+              <button class="lang-btn" data-lang="curl">cURL</button>
+              <button class="lang-btn" data-lang="node">Node.js</button>
+            </div>
           </div>
         </div>
+        <pre id="code-snippet-display" class="code-block-viewer"></pre>
       </div>
-      <pre id="code-snippet-display" class="code-block-viewer"></pre>
+
+      <div class="devhub-response-card">
+        <div class="code-gen-header" style="border-radius: 14px 14px 0 0;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span style="font-size: 0.88rem; font-weight: 750; color: #fff;">Response</span>
+            <span id="devhub-response-status" class="mini-chip" style="color:#7cc8b8; border-color: rgba(124,200,184,.3); background: rgba(124,200,184,.08);">waiting for a parse…</span>
+          </div>
+          <button id="btn-copy-response" class="btn-tool" style="background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.2);">Copy</button>
+        </div>
+        <pre id="devhub-response" class="devhub-response-pre">// Run a parse in the workbench above —
+// the real API response lands here, pretty-printed.</pre>
+      </div>
+    </div>
+
+    <div class="sandbox-key-card">
+      <div class="sk-left">
+        <div class="sk-title">Get your free sandbox key</div>
+        <div class="sk-desc">1,000 inferences a month, no credit card. Create an account, generate a key, make your first call in under a minute.</div>
+      </div>
+      <div class="sk-key" id="sk-key-visual" title="Click to copy a sample key format">
+        <span class="sk-key-label">SAMPLE KEY FORMAT</span>
+        <code>sicce_xxxxxxxxxxxxxxxx</code>
+      </div>
+      <a href="/docs" target="_blank" class="btn-v3 btn-v3--ghost" style="padding:11px 20px; font-size:.86rem;">Auth Docs</a>
     </div>
   </section>
 
@@ -841,6 +873,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="/static/site.js?v=20260824_v41"></script>
+<script src="/static/site.js?v=20260824_v42"></script>
 </body>
 </html>

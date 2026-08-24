@@ -212,3 +212,191 @@
   });
 
 })();
+
+/* ============================================================
+   v5.2 DX LAYER — Deepgram/Veryfi-inspired developer experience
+   Captures real workbench traffic (fetch monkey-patch, zero
+   app.js edits) to power: Copy-as-cURL · DevHub response mirror ·
+   drag-drop upload · sandbox-key auto-select · toasts.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var last = { url: null, method: null, requestHeaders: null, body: null, responseText: null, status: null };
+
+  /* ---------- toast ---------- */
+  var toastEl = null, toastTimer = null;
+  function toast(msg) {
+    if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'pp-toast'; document.body.appendChild(toastEl); }
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
+  }
+  function copyText(text, okMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { toast(okMsg || 'Copied'); }, function () { fallbackCopy(text, okMsg); });
+    } else { fallbackCopy(text, okMsg); }
+  }
+  function fallbackCopy(text, okMsg) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast(okMsg || 'Copied'); } catch (e) { toast('Copy failed'); }
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- fetch interceptor: capture parse traffic ---------- */
+  var origFetch = window.fetch;
+  if (typeof origFetch === 'function') {
+    window.fetch = function (input, init) {
+      try {
+        var url = typeof input === 'string' ? input : (input && input.url) || '';
+        if (url.indexOf('/api/v1/parse') !== -1 || url.indexOf('/api/v1/ocr-parse') !== -1) {
+          last.url = url;
+          last.method = (init && init.method) || (input && input.method) || 'GET';
+          last.body = (init && init.body) || null;
+          var hdrs = {};
+          if (init && init.headers) {
+            if (init.headers instanceof Headers) { init.headers.forEach(function (v, k) { hdrs[k] = v; }); }
+            else { hdrs = Object.assign({}, init.headers); }
+          }
+          last.requestHeaders = hdrs;
+          return origFetch.apply(this, arguments).then(function (res) {
+            try {
+              var cloned = res.clone();
+              cloned.text().then(function (txt) {
+                last.statusText = res.status;
+                last.responseText = txt;
+                renderDevhubResponse();
+              }).catch(function () {});
+            } catch (e) {}
+            return res;
+          });
+        }
+      } catch (e) {}
+      return origFetch.apply(this, arguments);
+    };
+  }
+
+  /* ---------- devhub response mirror ---------- */
+  function prettyBody() {
+    if (!last.body) return null;
+    try {
+      if (typeof last.body === 'string' && last.body.trim().indexOf('{') === 0) {
+        return JSON.stringify(JSON.parse(last.body), null, 2);
+      }
+      return String(last.body);
+    } catch (e) { return String(last.body); }
+  }
+  function renderDevhubResponse() {
+    var pre = document.getElementById('devhub-response');
+    var badge = document.getElementById('devhub-response-status');
+    if (!pre) return;
+    if (!last.responseText) return;
+    var out = last.responseText;
+    try { out = JSON.stringify(JSON.parse(last.responseText), null, 2); } catch (e) {}
+    pre.textContent = '// HTTP ' + (last.statusText || '') + ' — live response from /api/v1/parse\n' + out;
+    if (badge) {
+      badge.textContent = 'HTTP ' + (last.statusText || '') + ' · live';
+      badge.style.color = last.statusText && last.statusText < 400 ? '#7cc8b8' : '#f0a8a8';
+    }
+  }
+
+  /* ---------- copy as cURL ---------- */
+  function buildCurl() {
+    var base = window.location.origin;
+    var url = last.url || (base + '/api/v1/parse');
+    if (url.indexOf('http') !== 0) url = base + url;
+    var method = last.method || 'POST';
+    var lines = ['curl -X ' + method + ' "' + url + '"'];
+    var headers = last.requestHeaders || {};
+    var hasAuth = false;
+    Object.keys(headers).forEach(function (k) {
+      var lk = k.toLowerCase();
+      if (lk === 'content-type' && String(headers[k]).indexOf('multipart') !== -1) return; // curl sets multipart boundary itself
+      lines.push('  -H "' + k + ': ' + String(headers[k]).replace(/"/g, '\\"') + '"');
+      if (lk === 'x-api-key' || lk === 'authorization') hasAuth = true;
+    });
+    if (!hasAuth) lines.push('  -H "X-API-KEY: test-dev-key"');
+    var body = prettyBody();
+    if (body && method !== 'GET' && method !== 'HEAD') {
+      lines.push("  -d '" + body.replace(/'/g, "'\\''") + "'");
+    }
+    return lines.join(' \\\n');
+  }
+  var curlBtn = document.getElementById('btn-copy-curl');
+  if (curlBtn) {
+    curlBtn.addEventListener('click', function () {
+      copyText(buildCurl(), last.url ? 'cURL copied — paste & run' : 'Sample cURL copied (run a parse first for your exact request)');
+    });
+  }
+
+  /* ---------- devhub response copy ---------- */
+  var copyResp = document.getElementById('btn-copy-response');
+  if (copyResp) {
+    copyResp.addEventListener('click', function () {
+      var pre = document.getElementById('devhub-response');
+      if (pre) copyText(pre.textContent, 'Response copied');
+    });
+  }
+
+  /* ---------- sandbox key visual: click to copy sample ---------- */
+  var skKey = document.getElementById('sk-key-visual');
+  if (skKey) {
+    skKey.addEventListener('click', function () { copyText('sicce_xxxxxxxxxxxxxxxx', 'Sample key format copied'); });
+  }
+
+  /* ---------- drag & drop prescription upload ---------- */
+  var stage = document.getElementById('optical-doc-container');
+  var fileInput = document.getElementById('rx-file-input');
+  if (stage && fileInput) {
+    var hint = null;
+    function showHint(show) {
+      if (show) {
+        if (!hint) { hint = document.createElement('div'); hint.className = 'drag-hint-float'; hint.textContent = 'Drop prescription to parse'; stage.appendChild(hint); }
+        stage.classList.add('drag-over');
+      } else {
+        if (hint) { hint.remove(); hint = null; }
+        stage.classList.remove('drag-over');
+      }
+    }
+    ['dragenter', 'dragover'].forEach(function (evt) {
+      stage.addEventListener(evt, function (e) { e.preventDefault(); showHint(true); });
+    });
+    ['dragleave', 'drop'].forEach(function (evt) {
+      stage.addEventListener(evt, function (e) { e.preventDefault(); showHint(false); });
+    });
+    stage.addEventListener('drop', function (e) {
+      var files = e.dataTransfer && e.dataTransfer.files;
+      if (!files || !files.length) return;
+      try {
+        var dt = new DataTransfer();
+        dt.items.add(files[0]);
+        fileInput.files = dt.files;
+        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+        toast('Prescription received — parsing');
+      } catch (err) { toast('Could not read dropped file'); }
+    });
+    // whole-page drop guard: prevent browser from navigating away
+    window.addEventListener('dragover', function (e) { e.preventDefault(); });
+    window.addEventListener('drop', function (e) { if (!stage.contains(e.target)) e.preventDefault(); });
+  }
+
+  /* ---------- key selector: hide when only one key ---------- */
+  window.addEventListener('DOMContentLoaded', function () {
+    var sel = document.getElementById('active-key-select');
+    if (sel && sel.options.length <= 1) {
+      var wrap = sel.closest('.key-selector');
+      if (wrap) wrap.classList.add('hidden-single');
+    }
+  });
+  if (document.readyState !== 'loading') {
+    var sel2 = document.getElementById('active-key-select');
+    if (sel2 && sel2.options.length <= 1) {
+      var wrap2 = sel2.closest('.key-selector');
+      if (wrap2) wrap2.classList.add('hidden-single');
+    }
+  }
+
+})();
