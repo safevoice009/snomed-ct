@@ -116,13 +116,14 @@ class TerminologyResolver:
             """, (term_clean, term_clean))
             row = cur.fetchone()
             if row:
+                has_snomed = bool(row[3] and str(row[3]).strip())
                 return {
-                    "concept_id": row[3] or "387517004",
+                    "concept_id": row[3] if has_snomed else None,
                     "preferred_name": f"{row[0]} ({row[1]})",
                     "generic_name": row[1],
                     "semantic_tag": "substance",
                     "category": row[2],
-                    "coded": True
+                    "coded": has_snomed
                 }
 
             # B. Search concepts table (Exact match on preferred name)
@@ -151,13 +152,14 @@ class TerminologyResolver:
             """, (fts_query,))
             row = cur.fetchone()
             if row:
+                has_snomed = bool(row[3] and str(row[3]).strip())
                 return {
-                    "concept_id": row[3] or "387517004",
+                    "concept_id": row[3] if has_snomed else None,
                     "preferred_name": f"{row[0]} ({row[1]})",
                     "generic_name": row[1],
                     "semantic_tag": "substance",
                     "category": row[2],
-                    "coded": True
+                    "coded": has_snomed
                 }
 
             # D. FTS5 Search on concepts
@@ -321,12 +323,14 @@ class TerminologyResolver:
 
     def _format_concept(self, concept: Dict[str, Any], query_term: str) -> Dict[str, Any]:
         """Formats concept metadata into a standard terminology payload."""
+        cid = concept.get("concept_id")
+        has_code = bool(cid and str(cid).strip())
         data = {
-            "concept_id": concept["concept_id"],
-            "display": concept["preferred_name"],
+            "concept_id": cid if has_code else None,
+            "display": concept.get("preferred_name") or query_term,
             "original_query": query_term,
-            "semantic_tag": concept.get("semantic_tag", "finding"),
-            "coded": True
+            "semantic_tag": concept.get("semantic_tag", "substance" if concept.get("generic_name") else "finding"),
+            "coded": has_code
         }
         
         if concept.get("ayush_extension"):
