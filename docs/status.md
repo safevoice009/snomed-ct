@@ -2,8 +2,16 @@
 
 **Last Verified Session**: August 24, 2026  
 **Governing Authority**: [`MASTER_DIRECTIVE.md`](file:///c:/Users/unbou/snomedct/snomed%20ct/MASTER_DIRECTIVE.md)  
-**Current Phase 1 Status**: 🟡 **~75% Complete — BLOCKED ON FOUNDER INPUTS (NOT READY FOR OUTREACH)**  
+**Current Status**: 🟡 **Phase 1/1.5 verified complete; awaiting founder gates (NRCeS, ABDM sandbox, real notes)**  
 **Pytest Suite**: `40 passed, 0 failed (100% pass rate)`  
+
+---
+
+## 🆕 Session Update (Aug 24, 2026 — later)
+
+- **Website honesty redesign applied** (`static/index.html`): removed fabricated ABDM certification badge, fake customer testimonials ("Apollo TeleHealth" etc.), invented stats (38ms / 100k concepts / 99.4% precision), and disparaging unverified competitor comparisons. Mock subsystems in the UI (ABHA tab, NHCX pre-adjudication, WhatsApp/Lens/TPA showcases) are now explicitly labeled MOCK/ROADMAP/PREVIEW. Spec grid now shows only verifiable numbers. Functional demo workbench and all element IDs preserved.
+- **New legal artifacts**: [`docs/BREACH_RESPONSE_PLAYBOOK.md`](BREACH_RESPONSE_PLAYBOOK.md) (DPDP breach response, ₹0 pre-revenue item) and [`docs/BRAND_SHORTLIST.md`](BRAND_SHORTLIST.md) (rename candidates + MCA/IP India verification procedure — "SICCE" flagged for rename).
+- **Git security incident closed**: compromised PAT removed from remote URLs; credential.helper=manager; token grep clean; `.env*` never committed to history.
 
 ---
 
