@@ -9,6 +9,7 @@
 
 ## 🆕 Session Update (Aug 24, 2026 — later)
 
+- **Full site redesign shipped** (`static/index.html` + new `static/style-v3.css` design system + `static/site.js`): dark "Midnight Clinical" developer aesthetic per 2026 product-led SaaS patterns (interactive product-first hero = the live workbench, bento capabilities grid, honest roadmap cards, FAQ block, minimal nav). All 67 functional element IDs preserved and binding-verified; workbench untouched functionally. Honesty standards maintained: no fabricated stats, mock features labeled, illustrative calculators marked.
 - **Website honesty redesign applied** (`static/index.html`): removed fabricated ABDM certification badge, fake customer testimonials ("Apollo TeleHealth" etc.), invented stats (38ms / 100k concepts / 99.4% precision), and disparaging unverified competitor comparisons. Mock subsystems in the UI (ABHA tab, NHCX pre-adjudication, WhatsApp/Lens/TPA showcases) are now explicitly labeled MOCK/ROADMAP/PREVIEW. Spec grid now shows only verifiable numbers. Functional demo workbench and all element IDs preserved.
 - **New legal artifacts**: [`docs/BREACH_RESPONSE_PLAYBOOK.md`](BREACH_RESPONSE_PLAYBOOK.md) (DPDP breach response, ₹0 pre-revenue item) and [`docs/BRAND_SHORTLIST.md`](BRAND_SHORTLIST.md) (rename candidates + MCA/IP India verification procedure — "SICCE" flagged for rename).
 - **Git security incident closed**: compromised PAT removed from remote URLs; credential.helper=manager; token grep clean; `.env*` never committed to history.
