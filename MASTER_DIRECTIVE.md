@@ -142,6 +142,33 @@ Goal: replace the hollow core with real data, honest errors, security basics, me
 
 ---
 
+## 3.5 PHASE 1.5 — Parallel Track While Founder Gates Pending
+
+Execute ONLY after Phase 1 is verified done and while awaiting: (a) NRCeS license, (b) real notes.
+No outreach, no new features beyond these tasks, mocks stay labeled, tests green at end.
+
+### Task 1.5A — Curated OPD RefSet v1 (interim credibility + future cloud refset)
+- Founder supplies (voice notes/chat is fine) their top ~200–400 real-world OPD conditions, symptoms, and findings from clinical practice.
+- Agent structures them into `data/refset/opd_refset_v1.json` schema:
+  `{"preferred_name","semantic_tag","icd10_guess(optional)","hinglish_synonyms":[],"abbreviations":[]}` — every entry clinically plausible; NO invented concepts.
+- Load into `clinical_knowledge.db` (tagged rows are fine to merge into `concepts`/synonym tables) AND export `scripts/export_supabase_refset.sql` for the future cloud refset.
+- Acceptance: `/health` still reports degraded (count <100k guard unchanged); demo parse of 20 common OPD notes resolves ≥90% of entities.
+
+### Task 1.5B — Public formulary expansion (real, legal brand→generic data)
+- Ingest the **PMBJP / Jan Aushadhi public product list** (publicly published by Govt of India) plus any other legally public Indian formulary sources.
+- Expand the `brands` table with real `(brand_name, generic_name, category)` rows. Every row must carry a real generic mapping — zero invented drugs.
+- Re-run resolver tests + eval; commit counts as proof.
+
+### Task 1.5C — Deployment dry-run (so launch takes minutes, not days)
+- Run `docker build -t sicce .` locally; run container; verify `/health` + one text parse inside the container.
+- Write `docs/DEPLOY_CHECKLIST.md`: env vars required, exact Render deploy steps, post-deploy verification commands.
+- Acceptance: founder can take current build live in <10 minutes following only that doc.
+
+### Task 1.5D — (Founder, parallel) ABDM Sandbox registration
+- Register at sandbox.abdm.gov.in NOW — it does NOT require the NRCeS license. Use `docs/ABDM_SANDBOX_REGISTRATION.md`.
+
+---
+
 ## 4. PHASE 2 — Wedge & First Revenue (Months 3–6)
 
 Positioning: **"ABDM/NHCX compliance engine in a box"** for small EMR/HIS vendors (2–5 dev teams, thousands of them in India) and pilot with 1–2 TPAs for legacy claim digitization. Not sold to doctors directly.

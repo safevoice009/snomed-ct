@@ -10,6 +10,10 @@ data/*
 !data/rf2/
 data/rf2/*
 !data/rf2/_format_test/
+!data/refset/
+!data/refset/**
+!data/formulary/
+!data/formulary/**
 *.zip
 *.tar.gz
 
