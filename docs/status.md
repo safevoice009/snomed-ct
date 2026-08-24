@@ -9,10 +9,11 @@
 
 ## 🆕 Session Update (Aug 24, 2026 — later)
 
-- **Full site redesign shipped** (`static/index.html` + new `static/style-v3.css` design system + `static/site.js`): dark "Midnight Clinical" developer aesthetic per 2026 product-led SaaS patterns (interactive product-first hero = the live workbench, bento capabilities grid, honest roadmap cards, FAQ block, minimal nav). All 67 functional element IDs preserved and binding-verified; workbench untouched functionally. Honesty standards maintained: no fabricated stats, mock features labeled, illustrative calculators marked.
-- **Website honesty redesign applied** (`static/index.html`): removed fabricated ABDM certification badge, fake customer testimonials ("Apollo TeleHealth" etc.), invented stats (38ms / 100k concepts / 99.4% precision), and disparaging unverified competitor comparisons. Mock subsystems in the UI (ABHA tab, NHCX pre-adjudication, WhatsApp/Lens/TPA showcases) are now explicitly labeled MOCK/ROADMAP/PREVIEW. Spec grid now shows only verifiable numbers. Functional demo workbench and all element IDs preserved.
+- **v5 "Lancet Edit" premium redesign shipped** (`static/index.html` + `static/style-v3.css` rewritten + `static/site.js` rewritten): scroll-driven motion stack via CDN (GSAP ScrollTrigger choreography, Lenis smooth scrolling, Three.js particle double-helix hero field), film-grain texture, alternating dark ink interlude section, ticker marquee, animated stat counters, mobile nav. Light editorial base retained after founder rejected dark-neon aesthetic. Honesty standards unchanged — no fabricated claims, mocks labeled, illustrative calculators marked. All 67 functional IDs binding-verified; 40/40 tests green.
+- **Website honesty redesign applied** (`static/index.html`): removed fabricated ABDM certification badge, fake customer testimonials ("Apollo TeleHealth" etc.), invented stats (38ms / 100k concepts / 99.4% precision), and disparaging unverified competitor comparisons. Mock subsystems in the UI (ABHA tab, NHCX pre-adjudication, WhatsApp/Lens/TPA showcases) are now explicitly labeled MOCK/ROADMAP/PREVIEW.
 - **New legal artifacts**: [`docs/BREACH_RESPONSE_PLAYBOOK.md`](BREACH_RESPONSE_PLAYBOOK.md) (DPDP breach response, ₹0 pre-revenue item) and [`docs/BRAND_SHORTLIST.md`](BRAND_SHORTLIST.md) (rename candidates + MCA/IP India verification procedure — "SICCE" flagged for rename).
 - **Git security incident closed**: compromised PAT removed from remote URLs; credential.helper=manager; token grep clean; `.env*` never committed to history.
+- **Render infra note**: TWO services exist — `snomed-ct-parser.onrender.com` (live, autodeploy working) and `snomed-ct-parser-1.onrender.com` (stale duplicate, founder should delete in Render dashboard).
 
 ---
 

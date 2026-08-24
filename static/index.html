@@ -6,59 +6,78 @@
   <title>SICCE — Hinglish Prescriptions to Coded FHIR R4 | Clinical Coding Engine</title>
   <meta name="description" content="SICCE is a physician-built clinical coding engine that converts Indian OPD prescriptions — handwriting, free text, and Hinglish — into SNOMED CT-mapped HL7 FHIR R4 bundles with drug-safety checks and NHCX-shaped claim payloads. Built for EMR vendors, HIS platforms, and claims teams.">
   <meta property="og:title" content="SICCE — Clinical Coding Engine for Indian Healthcare">
-  <meta property="og:description" content="Messy Indian prescriptions in. Coded, compliant FHIR R4 out. Live demo — no signup.">
+  <meta property="og:description" content="Messy Indian prescriptions in. Coded, compliant FHIR out. Live demo — no signup.">
   <meta property="og:type" content="website">
-  <link rel="stylesheet" href="/static/style.css?v=20260824_v30">
-  <link rel="stylesheet" href="/static/style-v3.css?v=20260824_v31">
+  <link rel="stylesheet" href="/static/style.css?v=20260824_v40">
+  <link rel="stylesheet" href="/static/style-v3.css?v=20260824_v40">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="sw-root">
 
+  <div class="scroll-progress" id="scroll-progress"></div>
+
   <!-- ================= NAV ================= -->
   <header class="site-nav" id="site-nav">
     <div class="site-nav__inner">
-      <a href="#top" class="site-nav__brand">
-        <span class="site-nav__mark">S</span>
-        SICCE
-      </a>
+      <a href="#top" class="site-nav__brand"><span class="site-nav__mark">S</span> SICCE</a>
       <nav class="site-nav__links">
         <a href="#workbench">Live Demo</a>
         <a href="#capabilities">Capabilities</a>
         <a href="#transparency">Transparency</a>
-        <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
-        <a href="#workbench" class="site-nav__cta sw-nav__item">Try the Workbench</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#workbench" class="btn-nav-cta sw-nav__item">Try the Workbench</a>
       </nav>
+      <button class="nav-burger" id="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </header>
+  <nav class="nav-mobile" id="nav-mobile">
+    <a href="#workbench">Live Demo</a>
+    <a href="#capabilities">Capabilities</a>
+    <a href="#transparency">Transparency</a>
+    <a href="#faq">FAQ</a>
+    <a href="#pricing">Pricing</a>
+  </nav>
 
   <div id="top"></div>
 
-  <!-- ================= HERO (product-first) ================= -->
+  <!-- ================= HERO + 3D PARTICLE FIELD ================= -->
   <section class="v3-hero">
-    <div class="v3-hero__mesh"></div>
-    <span class="v3-hero__eyebrow reveal"><strong>Physician-built</strong> · FHIR R4 · NRCeS-profiled output</span>
-    <h1 class="reveal reveal-delay-1">Hinglish prescriptions in.<br><span class="grad">Coded, compliant FHIR out.</span></h1>
-    <p class="v3-hero__sub reveal reveal-delay-2">
-      SICCE turns doctor handwriting, free-text OPD notes, and mixed-language clinical narratives into structured
-      HL7 FHIR R4 consultation bundles — with SNOMED CT mapping, drug-safety checks, and insurance-ready payloads.
-      Built as an API layer for EMR vendors, HIS platforms, and claims teams.
-    </p>
-    <div class="v3-hero__ctas reveal reveal-delay-3">
-      <a href="#workbench" class="btn-v3 btn-v3--primary">Try it live — no signup</a>
-      <a href="/docs" target="_blank" class="btn-v3 btn-v3--ghost">API Docs</a>
+    <canvas id="hero-canvas"></canvas>
+    <div class="v3-hero__content">
+      <span class="v3-hero__eyebrow reveal" style="border:1px solid var(--pp-line-strong); background:var(--pp-paper); padding:6px 14px; border-radius:999px; font-size:.78rem; color:var(--pp-dim); display:inline-flex; gap:8px;"><strong style="color:var(--pp-accent);">Physician-built</strong> · FHIR R4 · NRCeS-profiled output</span>
+      <h1 class="reveal reveal-delay-1">Hinglish prescriptions in.<br><span class="grad">Coded, compliant FHIR out.</span></h1>
+      <p class="v3-hero__sub reveal reveal-delay-2">SICCE turns doctor handwriting, free-text OPD notes, and mixed-language clinical narratives into structured HL7 FHIR R4 bundles — SNOMED CT mapping, drug-safety checks, insurance-ready payloads. One API layer for EMR vendors, HIS platforms, and claims teams.</p>
+      <div class="v3-hero__ctas reveal reveal-delay-3">
+        <a href="#workbench" class="btn-v3 btn-v3--primary">Try it live — no signup</a>
+        <a href="/docs" target="_blank" class="btn-v3 btn-v3--ghost">API Docs</a>
+      </div>
+      <div class="hero-proofrow reveal reveal-delay-4">
+        <span><b>40</b> CI-gated tests</span>
+        <span><b>FHIR R4</b> NRCeS profiles</span>
+        <span><b>15+</b> physician-authored safety rules</span>
+        <span><b>DPDP-aligned</b> processing design</span>
+      </div>
     </div>
   </section>
 
-  <!-- ================= LIVE WORKBENCH ================= -->
-  <div class="workbench-tag reveal">
-    <span class="live-dot"></span>
-    LIVE SANDBOX — every result below comes from the real running API. Mock features are labeled as mock.
+  <!-- ================= TICKER ================= -->
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span>SNOMED CT India Edition <b>✦</b></span><span>HL7 FHIR R4 <b>✦</b></span><span>NHCX Claim Payloads <b>✦</b></span><span>Hinglish Clinical NLP <b>✦</b></span><span>CDSS Drug-Safety Rules <b>✦</b></span><span>Brand → Generic Formulary <b>✦</b></span><span>Vernacular Dosage Cards <b>✦</b></span><span>DPDP-Aligned Design <b>✦</b></span><span>On-Prem Option <b>✦</b></span>
+      <span>SNOMED CT India Edition <b>✦</b></span><span>HL7 FHIR R4 <b>✦</b></span><span>NHCX Claim Payloads <b>✦</b></span><span>Hinglish Clinical NLP <b>✦</b></span><span>CDSS Drug-Safety Rules <b>✦</b></span><span>Brand → Generic Formulary <b>✦</b></span><span>Vernacular Dosage Cards <b>✦</b></span><span>DPDP-Aligned Design <b>✦</b></span><span>On-Prem Option <b>✦</b></span>
+    </div>
   </div>
-  <section id="workbench" class="sandbox-wrapper">
+
+  <!-- ================= LIVE WORKBENCH ================= -->
+  <section id="workbench" class="sandbox-wrapper" style="padding-top: 84px;">
+    <div class="workbench-tag">
+      <span class="live-dot"></span>
+      LIVE SANDBOX — every result comes from the real running API. Mock features are labeled as mock.
+    </div>
     <div class="sandbox-container">
 
       <div class="sandbox-header-bar">
@@ -92,7 +111,6 @@
 
       <div class="sandbox-grid">
 
-        <!-- LEFT PANE -->
         <div class="sandbox-left">
           <div class="preset-strip">
             <span style="font-size: 0.75rem; color: var(--text-tertiary); font-weight: 600; margin-right: 0.25rem;">Samples:</span>
@@ -155,7 +173,6 @@
           </div>
         </div>
 
-        <!-- RIGHT PANE -->
         <div class="sandbox-right">
           <div class="inspector-tab-row">
             <div class="inspector-tabs">
@@ -251,7 +268,7 @@
             </div>
 
             <div id="inspector-view-json" class="hidden">
-              <pre id="fhir-json-code" style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5; overflow-x: auto; background: #050a12; color: #d7e3f4; padding: 1rem; border-radius: 8px; border: 1px solid rgba(148,163,184,.12);">{\n  "resourceType": "Bundle",\n  "type": "document",\n  "id": "ABDM-OPD-2026-991"\n}</pre>
+              <pre id="fhir-json-code" style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5; overflow-x: auto; background: #171a21; color: #d7e3f4; padding: 1rem; border-radius: 8px; border: 1px solid #262b36;">{\n  "resourceType": "Bundle",\n  "type": "document",\n  "id": "ABDM-OPD-2026-991"\n}</pre>
             </div>
 
             <div id="inspector-view-nhcx" class="hidden">
@@ -262,7 +279,7 @@
                 </div>
                 <span class="tpa-status-badge" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 6px;">GENERATED LOCALLY</span>
               </div>
-              <pre id="nhcx-json-code" style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5; overflow-x: auto; background: #050a12; color: #d7e3f4; padding: 1rem; border-radius: 8px; border: 1px solid rgba(148,163,184,.12);">{\n  "resourceType": "Bundle",\n  "type": "collection",\n  "profile": ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"]\n}</pre>
+              <pre id="nhcx-json-code" style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5; overflow-x: auto; background: #171a21; color: #d7e3f4; padding: 1rem; border-radius: 8px; border: 1px solid #262b36;">{\n  "resourceType": "Bundle",\n  "type": "collection",\n  "profile": ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"]\n}</pre>
             </div>
 
             <div id="inspector-view-adjudication" class="hidden">
@@ -311,7 +328,7 @@
                 <p style="font-size: 0.78rem; color: #64748b;">Planned flow: ABHA creation via OTP, KYC verification &amp; care-context linkage.</p>
               </div>
 
-              <div style="background: linear-gradient(135deg, #0f172a 0%, #16233c 100%); color: #fff; padding: 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; position: relative; overflow: hidden; border: 1px solid rgba(148,163,184,.16);">
+              <div style="background: linear-gradient(135deg, #10141c 0%, #16233c 100%); color: #fff; padding: 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; position: relative; overflow: hidden; border: 1px solid rgba(148,163,184,.16);">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                   <div>
                     <div style="font-size: 0.72rem; color: #94a3b8; letter-spacing: 0.08em; text-transform: uppercase;">National Health Authority (NHA)</div>
@@ -330,7 +347,7 @@
                 <div style="font-size: 0.82rem; font-weight: 750; color: #0f172a; margin-bottom: 0.5rem;">Simulate ABHA OTP Generation / Linkage:</div>
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
                   <input type="text" id="abha-mobile-input" placeholder="Mobile / Aadhaar (e.g. 9876543210)" value="9876543210" style="flex: 1; padding: 0.45rem 0.65rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; background: #ffffff; color: #0f172a;">
-                  <button id="btn-generate-abha-otp" class="btn-tool" style="background: #0f172a; color: #fff; font-weight: 700; white-space: nowrap;">Send OTP</button>
+                  <button id="btn-generate-abha-otp" class="btn-tool" style="background: #10141c; color: #fff; font-weight: 700; white-space: nowrap;">Send OTP</button>
                 </div>
                 <div id="abha-otp-box" class="hidden" style="margin-top: 0.5rem; padding-top: 0.75rem; border-top: 1px dashed #cbd5e1;">
                   <div style="display: flex; gap: 0.5rem;">
@@ -381,73 +398,82 @@
     </div>
   </section>
 
-  <!-- ================= STATS BAR ================= -->
-  <div class="v3-statsbar reveal">
+  <!-- ================= STATS BAND ================= -->
+  <div class="v3-statsbar">
     <div class="v3-statsbar__grid">
-      <div class="v3-stat"><div class="v3-stat__val"><em>40</em></div><div class="v3-stat__label">CI-gated automated tests incl. data-integrity guards</div></div>
+      <div class="v3-stat"><div class="v3-stat__val"><em data-count="40">0</em></div><div class="v3-stat__label">CI-gated automated tests incl. data-integrity guards</div></div>
       <div class="v3-stat"><div class="v3-stat__val">FHIR <em>R4</em></div><div class="v3-stat__label">NRCeS-profiled OPConsultation bundle output</div></div>
-      <div class="v3-stat"><div class="v3-stat__val"><em>15+</em></div><div class="v3-stat__label">CDSS drug-interaction, allergy &amp; duplicate rules</div></div>
-      <div class="v3-stat"><div class="v3-stat__val"><em>99+</em></div><div class="v3-stat__label">Brand→generic mappings incl. Jan Aushadhi formulary</div></div>
-      <div class="v3-stat"><div class="v3-stat__val"><em>0</em></div><div class="v3-stat__label">PHI records stored — ephemeral processing design</div></div>
+      <div class="v3-stat"><div class="v3-stat__val"><em data-count="15">0</em>+</div><div class="v3-stat__label">Physician-authored drug-safety &amp; allergy rules</div></div>
+      <div class="v3-stat"><div class="v3-stat__val"><em data-count="99">0</em>+</div><div class="v3-stat__label">Brand→generic mappings incl. Jan Aushadhi formulary</div></div>
+      <div class="v3-stat"><div class="v3-stat__val"><em data-count="0">0</em></div><div class="v3-stat__label">PHI records stored — ephemeral processing design</div></div>
     </div>
   </div>
 
-  <!-- ================= BENTO CAPABILITIES ================= -->
+  <!-- ================= DARK INTERLUDE QUOTE ================= -->
+  <section class="v3-dark">
+    <div class="v3-dark-inner">
+      <div class="v3-kicker">Why this exists</div>
+      <p class="v3-quote">India mandated coded, interoperable health records.<br>Doctors still write <em>"sar dard x 2 days, Dolo 650 BD"</em>.<br>SICCE is the bridge between those two realities.</p>
+      <p class="v3-dark__sub">Every claim on this page is verifiable, every mock is labeled, and every accuracy number will come from published evaluation methodology — not marketing. That is the standard we hold ourselves to before asking any vendor for trust.</p>
+    </div>
+  </section>
+
+  <!-- ================= CAPABILITIES BENTO ================= -->
   <section id="capabilities" class="v3-section">
-    <div class="v3-kicker reveal">Capabilities</div>
-    <h2 class="v3-h2 reveal reveal-delay-1">Everything between a scribbled slip<br>and a machine-readable record</h2>
-    <p class="v3-sub reveal reveal-delay-2">One API layer that does the boring, safety-critical work your product shouldn't rebuild.</p>
+    <div class="v3-kicker">Capabilities</div>
+    <h2 class="v3-h2">Everything between a scribbled slip<br>and a machine-readable record</h2>
+    <p class="v3-sub">One API layer that does the boring, safety-critical work your product shouldn't rebuild.</p>
 
     <div class="v3-bento">
-      <div class="v3-cell v3-cell--wide v3-cell--tall reveal">
+      <div class="v3-cell v3-cell--wide v3-cell--tall">
         <div class="v3-cell__icon">🗣️</div>
         <div class="v3-cell__title">Hinglish &amp; Abbreviation NLP</div>
         <div class="v3-cell__desc">Understands how Indian doctors actually write — "sar dard", "loose motions", "AP+", "k/c/o", brand shorthand like Pantocid and Dolo — via a hybrid rule-engine plus LLM fallback with caching.</div>
         <div class="v3-cell__visual mini-flow">
           <span class="node">'pet kharab x 2d'</span><span class="arrow">→</span>
           <span class="node">Diarrhoea</span><span class="arrow">→</span>
-          <span class="node" style="border-color: rgba(45,212,191,.4); color: var(--v3-accent);">SNOMED 62315008</span>
+          <span class="node" style="border-color: var(--pp-accent-line); color: var(--pp-accent);">SNOMED 62315008</span>
         </div>
       </div>
 
-      <div class="v3-cell reveal reveal-delay-1">
+      <div class="v3-cell">
         <div class="v3-cell__icon">📄</div>
         <div class="v3-cell__title">FHIR R4 Bundle Output</div>
-        <div class="v3-cell__desc">Valid OPConsultation DocumentBundles profiled to NRCeS specifications — Composition, Condition, Observation, MedicationRequest.</div>
+        <div class="v3-cell__desc">Valid OPConsultation DocumentBundles profiled to NRCeS specifications.</div>
         <div class="v3-cell__visual mini-code"><span class="k">"resourceType"</span>: <span class="s">"Bundle"</span>,
 <span class="k">"entry"</span>: [{ <span class="k">"resource"</span>: { <span class="s">"Condition"</span> ... }}]</div>
       </div>
 
-      <div class="v3-cell reveal reveal-delay-2">
+      <div class="v3-cell">
         <div class="v3-cell__icon">🛡️</div>
         <div class="v3-cell__title">CDSS Safety Layer</div>
-        <div class="v3-cell__desc">Drug–drug interactions, allergy cross-reactivity, duplicate therapy, disease contraindications — written by a physician.</div>
+        <div class="v3-cell__desc">Interactions, allergies, duplicate therapy, contraindications — written by a physician.</div>
         <div class="v3-cell__visual mini-alert"><span>⚠</span><span><strong>Warfarin + Ibuprofen:</strong> major hemorrhagic risk. Consider paracetamol with gastroprotection.</span></div>
       </div>
 
-      <div class="v3-cell reveal">
+      <div class="v3-cell">
         <div class="v3-cell__icon">💊</div>
         <div class="v3-cell__title">Brand → Generic Resolution</div>
-        <div class="v3-cell__desc">99+ commercial brands plus the public Jan Aushadhi formulary, each mapped to its active molecule — codes verified against SNOMED, never guessed.</div>
+        <div class="v3-cell__desc">Commercial brands plus the public Jan Aushadhi formulary — codes verified against SNOMED, never guessed.</div>
         <div class="v3-cell__visual mini-flow">
           <span class="node">Telma 40</span><span class="arrow">→</span>
-          <span class="node" style="color: var(--v3-accent);">Telmisartan</span>
+          <span class="node" style="color: var(--pp-accent);">Telmisartan</span>
         </div>
       </div>
 
-      <div class="v3-cell reveal reveal-delay-1">
-        <div class="v3-cell__icon">🗣️🌐</div>
+      <div class="v3-cell">
+        <div class="v3-cell__icon">🌐</div>
         <div class="v3-cell__title">Vernacular Patient Cards</div>
-        <div class="v3-cell__desc">Dosage schedules patients can follow — rendered in Hindi, Marathi, Tamil, Telugu and Bengali straight from parsed prescriptions.</div>
+        <div class="v3-cell__desc">Dosage schedules patients can follow — Hindi, Marathi, Tamil, Telugu, Bengali.</div>
         <div class="v3-cell__visual mini-chips">
           <span class="mini-chip mini-chip--accent">हिंदी</span><span class="mini-chip mini-chip--accent">मराठी</span><span class="mini-chip mini-chip--accent">தமிழ்</span><span class="mini-chip mini-chip--accent">తెలుగు</span><span class="mini-chip">বাংলা</span>
         </div>
       </div>
 
-      <div class="v3-cell v3-cell--full reveal">
+      <div class="v3-cell v3-cell--full">
         <div class="v3-cell__icon">🔒</div>
         <div class="v3-cell__title">DPDP-Aligned by Design</div>
-        <div class="v3-cell__desc" style="margin-bottom: 14px;">Ephemeral PHI processing, upstream sanitization before any cloud LLM call, honest erasure endpoints, breach playbook on file, and India-region deployment with an on-prem option for hospital chains.</div>
+        <div class="v3-cell__desc" style="margin-bottom: 14px;">Ephemeral PHI processing, upstream sanitization before any cloud LLM call, honest erasure endpoints, breach playbook on file, India-region deployment with an on-prem option for hospital chains.</div>
         <div class="mini-code"><span class="k">POST</span> /api/v1/parse   <span class="n"># sanitized → resolved → CDSS-checked → bundled</span>
 <span class="k">GET</span>  /api/v1/metrics/summary   <span class="n"># p50/p95 latency · cost per note · cache hits</span></div>
       </div>
@@ -456,119 +482,93 @@
 
   <!-- ================= PIPELINE ================= -->
   <section class="v3-section">
-    <div class="v3-kicker reveal">How it works</div>
-    <h2 class="v3-h2 reveal reveal-delay-1">Four steps, one API call</h2>
-    <p class="v3-sub reveal reveal-delay-2">POST a note or an image. Get back structured, coded, safety-checked clinical data.</p>
+    <div class="v3-kicker">How it works</div>
+    <h2 class="v3-h2">Four steps, one API call</h2>
+    <p class="v3-sub">POST a note or an image. Get back structured, coded, safety-checked clinical data.</p>
     <div class="v3-pipeline">
-      <div class="v3-step reveal"><div class="v3-step__num">STEP 01</div><div class="v3-step__title">Ingest &amp; Sanitize</div><div class="v3-step__desc">Text or prescription photo in. PHI scrubbed before anything leaves your control boundary.</div></div>
-      <div class="v3-step reveal reveal-delay-1"><div class="v3-step__num">STEP 02</div><div class="v3-step__title">Extract Entities</div><div class="v3-step__desc">Symptoms, diagnoses, medications with dose &amp; frequency — across English, Hindi and Hinglish.</div></div>
-      <div class="v3-step reveal reveal-delay-2"><div class="v3-step__num">STEP 03</div><div class="v3-step__title">Resolve &amp; Safety-Check</div><div class="v3-step__desc">Map to SNOMED CT concepts, resolve brands to generics, run CDSS interaction rules. Unresolved = flagged, never invented.</div></div>
-      <div class="v3-step reveal reveal-delay-3"><div class="v3-step__num">STEP 04</div><div class="v3-step__title">Emit Bundles</div><div class="v3-step__desc">FHIR R4 consultation bundle out; NHCX-shaped insurance payload ready when you are.</div></div>
-    </div>
-  </section>
-
-  <!-- ================= ROADMAP PRODUCTS (honest) ================= -->
-  <section id="solutions" class="v3-section">
-    <div class="v3-kicker reveal">Product surface</div>
-    <h2 class="v3-h2 reveal reveal-delay-1">Shipping now, and what's next</h2>
-    <p class="v3-sub reveal reveal-delay-2">We label everything honestly: what runs today versus what's on the roadmap.</p>
-    <div class="v3-truthgrid">
-      <div class="v3-truth v3-truth--real reveal">
-        <div class="v3-truth__status">● Shipping Today</div>
-        <div class="v3-truth__title">Coding API — Text &amp; OCR</div>
-        <div class="v3-truth__desc">The exact engine powering this page's workbench: parsing, terminology resolution, CDSS, FHIR generation. Integrate via REST with API keys and per-key rate limits.</div>
-      </div>
-      <div class="v3-truth v3-truth--wip reveal reveal-delay-1">
-        <div class="v3-truth__status">● In Progress — ABDM Sandbox</div>
-        <div class="v3-truth__status-title" class="v3-truth__title">ABHA M1/M2 Gateway</div>
-        <div class="v3-truth__desc">Interface built and demoable above in mock mode; live wiring to the official ABDM sandbox underway. Every response is labeled mock until certified.</div>
-      </div>
-      <div class="v3-truth v3-truth--wip reveal reveal-delay-2">
-        <div class="v3-truth__status">● In Development</div>
-        <div class="v3-truth__title">Claims Pre-Adjudication &amp; WhatsApp Ingestion</div>
-        <div class="v3-truth__desc">Rules-engine preview ships today (labeled mock). Production insurer-rule packs and WhatsApp ingestion arrive with customer integrations.</div>
-      </div>
+      <div class="v3-step"><div class="v3-step__num">STEP 01</div><div class="v3-step__title">Ingest &amp; Sanitize</div><div class="v3-step__desc">Text or prescription photo in. PHI scrubbed before anything leaves your control boundary.</div></div>
+      <div class="v3-step"><div class="v3-step__num">STEP 02</div><div class="v3-step__title">Extract Entities</div><div class="v3-step__desc">Symptoms, diagnoses, medications with dose &amp; frequency — English, Hindi, Hinglish.</div></div>
+      <div class="v3-step"><div class="v3-step__num">STEP 03</div><div class="v3-step__title">Resolve &amp; Safety-Check</div><div class="v3-step__desc">Map to SNOMED CT, resolve brands to generics, run CDSS rules. Unresolved = flagged, never invented.</div></div>
+      <div class="v3-step"><div class="v3-step__num">STEP 04</div><div class="v3-step__title">Emit Bundles</div><div class="v3-step__desc">FHIR R4 consultation bundle out; NHCX-shaped insurance payload ready when you are.</div></div>
     </div>
   </section>
 
   <!-- ================= TRANSPARENCY ================= -->
   <section id="transparency" class="v3-section">
-    <div class="v3-kicker reveal">Built in public</div>
-    <h2 class="v3-h2 reveal reveal-delay-1">No invented case studies.<br>Just engineering you can verify.</h2>
-    <p class="v3-sub reveal reveal-delay-2">Healthcare software earns trust differently. Here is our evidence policy.</p>
-    <div class="v3-bento" style="grid-template-columns: repeat(3, 1fr);">
-      <div class="v3-cell reveal" style="min-height: 0;">
-        <div class="v3-cell__icon">🔬</div>
-        <div class="v3-cell__title">Measured, Not Marketed</div>
-        <div class="v3-cell__desc">Accuracy claims come only from published eval methodology on real de-identified notes — currently in collection. Our synthetic benchmark exists but is labeled circular, never quoted as performance.</div>
+    <div class="v3-kicker">Built in public</div>
+    <h2 class="v3-h2">No invented case studies.<br>Just engineering you can verify.</h2>
+    <p class="v3-sub">Healthcare software earns trust differently. Here is our evidence policy.</p>
+    <div class="v3-truthgrid">
+      <div class="v3-truth v3-truth--real">
+        <div class="v3-truth__status">● Real &amp; Shipping Today</div>
+        <div class="v3-truth__title">The Working Pipeline</div>
+        <div class="v3-truth__desc">The exact engine powering the live workbench above: parsing, terminology resolution, CDSS checks, FHIR generation — behind 40 CI-gated tests with permanent data-integrity guards.</div>
       </div>
-      <div class="v3-cell v3-cell reveal reveal-delay-1" style="min-height: 0;">
-        <div class="v3-cell__icon">🩺</div>
-        <div class="v3-cell__title">Physician-Led Safety</div>
-        <div class="v3-cell__desc">Clinical safety rules are authored and reviewed by a practicing physician. Wrong codes are treated as defects: a permanent CI guard fails the build if any drug code maps to two molecules.</div>
+      <div class="v3-truth v3-truth--wip">
+        <div class="v3-truth__status">● In Progress — Founder Gates</div>
+        <div class="v3-truth__title">Full SNOMED CT India Edition</div>
+        <div class="v3-truth__desc">Ingestion pipeline built and dress-rehearsed against official RF2 format snapshots. Waiting on the national license download; /health reports exact loaded counts so you can watch it happen.</div>
       </div>
-      <div class="v3-cell reveal reveal-delay-2" style="min-height: 0;">
-        <div class="v3-cell__icon">📡</div>
-        <div class="v3-cell__title">Live Honest Telemetry</div>
-        <div class="v3-cell__desc">Our /health endpoint reports exact concept counts and flags degraded states publicly. When the full SNOMED CT India Edition lands (~350k concepts), you'll see the number move — not a marketing badge.</div>
+      <div class="v3-truth v3-truth--measured">
+        <div class="v3-truth__status">● Accuracy Program</div>
+        <div class="v3-truth__title">Published Benchmarks — With Real Data</div>
+        <div class="v3-truth__desc">An eval harness runs today on clearly-labeled synthetic cases. Certification-grade precision/recall publishes only after tuning against 200+ real de-identified notes. Never marketing percentages instead of measurements.</div>
       </div>
     </div>
   </section>
 
   <!-- ================= DEVELOPER HUB ================= -->
   <section id="developers" class="v3-section">
-    <div class="v3-kicker reveal">Developers</div>
-    <h2 class="v3-h2 reveal reveal-delay-1">Integrate in an afternoon</h2>
-    <p class="v3-sub reveal reveal-delay-2">REST + JSON. Interactive OpenAPI docs, Postman collection, and copy-paste snippets.</p>
-    <div class="reveal">
-      <div class="code-gen-card">
-        <div class="code-gen-header">
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <span style="font-size: 0.88rem; font-weight: 750; color: #fff;">Developer Integration Hub</span>
-            <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #818cf8; background: rgba(99, 102, 241, 0.2); padding: 0.18rem 0.55rem; border-radius: 4px; font-weight: 600;">Live Payload</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <a href="/api/v1/postman-collection" target="_blank" download="SICCE_Postman_Collection.json" class="btn-tool" style="background: #ea580c; color: #fff; border-color: #ea580c; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-              🚀 Download Postman Collection
-            </a>
-            <div class="lang-tabs">
-              <button class="lang-btn active" data-lang="python">Python</button>
-              <button class="lang-btn" data-lang="curl">cURL</button>
-              <button class="lang-btn" data-lang="node">Node.js</button>
-            </div>
+    <div class="v3-kicker">Developers</div>
+    <h2 class="v3-h2">Integrate in an afternoon</h2>
+    <p class="v3-sub">REST + JSON. Interactive OpenAPI docs, Postman collection, and copy-paste snippets.</p>
+    <div class="code-gen-card">
+      <div class="code-gen-header">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span style="font-size: 0.88rem; font-weight: 750; color: #fff;">Developer Integration Hub</span>
+          <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #818cf8; background: rgba(99, 102, 241, 0.2); padding: 0.18rem 0.55rem; border-radius: 4px; font-weight: 600;">Live Payload</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <a href="/api/v1/postman-collection" target="_blank" download="SICCE_Postman_Collection.json" class="btn-tool" style="background: #ea580c; color: #fff; border-color: #ea580c; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+            🚀 Download Postman Collection
+          </a>
+          <div class="lang-tabs">
+            <button class="lang-btn active" data-lang="python">Python</button>
+            <button class="lang-btn" data-lang="curl">cURL</button>
+            <button class="lang-btn" data-lang="node">Node.js</button>
           </div>
         </div>
-        <pre id="code-snippet-display" class="code-block-viewer"></pre>
       </div>
+      <pre id="code-snippet-display" class="code-block-viewer"></pre>
     </div>
   </section>
 
-  <!-- ================= FAQ (AI-search optimized) ================= -->
+  <!-- ================= FAQ ================= -->
   <section id="faq" class="v3-section">
-    <div class="v3-kicker reveal">FAQ</div>
-    <h2 class="v3-h2 reveal reveal-delay-1">Straight answers</h2>
-    <div class="v3-faq" style="margin-top: 28px;">
-      <div class="v3-faq__item reveal">
+    <div class="v3-kicker">FAQ</div>
+    <h2 class="v3-h2">Straight answers</h2>
+    <div class="v3-faq" style="margin-top: 30px;">
+      <div class="v3-faq__item">
         <button class="v3-faq__q">What exactly does SICCE do?<span class="chev">▾</span></button>
         <div class="v3-faq__a"><div class="v3-faq__a-inner">It converts unstructured Indian clinical input — typed notes, scanned prescriptions, dictated narratives — into structured HL7 FHIR R4 consultation bundles mapped to SNOMED CT concepts, with drug-safety (CDSS) checks and NHCX-shaped insurance claim payloads. It's sold as a B2B API to EMR/HIS vendors and claims teams, not as a doctor-facing app.</div></div>
       </div>
-      <div class="v3-faq__item reveal">
+      <div class="v3-faq__item">
         <button class="v3-faq__q">Does it really understand Hinglish medical notes?<span class="chev">▾</span></button>
         <div class="v3-faq__a"><div class="v3-faq__a-inner">Yes — through a maintained lexicon of Indian abbreviations (c/o, k/c/o, AP+, SOBOE), Hindi/Hinglish phrases (sar dard, pet kharab, bukhar), and commercial brand names, combined with an LLM fallback for novel phrasing. Accuracy targets are being validated on real de-identified notes and will be published with methodology rather than marketing percentages.</div></div>
       </div>
-      <div class="v3-faq__item reveal">
-        <button class="v3-faq__q">Is it ABDM-certified today?<span class="chev">▸</span></button>
+      <div class="v3-faq__item">
+        <button class="v3-faq__q">Is it ABDM-certified today?<span class="chev">▾</span></button>
         <div class="v3-faq__a"><div class="v3-faq__a-inner">Not yet, and we won't pretend otherwise. FHIR output follows NRCeS profiles, SNOMED CT India Edition ingestion is licensed and in progress, and ABDM sandbox M1/M2 integration is under way. Anything not yet live is labeled MOCK in our product and on this site.</div></div>
       </div>
-      <div class="v3-faq__item reveal">
+      <div class="v3-faq__item">
         <button class="v3-faq__q">How do you handle patient data (DPDP)?<span class="chev">▾</span></button>
         <div class="v3-faq__a"><div class="v3-faq__a-inner">Processing is designed ephemeral: PHI identifiers are sanitized upstream of any cloud LLM call, nothing is persisted after response delivery, erasure endpoints exist and are tested, and a documented breach-response playbook is on file. On-prem deployment is available for institutions that require data to never leave their network.</div></div>
       </div>
-      <div class="v3-faq__item reveal">
+      <div class="v3-faq__item">
         <button class="v3-faq__q">Who is this for — doctors?<span class="chev">▾</span></button>
         <div class="v3-faq__a"><div class="v3-faq__a-inner">No. It's infrastructure for software teams: EMR vendors adding coded documentation, HIS platforms preparing NHCX-ready claims, pharmacy chains verifying prescriptions, and TPAs digitizing legacy paper claims. Doctors interact through products built on top of it.</div></div>
       </div>
-      <div class="v3-faq__item reveal">
+      <div class="v3-faq__item">
         <button class="v3-faq__q">What happens when the engine can't understand something?<span class="chev">▾</span></button>
         <div class="v3-faq__a"><div class="v3-faq__a-inner">It tells you. Unresolvable terms return explicitly uncoded fields and get logged for dictionary improvement. We consider fabricated output — inventing symptoms or codes — a disqualifying defect, enforced by automated tests.</div></div>
       </div>
@@ -585,7 +585,7 @@
     <div class="roi-grid">
       <div class="roi-control-pane">
         <label style="display: block; font-size: 0.88rem; font-weight: 750; color: #16181d; margin-bottom: 0.5rem;">
-          Monthly Prescription Volume: <span id="roi-volume-display" style="color: var(--v3-accent); font-size: 1.25rem;">50,000</span> <span style="font-size: 0.85rem; color: #8b929e;">Rx / month</span>
+          Monthly Prescription Volume: <span id="roi-volume-display" style="color: var(--pp-accent); font-size: 1.25rem;">50,000</span> <span style="font-size: 0.85rem; color: #8b929e;">Rx / month</span>
         </label>
         <input type="range" id="roi-slider" min="5000" max="500000" step="5000" value="50000" class="roi-range-slider">
 
@@ -655,7 +655,7 @@
           <li>✅ 30,000 inferences / month (₹0.16 extra)</li>
           <li>✅ OCR + Voice + text pipelines</li>
           <li>✅ Priority email support</li>
-          <li>✅ Integration assistance onboarding call</li>
+          <li>✅ Onboarding integration call</li>
         </ul>
         <a href="#workbench" class="sw-btn sw-btn--primary" style="justify-content: center; margin-top: auto;">Start Free, Upgrade Later</a>
       </div>
@@ -677,10 +677,10 @@
 
   <!-- ================= FINAL CTA ================= -->
   <section class="v3-final">
-    <div class="v3-final__panel reveal">
-      <h2>Stop re-typing prescriptions.<br>Start receiving coded records.</h2>
-      <p>The workbench at the top of this page is the real engine, running live. Paste one of your own de-identified notes and see what comes back.</p>
-      <a href="#workbench" class="btn-v3 btn-v3--primary">Open the Live Workbench</a>
+    <div class="v3-final__panel">
+      <h2>Stop re-typing prescriptions.<br><em>Start receiving coded records.</em></h2>
+      <p>The workbench above is the real engine, running live. Paste one of your own de-identified notes and see what comes back.</p>
+      <a href="#workbench" class="btn-v3 btn-v3--invert magnetic">Open the Live Workbench</a>
     </div>
   </section>
 
@@ -724,12 +724,12 @@
       </div>
     </div>
 
-    <div class="footer-content" style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--v3-border);">
-      <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; color: var(--v3-text-dim);">
-        <span style="background: rgba(45,212,191,.08); color: var(--v3-accent); border: 1px solid rgba(45,212,191,.25); padding: 0.2rem 0.55rem; border-radius: 6px; font-weight: 700;">DPDP-aligned design</span>
+    <div class="footer-content" style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--pp-line);">
+      <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; color: var(--pp-dim);">
+        <span style="background: var(--pp-accent-soft); color: var(--pp-accent); border: 1px solid var(--pp-accent-line); padding: 0.2rem 0.55rem; border-radius: 6px; font-weight: 700;">DPDP-aligned design</span>
         <span>Ephemeral processing · Physician-built · Engineering in public</span>
       </div>
-      <div style="font-size: 0.78rem; color: var(--v3-text-faint);">
+      <div style="font-size: 0.78rem; color: var(--pp-faint);">
         © 2026 SICCE Health Systems. All rights reserved.
       </div>
     </div>
@@ -822,8 +822,12 @@
 
 </div>
 
-<script src="/static/scrub-engine.js?v=20260824_v30"></script>
-<script src="/static/app.js?v=20260824_v30"></script>
-<script src="/static/site.js?v=20260824_v31"></script>
+<script src="/static/scrub-engine.js?v=20260824_v40"></script>
+<script src="/static/app.js?v=20260824_v40"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="/static/site.js?v=20260824_v40"></script>
 </body>
 </html>
