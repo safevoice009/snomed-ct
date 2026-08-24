@@ -36,19 +36,21 @@ class TestSICCEProductionSuite(unittest.TestCase):
 
     # --- 1. Terminology & Indian Brand Resolution Tests ---
     def test_indian_brand_resolution(self):
-        """Verifies top Indian pharmaceutical brands resolve to correct generic & SNOMED CT IDs."""
+        """Verifies top Indian pharmaceutical brands resolve to correct active generic molecules."""
         test_cases = [
-            ("Augmentin 625", "372687004", "Amoxicillin and clavulanic acid"),
-            ("Pan-D", "715879001", "Pantoprazole and domperidone"),
-            ("Telma 40", "387532007", "Telmisartan"),
-            ("Dolo 650", "387517004", "Paracetamol"),
-            ("Shelcal 500", "715879001", "Calcium and vitamin D3")
+            ("Augmentin 625", "Amoxicillin and clavulanic acid"),
+            ("Pan-D", "Pantoprazole and domperidone"),
+            ("Telma 40", "Telmisartan"),
+            ("Dolo 650", "Paracetamol"),
+            ("Shelcal 500", "Calcium and vitamin D3"),
+            ("Glycomet 500", "Metformin"),
+            ("Atorva 10", "Atorvastatin")
         ]
-        for query, expected_snomed, expected_generic in test_cases:
+        for query, expected_generic in test_cases:
             match = self.resolver.resolve_term(query)
             self.assertIsNotNone(match, f"Failed to resolve {query}")
-            self.assertEqual(match.get("concept_id"), expected_snomed)
             self.assertIn(expected_generic.lower(), match.get("preferred_name", "").lower())
+            self.assertEqual(match.get("generic_name", "").lower(), expected_generic.lower())
 
     def test_hindi_symptom_resolution(self):
         """Verifies colloquial Hindi/Hinglish symptoms resolve to standard clinical findings."""

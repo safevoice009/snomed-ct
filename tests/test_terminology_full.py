@@ -87,6 +87,46 @@ class TestFullTerminologyResolver(unittest.TestCase):
             content = f.read()
             self.assertIn(test_term, content)
 
+    def test_no_duplicate_snomed_codes_across_different_generics(self):
+        """CRITICAL DATA INTEGRITY GUARD (Law #1/#2): Fail if any snomed_id maps to >1 distinct generic_name."""
+        import sqlite3
+        import json
+        from collections import defaultdict
+
+        # 1. Check SQLite brands table
+        db_path = os.path.join(PROJECT_ROOT, "clinical_knowledge.db")
+        if os.path.exists(db_path):
+            conn = sqlite3.connect(db_path)
+            rows = conn.execute("SELECT snomed_id, generic_name FROM brands WHERE snomed_id IS NOT NULL AND snomed_id != '';").fetchall()
+            conn.close()
+
+            code_to_generics = defaultdict(set)
+            for sid, gen in rows:
+                code_to_generics[sid].add(gen.strip().lower())
+
+            for sid, generics in code_to_generics.items():
+                self.assertLessEqual(
+                    len(generics), 1,
+                    f"DATA INTEGRITY FAILURE: SNOMED code {sid} is mapped to multiple distinct generics: {generics}"
+                )
+
+        # 2. Check PMBJP formulary JSON
+        pmbjp_path = os.path.join(PROJECT_ROOT, "data", "formulary", "pmbjp_generic_formulary.json")
+        if os.path.exists(pmbjp_path):
+            with open(pmbjp_path, "r", encoding="utf-8") as f:
+                pmbjp_data = json.load(f)
+            json_code_to_generics = defaultdict(set)
+            for item in pmbjp_data:
+                sid = item.get("snomed_id")
+                if sid:
+                    json_code_to_generics[sid].add(item["generic_name"].strip().lower())
+
+            for sid, generics in json_code_to_generics.items():
+                self.assertLessEqual(
+                    len(generics), 1,
+                    f"DATA INTEGRITY FAILURE in PMBJP formulary: SNOMED code {sid} is mapped to multiple distinct generics: {generics}"
+                )
+
 
 if __name__ == "__main__":
     unittest.main()
