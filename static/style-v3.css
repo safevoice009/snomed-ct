@@ -319,3 +319,59 @@ body::after {
 
 /* Hinglish flagship cell: phrase chips fill the space */
 .hinglish-phrases { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+
+/* ============================================================
+   v5.2 DEVHUB SPLIT VIEW + SANDBOX KEY CARD + TOAST + DND
+   ============================================================ */
+.devhub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; }
+@media (max-width: 980px) { .devhub-grid { grid-template-columns: 1fr; } }
+.devhub-grid .code-gen-card, .devhub-response-card { height: 100%; display: flex; flex-direction: column; }
+.devhub-grid .code-block-viewer, .devhub-response-pre { flex: 1; margin: 0; }
+
+.devhub-response-card {
+  background: #171a21; border: 1px solid #262b36; border-radius: 14px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.devhub-response-pre {
+  font-family: 'JetBrains Mono', monospace; font-size: .72rem; line-height: 1.62;
+  color: #aab4c4; padding: 16px; overflow: auto; margin: 0; white-space: pre; min-height: 260px;
+}
+
+.sandbox-key-card {
+  margin-top: 14px; display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  background: var(--pp-accent-soft); border: 1px solid var(--pp-accent-line);
+  border-radius: 16px; padding: 22px 26px;
+}
+.sk-left { flex: 1; min-width: 240px; }
+.sk-title { font-family: var(--pp-font-display); font-weight: 600; font-size: 1.15rem; color: var(--pp-ink); margin-bottom: 6px; }
+.sk-desc { font-size: .85rem; line-height: 1.55; color: var(--pp-dim); }
+.sk-key {
+  display: flex; flex-direction: column; gap: 4px; cursor: pointer;
+  background: var(--pp-ink); border-radius: 12px; padding: 14px 18px;
+  transition: transform .18s ease;
+}
+.sk-key:hover { transform: translateY(-2px); }
+.sk-key-label { font-family: 'JetBrains Mono', monospace; font-size: .58rem; letter-spacing: .18em; color: #8b929e; }
+.sk-key code { font-family: 'JetBrains Mono', monospace; font-size: .92rem; color: #7cc8b8; }
+
+/* drag-over state for prescription upload */
+.optical-doc-stage.drag-over { outline: 2px dashed var(--pp-accent); outline-offset: 6px; border-radius: 10px; background: var(--pp-accent-soft); }
+.drag-hint-float {
+  position: absolute; inset: 0; display: grid; place-items: center; z-index: 5;
+  background: rgba(250,250,247,.82); backdrop-filter: blur(2px);
+  font-weight: 700; color: var(--pp-accent); font-size: .95rem; pointer-events: none;
+  border-radius: 10px;
+}
+
+/* toast */
+.pp-toast {
+  position: fixed; bottom: 26px; left: 50%; transform: translate(-50%, 16px);
+  background: var(--pp-ink); color: #fff; font-size: .84rem; font-weight: 600;
+  padding: 11px 20px; border-radius: 999px; z-index: 99999;
+  opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease;
+  box-shadow: 0 12px 40px rgba(22,24,29,.3);
+}
+.pp-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* hide key selector when only one key exists */
+.key-selector.hidden-single { display: none; }
