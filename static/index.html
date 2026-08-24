@@ -9,10 +9,10 @@
   <meta property="og:description" content="Messy Indian prescriptions in. Coded, compliant FHIR R4 out. Live demo — no signup.">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="/static/style.css?v=20260824_v30">
-  <link rel="stylesheet" href="/static/style-v3.css?v=20260824_v30">
+  <link rel="stylesheet" href="/static/style-v3.css?v=20260824_v31">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="sw-root">
@@ -79,7 +79,7 @@
             <span class="credit-text">Sandbox: <strong id="credits-remaining-val">982</strong> / 1,000</span>
             <span class="credit-topup-btn">Top-Up</span>
           </div>
-          <button type="button" id="btn-voice-dictate" class="custom-file-upload-btn" style="background: rgba(52,211,153,.08); color: #6ee7b7; border: 1px solid rgba(52,211,153,.25); cursor: pointer;">
+          <button type="button" id="btn-voice-dictate" class="custom-file-upload-btn" style="background: #eaf4f0; color: #0e7c66; border: 1px solid #bcd9cf; cursor: pointer;">
             <span id="voice-icon">🎙️</span> <span id="voice-label">Voice Scribe</span>
           </button>
           <label class="custom-file-upload-btn" for="rx-file-input">
@@ -186,12 +186,12 @@
                 </div>
               </div>
 
-              <div class="clinical-card-group" id="item-clinic" style="background: rgba(14,22,38,.7); padding: 1rem; border-radius: 10px; border: 1px solid rgba(148,163,184,.16); margin-bottom: 1.25rem;">
+              <div class="clinical-card-group" id="item-clinic" style="background: #f8fafc; padding: 1rem; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 1.25rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                  <span style="font-size: 0.88rem; font-weight: 800; color: #e6edf7;">Apollo Clinic, Pune (Dr. Rajesh Sharma, MD)</span>
-                  <span style="font-size: 0.68rem; font-family: var(--font-mono); color: #94a3b8; background: rgba(148,163,184,.08); padding: 0.15rem 0.45rem; border-radius: 4px;">SAMPLE DATA</span>
+                  <span style="font-size: 0.88rem; font-weight: 800; color: #0f172a;">Apollo Clinic, Pune (Dr. Rajesh Sharma, MD)</span>
+                  <span style="font-size: 0.68rem; font-family: var(--font-mono); color: #64748b; background: #eef2f6; padding: 0.15rem 0.45rem; border-radius: 4px;">SAMPLE DATA</span>
                 </div>
-                <div style="font-size: 0.8rem; color: #94a3b8;" id="item-patient">
+                <div style="font-size: 0.8rem; color: #475569;" id="item-patient">
                   Patient: <strong>Mr. Rahul Verma</strong> (34 Y/M) | BP: <strong id="item-vitals">120/80 mmHg</strong> | Wt: 72 Kgs
                 </div>
               </div>
@@ -238,7 +238,7 @@
 
             <div id="inspector-view-vernacular" class="hidden">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-                <span style="font-size: 0.88rem; font-weight: 750; color: #e6edf7;">Patient Dosage Schedule Card</span>
+                <span style="font-size: 0.88rem; font-weight: 750; color: #0f172a;">Patient Dosage Schedule Card</span>
                 <div class="lang-selector-pills">
                   <button class="vernacular-pill active" data-vlang="hi">Hindi (हिंदी)</button>
                   <button class="vernacular-pill" data-vlang="mr">Marathi (मराठी)</button>
@@ -255,60 +255,60 @@
             </div>
 
             <div id="inspector-view-nhcx" class="hidden">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; background: rgba(251,191,36,.07); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid rgba(251,191,36,.25);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; background: #fdf8ec; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #efe3c0;">
                 <div>
-                  <div style="font-size: 0.85rem; font-weight: 800; color: #fbbf24;">⚡ NHCX Claim Package Preview</div>
-                  <div style="font-size: 0.75rem; color: #cbd5e1;">ICD-10 cross-walked claim bundle shaped to NHCX specifications.</div>
+                  <div style="font-size: 0.85rem; font-weight: 800; color: #92400e;">⚡ NHCX Claim Package Preview</div>
+                  <div style="font-size: 0.75rem; color: #b45309;">ICD-10 cross-walked claim bundle shaped to NHCX specifications.</div>
                 </div>
-                <span class="tpa-status-badge" style="background: rgba(52,211,153,.08); color: #6ee7b7; border: 1px solid rgba(52,211,153,.25); font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 6px;">GENERATED LOCALLY</span>
+                <span class="tpa-status-badge" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 6px;">GENERATED LOCALLY</span>
               </div>
               <pre id="nhcx-json-code" style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5; overflow-x: auto; background: #050a12; color: #d7e3f4; padding: 1rem; border-radius: 8px; border: 1px solid rgba(148,163,184,.12);">{\n  "resourceType": "Bundle",\n  "type": "collection",\n  "profile": ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"]\n}</pre>
             </div>
 
             <div id="inspector-view-adjudication" class="hidden">
-              <div style="background: rgba(251,191,36,.06); border: 1px solid rgba(251,191,36,.25); border-radius: 8px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.76rem; color: #fbbf24;">
+              <div style="background: #fdf8ec; border: 1px solid #efe3c0; border-radius: 8px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.76rem; color: #92400e;">
                 <strong>⚠️ MOCK RULES ENGINE PREVIEW</strong> — runs on a small illustrative rule set locally. Not connected to any insurer/TPA system.
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <div>
-                  <h3 style="font-size: 0.95rem; font-weight: 800; color: #e6edf7; margin-bottom: 0.2rem;">NHCX Claim Pre-Adjudication Preview</h3>
-                  <p style="font-size: 0.78rem; color: #94a3b8;">Illustrative medical-necessity &amp; completeness checks before claim submission.</p>
+                  <h3 style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 0.2rem;">NHCX Claim Pre-Adjudication Preview</h3>
+                  <p style="font-size: 0.78rem; color: #64748b;">Illustrative medical-necessity &amp; completeness checks before claim submission.</p>
                 </div>
                 <button id="btn-run-adjudication" class="btn-tool" style="background: var(--brand-primary); color: #fff; font-weight: 700; padding: 0.35rem 0.75rem;">Run Pre-Check</button>
               </div>
 
-              <div id="adjudication-results-card" style="background: rgba(14,22,38,.7); border-radius: 12px; border: 1px solid rgba(148,163,184,.16); padding: 1.25rem; margin-bottom: 1rem;">
+              <div id="adjudication-results-card" style="background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.25rem; margin-bottom: 1rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                   <div>
-                    <span style="font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Illustrative Score</span>
-                    <div id="adj-prob-score" style="font-size: 1.75rem; font-weight: 850; color: #34d399; font-family: var(--font-mono);">98% — HIGH</div>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Illustrative Score</span>
+                    <div id="adj-prob-score" style="font-size: 1.75rem; font-weight: 850; color: #059669; font-family: var(--font-mono);">98% — HIGH</div>
                   </div>
-                  <div id="adj-status-badge" style="padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.78rem; font-weight: 800; background: rgba(52,211,153,.08); color: #6ee7b7; border: 1px solid rgba(52,211,153,.25);">
+                  <div id="adj-status-badge" style="padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.78rem; font-weight: 800; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
                     DEMO OUTPUT — NOT AN UNDERWRITING DECISION
                   </div>
                 </div>
                 <div style="margin-bottom: 1rem;">
-                  <div style="font-size: 0.8rem; font-weight: 750; color: #e6edf7; margin-bottom: 0.4rem;">Passed Statutory &amp; Necessity Checks:</div>
-                  <div id="adj-checks-list" style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.78rem; color: #cbd5e1;">
+                  <div style="font-size: 0.8rem; font-weight: 750; color: #0f172a; margin-bottom: 0.4rem;">Passed Statutory &amp; Necessity Checks:</div>
+                  <div id="adj-checks-list" style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.78rem; color: #334155;">
                     <div>✅ Primary ICD-10 Diagnosis Specificity Validated</div>
                     <div>✅ Pharmacy itemization matches prescribed medication count</div>
                     <div>✅ OPD billing within IRDAI benchmark sub-limits</div>
                   </div>
                 </div>
                 <div id="adj-flags-container" class="hidden">
-                  <div style="font-size: 0.8rem; font-weight: 750; color: #fca5a5; margin-bottom: 0.4rem;">⚠️ Pre-Submission Flags &amp; Action Items:</div>
-                  <div id="adj-flags-list" style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.78rem; color: #fca5a5;"></div>
+                  <div style="font-size: 0.8rem; font-weight: 750; color: #b91c1c; margin-bottom: 0.4rem;">⚠️ Pre-Submission Flags &amp; Action Items:</div>
+                  <div id="adj-flags-list" style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.78rem; color: #991b1b;"></div>
                 </div>
               </div>
             </div>
 
             <div id="inspector-view-abha" class="hidden">
-              <div style="background: rgba(251,191,36,.06); border: 1px solid rgba(251,191,36,.25); border-radius: 8px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.76rem; color: #fbbf24;">
+              <div style="background: #fdf8ec; border: 1px solid #efe3c0; border-radius: 8px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.76rem; color: #92400e;">
                 <strong>⚠️ SANDBOX SIMULATION</strong> — Local mock only (any OTP works, sample identity). Not connected to NHA production systems. Live M1/M2 integration in progress on the official ABDM sandbox.
               </div>
               <div style="margin-bottom: 1.25rem;">
-                <h3 style="font-size: 0.95rem; font-weight: 800; color: #e6edf7; margin-bottom: 0.2rem;">ABDM M1 &amp; M2 Gateway — Interface Preview</h3>
-                <p style="font-size: 0.78rem; color: #94a3b8;">Planned flow: ABHA creation via OTP, KYC verification &amp; care-context linkage.</p>
+                <h3 style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 0.2rem;">ABDM M1 &amp; M2 Gateway — Interface Preview</h3>
+                <p style="font-size: 0.78rem; color: #64748b;">Planned flow: ABHA creation via OTP, KYC verification &amp; care-context linkage.</p>
               </div>
 
               <div style="background: linear-gradient(135deg, #0f172a 0%, #16233c 100%); color: #fff; padding: 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; position: relative; overflow: hidden; border: 1px solid rgba(148,163,184,.16);">
@@ -326,15 +326,15 @@
                 </div>
               </div>
 
-              <div style="background: rgba(14,22,38,.7); border-radius: 10px; border: 1px solid rgba(148,163,184,.16); padding: 1rem;">
-                <div style="font-size: 0.82rem; font-weight: 750; color: #e6edf7; margin-bottom: 0.5rem;">Simulate ABHA OTP Generation / Linkage:</div>
+              <div style="background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; padding: 1rem;">
+                <div style="font-size: 0.82rem; font-weight: 750; color: #0f172a; margin-bottom: 0.5rem;">Simulate ABHA OTP Generation / Linkage:</div>
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
-                  <input type="text" id="abha-mobile-input" placeholder="Mobile / Aadhaar (e.g. 9876543210)" value="9876543210" style="flex: 1; padding: 0.45rem 0.65rem; border: 1px solid rgba(148,163,184,.3); border-radius: 6px; font-size: 0.82rem; background: #050a12; color: #e6edf7;">
+                  <input type="text" id="abha-mobile-input" placeholder="Mobile / Aadhaar (e.g. 9876543210)" value="9876543210" style="flex: 1; padding: 0.45rem 0.65rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; background: #ffffff; color: #0f172a;">
                   <button id="btn-generate-abha-otp" class="btn-tool" style="background: #0f172a; color: #fff; font-weight: 700; white-space: nowrap;">Send OTP</button>
                 </div>
-                <div id="abha-otp-box" class="hidden" style="margin-top: 0.5rem; padding-top: 0.75rem; border-top: 1px dashed rgba(148,163,184,.3);">
+                <div id="abha-otp-box" class="hidden" style="margin-top: 0.5rem; padding-top: 0.75rem; border-top: 1px dashed #cbd5e1;">
                   <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" id="abha-otp-input" placeholder="Enter 6-digit OTP (123456)" value="123456" style="width: 140px; padding: 0.45rem 0.65rem; border: 1px solid rgba(148,163,184,.3); border-radius: 6px; font-size: 0.82rem; font-family: var(--font-mono); background: #050a12; color: #e6edf7;">
+                    <input type="text" id="abha-otp-input" placeholder="Enter 6-digit OTP (123456)" value="123456" style="width: 140px; padding: 0.45rem 0.65rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; font-family: var(--font-mono); background: #ffffff; color: #0f172a;">
                     <button id="btn-verify-abha-otp" class="btn-tool" style="background: #059669; color: #fff; font-weight: 700;">Verify &amp; Link M2</button>
                   </div>
                 </div>
@@ -584,18 +584,18 @@
 
     <div class="roi-grid">
       <div class="roi-control-pane">
-        <label style="display: block; font-size: 0.88rem; font-weight: 750; color: #e6edf7; margin-bottom: 0.5rem;">
-          Monthly Prescription Volume: <span id="roi-volume-display" style="color: var(--v3-accent); font-size: 1.25rem;">50,000</span> <span style="font-size: 0.85rem; color: #94a3b8;">Rx / month</span>
+        <label style="display: block; font-size: 0.88rem; font-weight: 750; color: #16181d; margin-bottom: 0.5rem;">
+          Monthly Prescription Volume: <span id="roi-volume-display" style="color: var(--v3-accent); font-size: 1.25rem;">50,000</span> <span style="font-size: 0.85rem; color: #8b929e;">Rx / month</span>
         </label>
         <input type="range" id="roi-slider" min="5000" max="500000" step="5000" value="50000" class="roi-range-slider">
 
-        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-top: 0.4rem; font-family: var(--font-mono);">
+        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #8b929e; margin-top: 0.4rem; font-family: var(--font-mono);">
           <span>5,000 (Clinic)</span><span>100,000 (Hospital)</span><span>500,000+ (E-Pharmacy)</span>
         </div>
 
-        <div style="margin-top: 2rem; padding: 1.25rem; background: rgba(14,22,38,.7); border-radius: 12px; border: 1px solid rgba(148,163,184,.16);">
-          <div style="font-size: 0.85rem; font-weight: 750; color: #e6edf7; margin-bottom: 0.4rem;">Why per-call pricing works here</div>
-          <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.5;">
+        <div style="margin-top: 2rem; padding: 1.25rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+          <div style="font-size: 0.85rem; font-weight: 750; color: #16181d; margin-bottom: 0.4rem;">Why per-call pricing works here</div>
+          <p style="font-size: 0.8rem; color: var(--pp-dim, #5f6673); line-height: 1.5;">
             Aggressive caching means repeated terms cost fractions of a paisa. Listed pack rates start at ₹0.111/call and fall with volume — no USD invoice surprises.
           </p>
         </div>
@@ -824,6 +824,6 @@
 
 <script src="/static/scrub-engine.js?v=20260824_v30"></script>
 <script src="/static/app.js?v=20260824_v30"></script>
-<script src="/static/site.js?v=20260824_v30"></script>
+<script src="/static/site.js?v=20260824_v31"></script>
 </body>
 </html>
