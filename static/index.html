@@ -9,7 +9,7 @@
   <meta property="og:description" content="Messy Indian prescriptions in. Coded, compliant FHIR out. Live demo — no signup.">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="/static/style.css?v=20260824_v40">
-  <link rel="stylesheet" href="/static/style-v3.css?v=20260824_v40">
+  <link rel="stylesheet" href="/static/style-v3.css?v=20260824_v41">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -425,14 +425,27 @@
     <p class="v3-sub">One API layer that does the boring, safety-critical work your product shouldn't rebuild.</p>
 
     <div class="v3-bento">
-      <div class="v3-cell v3-cell--wide v3-cell--tall">
+      <div class="v3-cell v3-cell--wide">
         <div class="v3-cell__icon">🗣️</div>
         <div class="v3-cell__title">Hinglish &amp; Abbreviation NLP</div>
-        <div class="v3-cell__desc">Understands how Indian doctors actually write — "sar dard", "loose motions", "AP+", "k/c/o", brand shorthand like Pantocid and Dolo — via a hybrid rule-engine plus LLM fallback with caching.</div>
-        <div class="v3-cell__visual mini-flow">
-          <span class="node">'pet kharab x 2d'</span><span class="arrow">→</span>
-          <span class="node">Diarrhoea</span><span class="arrow">→</span>
-          <span class="node" style="border-color: var(--pp-accent-line); color: var(--pp-accent);">SNOMED 62315008</span>
+        <div class="v3-cell__desc">Understands how Indian doctors actually write — via a hybrid rule-engine plus LLM fallback with caching. The lexicon keeps growing from every unresolved term the engine logs.</div>
+        <div class="v3-cell__visual">
+          <div class="hinglish-phrases">
+            <span class="mini-chip mini-chip--accent">sar dard</span>
+            <span class="mini-chip mini-chip--accent">loose motions</span>
+            <span class="mini-chip mini-chip--accent">AP+</span>
+            <span class="mini-chip mini-chip--accent">k/c/o</span>
+            <span class="mini-chip mini-chip--accent">ulti</span>
+            <span class="mini-chip mini-chip--accent">bukhar</span>
+            <span class="mini-chip">pet kharab</span>
+            <span class="mini-chip">SOBOE</span>
+            <span class="mini-chip">Dolo 650 BD</span>
+          </div>
+          <div class="mini-flow">
+            <span class="node">'pet kharab x 2d'</span><span class="arrow">→</span>
+            <span class="node">Diarrhoea</span><span class="arrow">→</span>
+            <span class="node" style="border-color: var(--pp-accent-line); color: var(--pp-accent);">SNOMED 62315008</span>
+          </div>
         </div>
       </div>
 
@@ -828,6 +841,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="/static/site.js?v=20260824_v40"></script>
+<script src="/static/site.js?v=20260824_v41"></script>
 </body>
 </html>

@@ -267,3 +267,55 @@ body::after {
 /* ---------- WORKBENCH INTERNAL COHERENCE ---------- */
 .inspector-tabs { border-color: var(--pp-line) !important; }
 .optical-toolbar { background: #fafaf7 !important; }
+
+/* ============================================================
+   v5.1 LAYOUT FIXES — workbench grid + bento proportions
+   ============================================================ */
+
+/* WORKBENCH: let content flow naturally, no internal scrollbar */
+.sandbox-grid { min-height: 0 !important; align-items: stretch; }
+.sandbox-right { min-width: 0; }
+.inspector-content { max-height: none !important; overflow: visible !important; height: auto !important; flex: none !important; }
+
+/* Inspector tab row: tabs scroll horizontally instead of wrapping into stubs */
+.inspector-tab-row { flex-wrap: wrap !important; row-gap: 0.55rem; padding: 0.7rem 1.1rem !important; }
+.inspector-tabs {
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  max-width: 100%;
+  padding-bottom: 2px;
+}
+.inspector-tabs::-webkit-scrollbar { display: none; }
+.inspector-tab-btn {
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  font-size: 0.78rem !important;
+  padding: 0.42rem 0.85rem !important;
+  border-radius: 999px !important;
+  border: 1px solid transparent !important;
+}
+.inspector-tab-btn.active { border-color: var(--pp-accent-line) !important; background: var(--pp-accent-soft) !important; color: var(--pp-accent) !important; box-shadow: none !important; }
+
+/* Left pane footer sits flush inside its column */
+.sandbox-left-footer { margin-top: auto; }
+
+/* BENTO: 3-column proportional grid, no skinny cells */
+.v3-bento { grid-template-columns: repeat(3, 1fr) !important; }
+.v3-cell--wide { grid-column: span 2 !important; }
+.v3-cell--full { grid-column: span 3 !important; }
+.v3-cell--tall { grid-row: auto !important; }
+@media (max-width: 980px) {
+  .v3-bento { grid-template-columns: repeat(2, 1fr) !important; }
+  .v3-cell--wide, .v3-cell--full { grid-column: span 2 !important; }
+}
+@media (max-width: 600px) {
+  .v3-bento { grid-template-columns: 1fr !important; }
+  .v3-cell--wide, .v3-cell--full { grid-column: span 1 !important; }
+}
+.v3-cell--tall .v3-cell__desc { margin-bottom: 14px; }
+.mini-code { font-size: .66rem; }
+
+/* Hinglish flagship cell: phrase chips fill the space */
+.hinglish-phrases { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
