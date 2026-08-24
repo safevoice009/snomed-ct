@@ -13,6 +13,8 @@ Per MASTER_DIRECTIVE.md Task 1.2:
 import os
 import sys
 import glob
+import json
+import uuid
 import zipfile
 import sqlite3
 import argparse
@@ -21,7 +23,8 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("load_rf2")
 
-DB_PATH = "clinical_knowledge.db"
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(PROJECT_ROOT, "clinical_knowledge.db")
 
 
 def get_db_connection(db_path: str = DB_PATH) -> sqlite3.Connection:
@@ -336,9 +339,10 @@ CORE_SEEDS = {
 
 
 def load_seeds(conn: sqlite3.Connection):
-    """Loads essential clinical seeds for immediate zero-config operation."""
+    """Loads essential clinical seeds, OPD refsets, and public PMBJP formulary for zero-config operation."""
     cursor = conn.cursor()
     
+    # 1. Base Core Seeds
     cursor.executemany("""
     INSERT OR REPLACE INTO concepts (concept_id, preferred_name, semantic_tag, active)
     VALUES (?, ?, ?, ?);
@@ -354,8 +358,60 @@ def load_seeds(conn: sqlite3.Connection):
     VALUES (?, ?, ?, ?, ?, ?);
     """, CORE_SEEDS["brands"])
 
+    # 2. Ingest Task 1.5A Curated OPD RefSet v1
+    opd_refset_path = os.path.join(PROJECT_ROOT, "data", "refset", "opd_refset_v1.json")
+    if os.path.exists(opd_refset_path):
+        try:
+            with open(opd_refset_path, "r", encoding="utf-8") as f:
+                opd_data = json.load(f)
+            opd_concepts = []
+            opd_descriptions = []
+            for item in opd_data:
+                cid = item.get("concept_id") or str(uuid.uuid4().int)[:10]
+                pname = item["preferred_name"]
+                stag = item.get("semantic_tag", "disorder")
+                opd_concepts.append((cid, pname, stag, 1))
+
+                # Add FSN
+                opd_descriptions.append((f"desc-fsn-{cid}", cid, f"{pname} ({stag})", "900000000000003001", 1))
+
+                # Add Hinglish synonyms
+                for idx, syn in enumerate(item.get("hinglish_synonyms", [])):
+                    opd_descriptions.append((f"desc-syn-{cid}-{idx}", cid, syn, "900000000000013009", 1))
+
+                # Add Abbreviations
+                for idx, abbr in enumerate(item.get("abbreviations", [])):
+                    opd_descriptions.append((f"desc-abbr-{cid}-{idx}", cid, abbr, "900000000000013009", 1))
+
+            cursor.executemany("INSERT OR REPLACE INTO concepts VALUES (?, ?, ?, ?);", opd_concepts)
+            cursor.executemany("INSERT OR REPLACE INTO descriptions VALUES (?, ?, ?, ?, ?);", opd_descriptions)
+            logger.info(f"Loaded OPD RefSet v1: {len(opd_concepts)} conditions & {len(opd_descriptions)} vernacular descriptions.")
+        except Exception as e:
+            logger.warning(f"Failed to load OPD RefSet: {e}")
+
+    # 3. Ingest Task 1.5B Public PMBJP / Jan Aushadhi Formulary
+    pmbjp_path = os.path.join(PROJECT_ROOT, "data", "formulary", "pmbjp_generic_formulary.json")
+    if os.path.exists(pmbjp_path):
+        try:
+            with open(pmbjp_path, "r", encoding="utf-8") as f:
+                pmbjp_data = json.load(f)
+            pmbjp_brands = []
+            for item in pmbjp_data:
+                pmbjp_brands.append((
+                    item["brand_name"],
+                    item["generic_name"],
+                    item.get("category", "Generic Formulation"),
+                    item.get("snomed_id", "387517004"),
+                    item.get("typical_doses", ""),
+                    item.get("synonyms", "")
+                ))
+            cursor.executemany("INSERT OR REPLACE INTO brands VALUES (?, ?, ?, ?, ?, ?);", pmbjp_brands)
+            logger.info(f"Loaded PMBJP Jan Aushadhi Formulary: {len(pmbjp_brands)} public generic medicines.")
+        except Exception as e:
+            logger.warning(f"Failed to load PMBJP Formulary: {e}")
+
     conn.commit()
-    logger.info(f"Loaded core seeds: {len(CORE_SEEDS['concepts'])} concepts, {len(CORE_SEEDS['descriptions'])} descriptions, {len(CORE_SEEDS['brands'])} Indian brands.")
+    logger.info("Knowledge base seeds, OPD RefSet v1, and PMBJP formulary loaded successfully.")
 
 
 def load_rf2_directory(conn: sqlite3.Connection, rf2_dir: str):
@@ -364,8 +420,16 @@ def load_rf2_directory(conn: sqlite3.Connection, rf2_dir: str):
         logger.warning(f"RF2 directory {rf2_dir} does not exist. Skipping file parse.")
         return
 
-    concept_files = glob.glob(os.path.join(rf2_dir, "**", "*Concept_Snapshot*.txt"), recursive=True)
-    desc_files = glob.glob(os.path.join(rf2_dir, "**", "*Description_Snapshot*.txt"), recursive=True)
+    all_c_files = glob.glob(os.path.join(rf2_dir, "**", "*Concept_Snapshot*.txt"), recursive=True)
+    all_d_files = glob.glob(os.path.join(rf2_dir, "**", "*Description_Snapshot*.txt"), recursive=True)
+
+    # Exclude _format_test from standard data/rf2 runs unless explicitly targeting it
+    if os.path.basename(os.path.normpath(rf2_dir)) != "_format_test":
+        concept_files = [f for f in all_c_files if "_format_test" not in f]
+        desc_files = [f for f in all_d_files if "_format_test" not in f]
+    else:
+        concept_files = all_c_files
+        desc_files = all_d_files
 
     cursor = conn.cursor()
 

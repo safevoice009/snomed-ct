@@ -1,0 +1,432 @@
+[
+  {
+    "preferred_name": "Essential hypertension",
+    "semantic_tag": "disorder",
+    "concept_id": "38341003",
+    "icd10_guess": "I10",
+    "hinglish_synonyms": ["high bp", "bp badha hua", "uchh raktchap"],
+    "abbreviations": ["HTN", "BP+"]
+  },
+  {
+    "preferred_name": "Type 2 diabetes mellitus",
+    "semantic_tag": "disorder",
+    "concept_id": "44054006",
+    "icd10_guess": "E11",
+    "hinglish_synonyms": ["sugar ki bimari", "madhumeh", "sugar checkup"],
+    "abbreviations": ["T2DM", "DM2", "NIDDM"]
+  },
+  {
+    "preferred_name": "Acid peptic disease",
+    "semantic_tag": "disorder",
+    "concept_id": "367389006",
+    "icd10_guess": "K27",
+    "hinglish_synonyms": ["acidity", "pet me jalan", "khatti dakar"],
+    "abbreviations": ["APD", "GERD"]
+  },
+  {
+    "preferred_name": "Acute gastroenteritis",
+    "semantic_tag": "disorder",
+    "concept_id": "95892003",
+    "icd10_guess": "A09",
+    "hinglish_synonyms": ["pet kharab", "dast", "dast ulti"],
+    "abbreviations": ["AGE", "GE"]
+  },
+  {
+    "preferred_name": "Acute bronchitis",
+    "semantic_tag": "disorder",
+    "concept_id": "10509002",
+    "icd10_guess": "J20",
+    "hinglish_synonyms": ["chhati me jalan", "khansi bukhar", "phephade me infection"],
+    "abbreviations": ["AB"]
+  },
+  {
+    "preferred_name": "Allergic rhinitis",
+    "semantic_tag": "disorder",
+    "concept_id": "61582004",
+    "icd10_guess": "J30.9",
+    "hinglish_synonyms": ["sardi", "chhink aana", "naak bahna"],
+    "abbreviations": ["AR"]
+  },
+  {
+    "preferred_name": "Asthma",
+    "semantic_tag": "disorder",
+    "concept_id": "195967001",
+    "icd10_guess": "J45",
+    "hinglish_synonyms": ["dama", "saas phoolna", "chhati bajna"],
+    "abbreviations": ["BA"]
+  },
+  {
+    "preferred_name": "Chronic obstructive pulmonary disease",
+    "semantic_tag": "disorder",
+    "concept_id": "13645005",
+    "icd10_guess": "J44.9",
+    "hinglish_synonyms": ["purani khansi", "phephade ki kamzori"],
+    "abbreviations": ["COPD", "CAL"]
+  },
+  {
+    "preferred_name": "Dyslipidemia",
+    "semantic_tag": "disorder",
+    "concept_id": "370992007",
+    "icd10_guess": "E78.5",
+    "hinglish_synonyms": ["cholesterol badha hua", "khoon me charbi"],
+    "abbreviations": ["DLD", "HLD"]
+  },
+  {
+    "preferred_name": "Hypothyroidism",
+    "semantic_tag": "disorder",
+    "concept_id": "40930008",
+    "icd10_guess": "E03.9",
+    "hinglish_synonyms": ["thyroid ki bimari", "motapa thyroid"],
+    "abbreviations": ["HYPO-T"]
+  },
+  {
+    "preferred_name": "Hyperuricemia and Gout",
+    "semantic_tag": "disorder",
+    "concept_id": "90560007",
+    "icd10_guess": "M10.9",
+    "hinglish_synonyms": ["uric acid badha hua", "anguthe me dard", "gathiya"],
+    "abbreviations": ["GOUT"]
+  },
+  {
+    "preferred_name": "Rheumatoid arthritis",
+    "semantic_tag": "disorder",
+    "concept_id": "69896004",
+    "icd10_guess": "M06.9",
+    "hinglish_synonyms": ["gathiya baav", "amavata", "sandhi vata"],
+    "abbreviations": ["RA"]
+  },
+  {
+    "preferred_name": "Osteoarthritis of knee",
+    "semantic_tag": "disorder",
+    "concept_id": "239872002",
+    "icd10_guess": "M17.9",
+    "hinglish_synonyms": ["ghutne ka ghisna", "ghutno ka dard"],
+    "abbreviations": ["OA Knee", "B/L OA"]
+  },
+  {
+    "preferred_name": "Urinary tract infection",
+    "semantic_tag": "disorder",
+    "concept_id": "68566005",
+    "icd10_guess": "N39.0",
+    "hinglish_synonyms": ["peshab me jalan", "peshab ka infection", "mutra marg sankraman"],
+    "abbreviations": ["UTI"]
+  },
+  {
+    "preferred_name": "Benign prostatic hyperplasia",
+    "semantic_tag": "disorder",
+    "concept_id": "266569009",
+    "icd10_guess": "N40",
+    "hinglish_synonyms": ["prostate badha hua", "peshab ruk ruk ke aana"],
+    "abbreviations": ["BPH"]
+  },
+  {
+    "preferred_name": "Fatty liver disease",
+    "semantic_tag": "disorder",
+    "concept_id": "235856003",
+    "icd10_guess": "K76.0",
+    "hinglish_synonyms": ["liver me charbi", "fatty liver grade 1", "fatty liver grade 2"],
+    "abbreviations": ["NAFLD", "MASLD"]
+  },
+  {
+    "preferred_name": "Irritable bowel syndrome",
+    "semantic_tag": "disorder",
+    "concept_id": "10743008",
+    "icd10_guess": "K58.9",
+    "hinglish_synonyms": ["aaw aana", "sangrahani", "subah baar baar jana"],
+    "abbreviations": ["IBS", "IBS-D", "IBS-C"]
+  },
+  {
+    "preferred_name": "Migraine",
+    "semantic_tag": "disorder",
+    "concept_id": "37796009",
+    "icd10_guess": "G43.9",
+    "hinglish_synonyms": ["aadha sar dard", "ardhavbhedak", "migraine ka dard"],
+    "abbreviations": ["MIG"]
+  },
+  {
+    "preferred_name": "Tension-type headache",
+    "semantic_tag": "disorder",
+    "concept_id": "398057008",
+    "icd10_guess": "G44.2",
+    "hinglish_synonyms": ["tanav se sar dard", "sir me bhari pan"],
+    "abbreviations": ["TTH"]
+  },
+  {
+    "preferred_name": "Generalised anxiety disorder",
+    "semantic_tag": "disorder",
+    "concept_id": "21897009",
+    "icd10_guess": "F41.1",
+    "hinglish_synonyms": ["ghabrahat", "bechaini", "chinta rog"],
+    "abbreviations": ["GAD"]
+  },
+  {
+    "preferred_name": "Major depressive disorder",
+    "semantic_tag": "disorder",
+    "concept_id": "370143000",
+    "icd10_guess": "F32.9",
+    "hinglish_synonyms": ["udasina", "man na lagna", "depression"],
+    "abbreviations": ["MDD"]
+  },
+  {
+    "preferred_name": "Primary insomnia",
+    "semantic_tag": "disorder",
+    "concept_id": "193462001",
+    "icd10_guess": "G47.0",
+    "hinglish_synonyms": ["neend na aana", "anidra"],
+    "abbreviations": ["INSOMNIA"]
+  },
+  {
+    "preferred_name": "Iron deficiency anemia",
+    "semantic_tag": "disorder",
+    "concept_id": "87522002",
+    "icd10_guess": "D50.9",
+    "hinglish_synonyms": ["khoon ki kami", "pandu rog", "kamzori thakan"],
+    "abbreviations": ["IDA", "ANEMIA"]
+  },
+  {
+    "preferred_name": "Vitamin D deficiency",
+    "semantic_tag": "disorder",
+    "concept_id": "34713006",
+    "icd10_guess": "E55.9",
+    "hinglish_synonyms": ["haddi me dard", "vitamin d kam"],
+    "abbreviations": ["VIT-D DEF"]
+  },
+  {
+    "preferred_name": "Vitamin B12 deficiency",
+    "semantic_tag": "disorder",
+    "concept_id": "190634004",
+    "icd10_guess": "E53.8",
+    "hinglish_synonyms": ["hath pair me jhunjhuni", "b12 kam"],
+    "abbreviations": ["B12 DEF"]
+  },
+  {
+    "preferred_name": "Tinea corporis",
+    "semantic_tag": "disorder",
+    "concept_id": "19839007",
+    "icd10_guess": "B35.4",
+    "hinglish_synonyms": ["daad", "khujli", "fungal infection"],
+    "abbreviations": ["TINEA", "RINGWORM"]
+  },
+  {
+    "preferred_name": "Scabies",
+    "semantic_tag": "disorder",
+    "concept_id": "301011002",
+    "icd10_guess": "B86",
+    "hinglish_synonyms": ["raat me tez khujli", "ungliyo ke beech khujli"],
+    "abbreviations": ["SCABIES"]
+  },
+  {
+    "preferred_name": "Acne vulgaris",
+    "semantic_tag": "disorder",
+    "concept_id": "11381005",
+    "icd10_guess": "L70.0",
+    "hinglish_synonyms": ["muhase", "pimples", "chehre par dane"],
+    "abbreviations": ["ACNE"]
+  },
+  {
+    "preferred_name": "Atopic dermatitis",
+    "semantic_tag": "disorder",
+    "concept_id": "24079001",
+    "icd10_guess": "L20.9",
+    "hinglish_synonyms": ["eczema", "chamdi ki allergy"],
+    "abbreviations": ["AD", "ECZEMA"]
+  },
+  {
+    "preferred_name": "Dysmenorrhea",
+    "semantic_tag": "disorder",
+    "concept_id": "266599000",
+    "icd10_guess": "N94.6",
+    "hinglish_synonyms": ["period me dard", "mahina aane par pet dard", "kashta aartava"],
+    "abbreviations": ["DYSMEN"]
+  },
+  {
+    "preferred_name": "Polycystic ovarian syndrome",
+    "semantic_tag": "disorder",
+    "concept_id": "237055002",
+    "icd10_guess": "E28.2",
+    "hinglish_synonyms": ["periods time pe na aana", "ovary me rasoli"],
+    "abbreviations": ["PCOS", "PCOD"]
+  },
+  {
+    "preferred_name": "Cervical spondylosis",
+    "semantic_tag": "disorder",
+    "concept_id": "202794002",
+    "icd10_guess": "M47.812",
+    "hinglish_synonyms": ["gardan me dard", "gardan jakadna", "manyastambha"],
+    "abbreviations": ["CS", "CERVICAL"]
+  },
+  {
+    "preferred_name": "Lumbar spondylosis with Sciatica",
+    "semantic_tag": "disorder",
+    "concept_id": "202796000",
+    "icd10_guess": "M47.816",
+    "hinglish_synonyms": ["kamar dard", "pair me khinchav", "gridhrasi"],
+    "abbreviations": ["LBA", "PIVD", "SCIATICA"]
+  },
+  {
+    "preferred_name": "Dengue fever",
+    "semantic_tag": "disorder",
+    "concept_id": "38362002",
+    "icd10_guess": "A90",
+    "hinglish_synonyms": ["dengue bukhar", "haddi tod bukhar", "platelet girna"],
+    "abbreviations": ["DENGUE"]
+  },
+  {
+    "preferred_name": "Enteric fever (Typhoid)",
+    "semantic_tag": "disorder",
+    "concept_id": "4834000",
+    "icd10_guess": "A01.0",
+    "hinglish_synonyms": ["typhoid", "miyadi bukhar", "motijhara"],
+    "abbreviations": ["TYPHOID", "ENTERIC"]
+  },
+  {
+    "preferred_name": "Acute pharyngitis / Tonsillitis",
+    "semantic_tag": "disorder",
+    "concept_id": "363746003",
+    "icd10_guess": "J02.9",
+    "hinglish_synonyms": ["gala kharab", "gale me jalan", "tonsil badhna"],
+    "abbreviations": ["URTI", "TONSILLITIS"]
+  },
+  {
+    "preferred_name": "Conjunctivitis",
+    "semantic_tag": "disorder",
+    "concept_id": "9826008",
+    "icd10_guess": "H10.9",
+    "hinglish_synonyms": ["aankh aana", "aankh lal hona", "netrabhishyanda"],
+    "abbreviations": ["CONJ"]
+  },
+  {
+    "preferred_name": "Headache",
+    "semantic_tag": "finding",
+    "concept_id": "25064002",
+    "hinglish_synonyms": ["sar dard", "sir dard", "matha dard"],
+    "abbreviations": ["HA"]
+  },
+  {
+    "preferred_name": "Fever",
+    "semantic_tag": "finding",
+    "concept_id": "386661006",
+    "hinglish_synonyms": ["bukhar", "taap", "badan garm hona", "jwara"],
+    "abbreviations": ["PYREXIA", "FEBRILE"]
+  },
+  {
+    "preferred_name": "Cough",
+    "semantic_tag": "finding",
+    "concept_id": "49727002",
+    "hinglish_synonyms": ["khansi", "sukhi khansi", "balgam wali khansi", "kasa"],
+    "abbreviations": ["COUGH"]
+  },
+  {
+    "preferred_name": "Dyspnea on exertion",
+    "semantic_tag": "finding",
+    "concept_id": "267036007",
+    "hinglish_synonyms": ["saas phoolna", "dam phoolna", "chalte waqt saas chadhna", "shwasa"],
+    "abbreviations": ["SOBOE", "DOE"]
+  },
+  {
+    "preferred_name": "Nausea",
+    "semantic_tag": "finding",
+    "concept_id": "422587007",
+    "hinglish_synonyms": ["ulti jaisa lagna", "jee ghabrana", "hrillasa"],
+    "abbreviations": ["NAUSEA"]
+  },
+  {
+    "preferred_name": "Vomiting",
+    "semantic_tag": "finding",
+    "concept_id": "422400008",
+    "hinglish_synonyms": ["ulti", "vomit", "chhardi"],
+    "abbreviations": ["VOMITING"]
+  },
+  {
+    "preferred_name": "Diarrhoea",
+    "semantic_tag": "finding",
+    "concept_id": "62315008",
+    "hinglish_synonyms": ["loose motion", "dast", "pet chalna", "atisara"],
+    "abbreviations": ["LM", "DIARRHEA"]
+  },
+  {
+    "preferred_name": "Abdominal pain",
+    "semantic_tag": "finding",
+    "concept_id": "21522000",
+    "icd10_guess": "R10.9",
+    "hinglish_synonyms": ["pet dard", "pet me marod", "udara shoola"],
+    "abbreviations": ["AP+", "ABD PAIN"]
+  },
+  {
+    "preferred_name": "Edema of foot",
+    "semantic_tag": "finding",
+    "concept_id": "267038008",
+    "hinglish_synonyms": ["pair me sujan", "pair phoolna", "pada shotha"],
+    "abbreviations": ["PEDAL EDEMA", "P/E+"]
+  },
+  {
+    "preferred_name": "Joint pain",
+    "semantic_tag": "finding",
+    "concept_id": "57676002",
+    "hinglish_synonyms": ["jodo me dard", "ghutne ka dard", "sandhi shoola"],
+    "abbreviations": ["ARTHRALGIA"]
+  },
+  {
+    "preferred_name": "Chest tightness",
+    "semantic_tag": "finding",
+    "concept_id": "29857009",
+    "hinglish_synonyms": ["chhati me bhari pan", "chhati jakadna", "urashoola"],
+    "abbreviations": ["CHEST TIGHTNESS"]
+  },
+  {
+    "preferred_name": "Heartburn",
+    "semantic_tag": "finding",
+    "concept_id": "16331000",
+    "hinglish_synonyms": ["jalan", "kaleje me jalan", "vidaha"],
+    "abbreviations": ["HEARTBURN"]
+  },
+  {
+    "preferred_name": "Sneezing",
+    "semantic_tag": "finding",
+    "concept_id": "91175000",
+    "hinglish_synonyms": ["chhink", "chhinke aana", "kshavathu"],
+    "abbreviations": ["SNEEZING"]
+  },
+  {
+    "preferred_name": "Rhinorrhea",
+    "semantic_tag": "finding",
+    "concept_id": "64531003",
+    "hinglish_synonyms": ["naak behna", "paani jaisi naak", "nasa srava"],
+    "abbreviations": ["RUNNING NOSE"]
+  },
+  {
+    "preferred_name": "Wheezing",
+    "semantic_tag": "finding",
+    "concept_id": "56018004",
+    "hinglish_synonyms": ["saas me seeti", "chhati bajna"],
+    "abbreviations": ["WHEEZE"]
+  },
+  {
+    "preferred_name": "Palpitations",
+    "semantic_tag": "finding",
+    "concept_id": "80313002",
+    "hinglish_synonyms": ["dil ki dhadkan tezi", "dhak dhak hona", "hridaya dravata"],
+    "abbreviations": ["PALP"]
+  },
+  {
+    "preferred_name": "Constipation",
+    "semantic_tag": "finding",
+    "concept_id": "14760008",
+    "hinglish_synonyms": ["kabz", "pet saaf na hona", "vibandha"],
+    "abbreviations": ["CONSTIPATION"]
+  },
+  {
+    "preferred_name": "Generalized weakness",
+    "semantic_tag": "finding",
+    "concept_id": "13791008",
+    "hinglish_synonyms": ["kamzori", "thakan", "shramshaada", "daurbalya"],
+    "abbreviations": ["ASTHENIA", "WEAKNESS"]
+  },
+  {
+    "preferred_name": "Loss of appetite",
+    "semantic_tag": "finding",
+    "concept_id": "79890006",
+    "hinglish_synonyms": ["bhookh na lagna", "aruchi"],
+    "abbreviations": ["ANOREXIA"]
+  }
+]
