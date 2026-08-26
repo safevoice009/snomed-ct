@@ -694,7 +694,7 @@ async def get_billing_packages():
     }
 
 @app.get("/api/v1/billing/balance")
-async def get_api_credit_balance(x_api_key: str = Header("test-dev-key", alias="X-API-KEY")):
+async def get_api_credit_balance(x_api_key: str = Header(..., alias="X-API-KEY")):
     """Returns current active credit quota and balance for an API key (Sandbox Mock Mode)."""
     return {
         "mode": "mock",
@@ -773,7 +773,7 @@ async def get_postman_collection():
                     "method": "POST",
                     "header": [
                         {"key": "Content-Type", "value": "application/json"},
-                        {"key": "X-API-KEY", "value": "test-dev-key"}
+                        {"key": "X-API-KEY", "value": "<YOUR_API_KEY>"}
                     ],
                     "body": {
                         "mode": "raw",
