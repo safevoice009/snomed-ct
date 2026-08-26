@@ -244,6 +244,30 @@ async def parse_clinical_text(
 
 import re
 
+# --- 1b. Public website demo proxy (no client key needed; strictly rate-limited) ---
+@app.post("/api/demo-parse")
+@limiter.limit("6/minute")
+async def demo_parse(request: Request, payload: ParseRequest):
+    """Powers the public landing-page demo. Runs the SAME engine as /api/v1/parse using a
+    server-side key; visitors never see or send credentials. Hard rate-limited per IP."""
+    if not payload.text.strip():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Input text cannot be empty")
+    demo_key = os.getenv("API_KEYS", "").split(",")[0].strip()
+    if not demo_key:
+        # Demo disabled rather than silently broken — honest failure (Law #2)
+        raise HTTPException(status_code=503, detail="Demo temporarily unavailable")
+    try:
+        raw_extraction = await parser.parse(payload.text)
+        resolved_profile = resolver.resolve_extraction(raw_extraction)
+        fhir_bundle = generator.create_op_consultation_bundle(resolved_profile)
+        return fhir_bundle
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Demo parse failed: {e}")
+        raise HTTPException(status_code=502, detail="Parsing failed upstream — no data invented.")
+
+
 def _to_list(val: Any) -> list:
     """Safely converts any value (string, list, dict, None) into a flat list."""
     if val is None:
