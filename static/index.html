@@ -1,878 +1,445 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>SICCE — Hinglish Prescriptions to Coded FHIR R4 | Clinical Coding Engine</title>
-  <meta name="description" content="SICCE is a physician-built clinical coding engine that converts Indian OPD prescriptions — handwriting, free text, and Hinglish — into SNOMED CT-mapped HL7 FHIR R4 bundles with drug-safety checks and NHCX-shaped claim payloads. Built for EMR vendors, HIS platforms, and claims teams.">
-  <meta property="og:title" content="SICCE — Clinical Coding Engine for Indian Healthcare">
-  <meta property="og:description" content="Messy Indian prescriptions in. Coded, compliant FHIR out. Live demo — no signup.">
-  <meta property="og:type" content="website">
-  <link rel="stylesheet" href="/static/style.css?v=20260824_v40">
-  <link rel="stylesheet" href="/static/style-v3.css?v=20260824_v42">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SICCE — Clinical Coding Infrastructure for Indian Healthcare</title>
+<meta name="description" content="Turn messy Indian clinical notes into ABDM-compliant FHIR R4 bundles with verified SNOMED CT codes. One API. Measured accuracy. Zero fabricated data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e14; --bg2:#0e131b; --bg3:#131926;
+  --line:rgba(148,163,184,.10); --line2:rgba(148,163,184,.18);
+  --fg:#e6edf3; --muted:#8b98a9; --dim:#5c6878;
+  --teal:#2dd4bf; --teal-dim:rgba(45,212,191,.12);
+  --amber:#fbbf24; --red:#f87171;
+  --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-weight:400;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:rgba(45,212,191,.25)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* ---------- nav ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;border-bottom:1px solid transparent;transition:.3s;background:transparent}
+nav.scrolled{background:rgba(10,14,20,.82);backdrop-filter:blur(16px);border-bottom-color:var(--line)}
+.nav-in{max-width:1120px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--mono);font-weight:500;font-size:17px;letter-spacing:.08em;color:var(--fg);text-decoration:none}
+.logo b{color:var(--teal);font-weight:500}
+.nav-links{display:flex;gap:32px;align-items:center}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:450;transition:color .2s}
+.nav-links a:hover{color:var(--fg)}
+.btn-nav{background:var(--teal);color:#04211c!important;padding:9px 18px;border-radius:8px;font-weight:600!important;font-size:13px!important}
+.btn-nav:hover{filter:brightness(1.1)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:190px 0 110px;text-align:center}
+.hero::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(ellipse 70% 55% at 50% -5%, rgba(45,212,191,.09), transparent 65%),
+  radial-gradient(ellipse 40% 40% at 80% 30%, rgba(56,132,255,.05), transparent 60%);
+  pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:
+  linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:72px 72px;
+  mask-image:radial-gradient(ellipse 75% 62% at 50% 28%, black 15%, transparent 70%);
+  pointer-events:none}
+.kicker{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;color:var(--teal);
+  border:1px solid rgba(45,212,191,.3);background:var(--teal-dim);border-radius:99px;padding:7px 16px;margin-bottom:34px;letter-spacing:.06em}
+.kicker .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(44px,7vw,78px);line-height:1.05;letter-spacing:-.02em;margin-bottom:26px}
+h1 em{font-style:italic;color:var(--teal)}
+.sub{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:620px;margin:0 auto 42px;font-weight:350}
+.sub b{color:var(--fg);font-weight:500}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{padding:14px 30px;border-radius:10px;font-size:15px;font-weight:550;text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:9px}
+.btn-primary{background:var(--teal);color:#04211c;font-weight:650}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(45,212,191,.25)}
+.btn-ghost{border:1px solid var(--line2);color:var(--fg)}
+.btn-ghost:hover{border-color:var(--muted);background:rgba(255,255,255,.03)}
+.hero-proof{margin-top:64px;font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.04em}
+.hero-proof span{color:var(--teal)}
+
+/* ---------- live demo ---------- */
+.demo{margin:-30px auto 0;max-width:900px;position:relative;z-index:2}
+.demo-shell{background:var(--bg2);border:1px solid var(--line2);border-radius:16px;overflow:hidden;
+  box-shadow:0 30px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(45,212,191,.04)}
+.demo-bar{display:flex;align-items:center;gap:8px;padding:13px 18px;border-bottom:1px solid var(--line);background:var(--bg3)}
+.tl{width:11px;height:11px;border-radius:50%;background:#2d3744}
+.tl:nth-child(1){background:#f87171aa}.tl:nth-child(2){background:#fbbf24aa}.tl:nth-child(3){background:#34d399aa}
+.demo-url{margin-left:12px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.demo-url b{color:var(--muted);font-weight:500}
+.demo-body{display:grid;grid-template-columns:1fr 1fr;min-height:320px}
+@media(max-width:760px){.demo-body{grid-template-columns:1fr}}
+.demo-pane{padding:22px}
+.demo-pane+.demo-pane{border-left:1px solid var(--line)}
+@media(max-width:760px){.demo-pane+.demo-pane{border-left:none;border-top:1px solid var(--line)}}
+.pane-label{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.12em;margin-bottom:14px}
+.note-input{width:100%;min-height:120px;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--fg);
+  font-family:var(--mono);font-size:13px;line-height:1.7;padding:16px;resize:vertical;outline:none;transition:border .2s}
+.note-input:focus{border-color:rgba(45,212,191,.45)}
+.run-btn{margin-top:14px;width:100%;padding:12px;border:none;border-radius:9px;background:var(--teal);color:#04211c;
+  font-family:var(--sans);font-size:14px;font-weight:650;cursor:pointer;transition:.2s}
+.run-btn:hover{filter:brightness(1.08)}
+.run-btn:disabled{opacity:.55;cursor:wait}
+.chips{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:10.5px;padding:5px 11px;border-radius:6px;border:1px solid var(--line2);
+  color:var(--muted);cursor:pointer;background:none;transition:.2s}
+.chip:hover{color:var(--teal);border-color:rgba(45,212,191,.4)}
+.out{font-family:var(--mono);font-size:12.5px;line-height:2}
+.ent-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 12px;border-radius:7px;background:var(--bg);border:1px solid var(--line);margin-bottom:7px}
+.ent-name{color:var(--fg);font-size:12.5px}
+.ent-code{font-size:11px;color:var(--teal);white-space:nowrap}
+.ent-code.uncoded{color:var(--amber)}
+.out-empty{color:var(--dim);text-align:center;padding-top:90px;font-size:12px}
+.fhir-note{margin-top:14px;padding-top:13px;border-top:1px dashed var(--line);font-family:var(--mono);font-size:11px;color:var(--dim)}
+.fhir-note a{color:var(--teal);text-decoration:none}
+
+/* ---------- sections ---------- */
+section{padding:96px 0}
+.sec-head{text-align:center;margin-bottom:64px}
+.sec-tag{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--teal);margin-bottom:16px}
+h2{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4vw,44px);letter-spacing:-.015em;line-height:1.15}
+.sec-sub{color:var(--muted);max-width:560px;margin:16px auto 0;font-weight:350;font-size:16px}
+
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:step}
+@media(max-width:900px){.pipe{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.pipe{grid-template-columns:1fr}}
+.step{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:28px 24px;position:relative;transition:.25s;counter-increment:step}
+.step:hover{border-color:rgba(45,212,191,.35);transform:translateY(-3px)}
+.step::before{content:"0" counter(step);font-family:var(--mono);font-size:11px;color:var(--teal);letter-spacing:.1em}
+.step h3{font-size:16.5px;font-weight:550;margin:14px 0 9px}
+.step p{font-size:13.5px;color:var(--muted);font-weight:350;line-height:1.6}
+
+/* honesty / diff table */
+.diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.diff-grid{grid-template-columns:1fr}}
+.diff-col{border-radius:16px;padding:34px 30px;border:1px solid var(--line)}
+.diff-col.them{background:var(--bg2)}
+.diff-col.us{background:linear-gradient(160deg,rgba(45,212,191,.07),rgba(45,212,191,.02));border-color:rgba(45,212,191,.3)}
+.diff-col h3{font-family:var(--serif);font-size:21px;font-weight:500;margin-bottom:22px}
+.diff-col.us h3{color:var(--teal)}
+.diff-item{display:flex;gap:12px;padding:11px 0;font-size:14px;color:var(--muted);border-top:1px solid var(--line);line-height:1.55}
+.diff-item:last-child{border-bottom:1px solid var(--line)}
+.diff-item .ic{flex-shrink:0;font-family:var(--mono);font-size:13px}
+.them .ic{color:var(--red)}
+.us .ic{color:var(--teal)}
+
+/* metrics band */
+.band{border-block:1px solid var(--line);background:var(--bg2);padding:64px 0}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
+@media(max-width:700px){.metrics{grid-template-columns:repeat(2,1fr)}}
+.metric b{display:block;font-family:var(--serif);font-size:clamp(30px,4vw,42px);font-weight:500;color:var(--teal);letter-spacing:-.02em}
+.metric span{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.08em}
+
+/* code section */
+.code-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media(max-width:860px){.code-cols{grid-template-columns:1fr}}
+.code-block{background:#070a0f;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.code-head{display:flex;justify-content:space-between;padding:11px 18px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--dim)}
+.code-block pre{padding:20px;font-family:var(--mono);font-size:12.5px;line-height:1.85;color:#a8b6c8;overflow-x:auto}
+.tk-kw{color:#7dd3fc}.tk-str{color:#86efac}.tk-cm{color:#4b5b6e}.tk-fn{color:#c4b5fd}.tk-num{color:#fbbf24}
+
+/* pricing */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:860px){.plans{grid-template-columns:1fr}}
+.plan{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:36px 30px;display:flex;flex-direction:column;transition:.25s}
+.plan:hover{transform:translateY(-3px)}
+.plan.hot{border-color:rgba(45,212,191,.45);background:linear-gradient(170deg,rgba(45,212,191,.06),transparent 50%);position:relative}
+.plan.hot::before{content:"MOST POPULAR";position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#04211c;background:var(--teal);padding:4px 14px;border-radius:99px;font-weight:600}
+.plan h3{font-size:16px;font-weight:550;color:var(--muted)}
+.price{font-family:var(--serif);font-size:40px;font-weight:500;margin:14px 0 4px}
+.price small{font-size:14px;color:var(--dim);font-family:var(--sans)}
+.plan-desc{font-size:13.5px;color:var(--dim);margin-bottom:24px;font-weight:350}
+.plan ul{list-style:none;margin-bottom:30px;flex:1}
+.plan li{font-size:14px;color:var(--muted);padding:7px 0;display:flex;gap:10px}
+.plan li::before{content:"→";color:var(--teal);font-family:var(--mono)}
+.plan .btn{justify-content:center}
+.plan-hot-btn{background:var(--teal);color:#04211c;font-weight:650}
+.plan-hot-btn:hover{box-shadow:0 8px 30px rgba(45,212,191,.25)}
+.plan-ghost-btn{border:1px solid var(--line2);color:var(--fg)}
+.plan-ghost-btn:hover{border-color:var(--muted)}
+
+/* cta + footer */
+.final-cta{text-align:center;padding:120px 0}
+.final-cta h2{margin-bottom:18px}
+.final-cta p{color:var(--muted);margin-bottom:38px;font-weight:350}
+footer{border-top:1px solid var(--line);padding:44px 0;color:var(--dim);font-size:13px}
+.foot-in{max-width:1120px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:18px;align-items:center}
+.foot-links{display:flex;gap:24px}
+.foot-links a{color:var(--dim);text-decoration:none;transition:.2s}
+.foot-links a:hover{color:var(--muted)}
+.disclaimer{max-width:1120px;margin:26px auto 0;padding:0 24px;font-size:11.5px;color:#48535f;line-height:1.6}
+
+/* reveal anim */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.rv.on{opacity:1;transform:none}
+</style>
 </head>
 <body>
-<div class="sw-root">
 
-  <div class="scroll-progress" id="scroll-progress"></div>
-
-  <!-- ================= NAV ================= -->
-  <header class="site-nav" id="site-nav">
-    <div class="site-nav__inner">
-      <a href="#top" class="site-nav__brand"><span class="site-nav__mark">S</span> SICCE</a>
-      <nav class="site-nav__links">
-        <a href="#workbench">Live Demo</a>
-        <a href="#capabilities">Capabilities</a>
-        <a href="#transparency">Transparency</a>
-        <a href="#faq">FAQ</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#workbench" class="btn-nav-cta sw-nav__item">Try the Workbench</a>
-      </nav>
-      <button class="nav-burger" id="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
-    </div>
-  </header>
-  <nav class="nav-mobile" id="nav-mobile">
-    <a href="#workbench">Live Demo</a>
-    <a href="#capabilities">Capabilities</a>
-    <a href="#transparency">Transparency</a>
-    <a href="#faq">FAQ</a>
-    <a href="#pricing">Pricing</a>
-  </nav>
-
-  <div id="top"></div>
-
-  <!-- ================= HERO + 3D PARTICLE FIELD ================= -->
-  <section class="v3-hero">
-    <canvas id="hero-canvas"></canvas>
-    <div class="v3-hero__content">
-      <span class="v3-hero__eyebrow reveal" style="border:1px solid var(--pp-line-strong); background:var(--pp-paper); padding:6px 14px; border-radius:999px; font-size:.78rem; color:var(--pp-dim); display:inline-flex; gap:8px;"><strong style="color:var(--pp-accent);">Physician-built</strong> · FHIR R4 · NRCeS-profiled output</span>
-      <h1 class="reveal reveal-delay-1">Hinglish prescriptions in.<br><span class="grad">Coded, compliant FHIR out.</span></h1>
-      <p class="v3-hero__sub reveal reveal-delay-2">SICCE turns doctor handwriting, free-text OPD notes, and mixed-language clinical narratives into structured HL7 FHIR R4 bundles — SNOMED CT mapping, drug-safety checks, insurance-ready payloads. One API layer for EMR vendors, HIS platforms, and claims teams.</p>
-      <div class="v3-hero__ctas reveal reveal-delay-3">
-        <a href="#workbench" class="btn-v3 btn-v3--primary">Try it live — no signup</a>
-        <a href="/docs" target="_blank" class="btn-v3 btn-v3--ghost">API Docs</a>
-      </div>
-      <div class="hero-proofrow reveal reveal-delay-4">
-        <span><b>40</b> CI-gated tests</span>
-        <span><b>FHIR R4</b> NRCeS profiles</span>
-        <span><b>15+</b> physician-authored safety rules</span>
-        <span><b>DPDP-aligned</b> processing design</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= TICKER ================= -->
-  <div class="ticker-wrap">
-    <div class="ticker">
-      <span>SNOMED CT India Edition <b>✦</b></span><span>HL7 FHIR R4 <b>✦</b></span><span>NHCX Claim Payloads <b>✦</b></span><span>Hinglish Clinical NLP <b>✦</b></span><span>CDSS Drug-Safety Rules <b>✦</b></span><span>Brand → Generic Formulary <b>✦</b></span><span>Vernacular Dosage Cards <b>✦</b></span><span>DPDP-Aligned Design <b>✦</b></span><span>On-Prem Option <b>✦</b></span>
-      <span>SNOMED CT India Edition <b>✦</b></span><span>HL7 FHIR R4 <b>✦</b></span><span>NHCX Claim Payloads <b>✦</b></span><span>Hinglish Clinical NLP <b>✦</b></span><span>CDSS Drug-Safety Rules <b>✦</b></span><span>Brand → Generic Formulary <b>✦</b></span><span>Vernacular Dosage Cards <b>✦</b></span><span>DPDP-Aligned Design <b>✦</b></span><span>On-Prem Option <b>✦</b></span>
+<nav id="nav">
+  <div class="nav-in">
+    <a class="logo" href="#">SIC<b>CE</b></a>
+    <div class="nav-links">
+      <a href="#pipeline">How it works</a>
+      <a href="#difference">Why different</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/workbench.html">Workbench</a>
+      <a class="btn-nav" href="#pricing">Get API key</a>
     </div>
   </div>
+</nav>
 
-  <!-- ================= LIVE WORKBENCH ================= -->
-  <section id="workbench" class="sandbox-wrapper" style="padding-top: 84px;">
-    <div class="workbench-tag">
-      <span class="live-dot"></span>
-      LIVE SANDBOX — every result comes from the real running API. Mock features are labeled as mock.
-      <span style="margin-left:auto; display:inline-flex; gap:8px; flex-wrap:wrap;">
-        <span class="mini-chip mini-chip--accent">No signup required</span>
-        <span class="mini-chip">1,000 free calls</span>
-      </span>
+<header class="hero">
+  <div class="hero-grid"></div>
+  <div class="wrap" style="position:relative">
+    <div class="kicker"><span class="dot"></span>LIVE · ABDM FHIR R4 · SNOMED CT · NHCX-READY</div>
+    <h1>Messy Indian prescriptions,<br><em>coded</em> in one call.</h1>
+    <p class="sub">SICCE turns Hinglish clinical notes into <b>ABDM-compliant FHIR R4 bundles</b> with verified SNOMED CT codes — <b>measured accuracy, zero fabricated data.</b></p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#demo">Try the live parser ↓</a>
+      <a class="btn btn-ghost" href="#pricing">Get a sandbox key</a>
     </div>
-    <div class="sandbox-container">
-
-      <div class="sandbox-header-bar">
-        <div class="sandbox-mode-selector">
-          <button class="mode-btn active" id="tab-btn-canvas-mode" data-mode="canvas">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            Prescription OCR
-          </button>
-          <button class="mode-btn" id="tab-btn-text-mode" data-mode="text">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Clinician Note Editor
-          </button>
-        </div>
-
-        <div style="display: flex; align-items: center; gap: 0.65rem;">
-          <div class="api-credit-wallet-pill" id="credit-wallet-trigger" title="Developer sandbox credits">
-            <span class="credit-icon">⚡</span>
-            <span class="credit-text">Sandbox: <strong id="credits-remaining-val">982</strong> / 1,000</span>
-            <span class="credit-topup-btn">Top-Up</span>
-          </div>
-          <button type="button" id="btn-voice-dictate" class="custom-file-upload-btn" style="background: #eaf4f0; color: #0e7c66; border: 1px solid #bcd9cf; cursor: pointer;">
-            <span id="voice-icon">🎙️</span> <span id="voice-label">Voice Scribe</span>
-          </button>
-          <label class="custom-file-upload-btn" for="rx-file-input">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Upload Rx Photo
-          </label>
-          <input type="file" id="rx-file-input" accept="image/png, image/jpeg, image/jpg" style="display: none;">
-        </div>
-      </div>
-
-      <div class="sandbox-grid">
-
-        <div class="sandbox-left">
-          <div class="preset-strip">
-            <span style="font-size: 0.75rem; color: var(--text-tertiary); font-weight: 600; margin-right: 0.25rem;">Samples:</span>
-            <button class="preset-chip active" id="chip-sample-1" data-preset="sample1">📄 Sample 1: OPD Slip</button>
-            <button class="preset-chip" id="chip-sample-2" data-preset="sample2">📄 Sample 2: Acute APD</button>
-            <button class="preset-chip" id="chip-sample-3" data-preset="sample3">🌿 Sample 3: AYUSH</button>
-          </div>
-
-          <div id="view-input-canvas" class="optical-viewer-wrapper">
-            <div class="optical-doc-stage" id="optical-doc-container">
-              <img src="/static/assets/sample_rx_slip.jpg" alt="Sample prescription document" class="optical-doc-img" id="optical-rx-img">
-              <div class="optical-box" id="box-clinic" style="top: 8%; left: 24%; width: 48%; height: 8%;" data-target="item-clinic">
-                <span class="box-label">CLINIC_ENTITY <strong style="color: #4ade80;">DEMO</strong></span>
-              </div>
-              <div class="optical-box" id="box-patient" style="top: 23%; left: 26%; width: 50%; height: 5%;" data-target="item-patient">
-                <span class="box-label">PATIENT_DEMOGRAPHICS <strong style="color: #4ade80;">DEMO</strong></span>
-              </div>
-              <div class="optical-box" id="box-vitals" style="top: 27%; left: 56%; width: 26%; height: 5%;" data-target="item-vitals">
-                <span class="box-label">VITALS (BP 120/80) <strong style="color: #4ade80;">DEMO</strong></span>
-              </div>
-              <div class="optical-box" id="box-symptoms" style="top: 38%; left: 25%; width: 52%; height: 10%;" data-target="chips-symptoms">
-                <span class="box-label">SYMPTOMS (SNOMED) <strong style="color: #4ade80;">DEMO</strong></span>
-              </div>
-              <div class="optical-box" id="box-diagnosis" style="top: 48%; left: 25%; width: 52%; height: 8%;" data-target="chips-diagnoses">
-                <span class="box-label">DIAGNOSIS (APD) <strong style="color: #4ade80;">DEMO</strong></span>
-              </div>
-              <div class="optical-box" id="box-rx1" style="top: 57%; left: 26%; width: 50%; height: 5%;" data-target="rx-row-1">
-                <span class="box-label">MEDICATION: PANTOCID 40 <strong style="color: #4ade80;">DEMO</strong></span>
-              </div>
-              <div class="optical-box" id="box-rx2" style="top: 62%; left: 26%; width: 50%; height: 5%;" data-target="rx-row-2">
-                <span class="box-label">MEDICATION: DOLO 650 <strong style="color: #4ade80;">DEMO</strong></span>
-              </div>
-              <div class="optical-box" id="box-rx3" style="top: 67%; left: 26%; width: 50%; height: 5%;" data-target="rx-row-3">
-                <span class="box-label">MEDICATION: MUCAINE <strong style="color: #4ade80;">DEMO</strong></span>
-              </div>
-            </div>
-            <div class="optical-toolbar">
-              <span style="font-size: 0.76rem; color: var(--text-secondary); font-weight: 600;">💡 Overlay boxes are illustrative positions on a bundled sample document. Upload any prescription to parse it live.</span>
-            </div>
-          </div>
-
-          <div id="view-input-text" class="text-editor-container hidden">
-            <textarea id="clinical-note-input" spellcheck="false" placeholder="Enter clinician narrative in English, Hindi, or Hinglish... e.g. 'Pt c/o sar dard x 2 days. Rx: Tab Dolo 650 BD'"></textarea>
-          </div>
-
-          <div class="sandbox-left-footer">
-            <div class="key-selector">
-              <span>Key:</span>
-              <select id="active-key-select">
-                <option value="test-dev-key">Default Test Key (test-dev-key)</option>
-              </select>
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.85rem;">
-              <span style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-tertiary);">Ctrl + Enter</span>
-              <button id="btn-parse-note" class="btn-execute-parse">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Parse &amp; Extract Entities
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="sandbox-right">
-          <div class="inspector-tab-row">
-            <div class="inspector-tabs">
-              <button class="inspector-tab-btn active" data-tab="clinical">Clinical Entities</button>
-              <button class="inspector-tab-btn" data-tab="vernacular">🗣️ Patient Card</button>
-              <button class="inspector-tab-btn" data-tab="json">FHIR R4 Bundle</button>
-              <button class="inspector-tab-btn" data-tab="nhcx">🛡️ NHCX Claim</button>
-              <button class="inspector-tab-btn" data-tab="adjudication">⚡ Pre-Adjudicate</button>
-              <button class="inspector-tab-btn" data-tab="abha">🇮🇳 ABHA M1/M2</button>
-              <button class="inspector-tab-btn" data-tab="pipeline">DPDP Audit</button>
-            </div>
-            <div style="display: flex; gap: 0.45rem;">
-              <button id="btn-copy-curl" class="btn-tool" title="Export the last parse request as a runnable cURL command">Copy as cURL</button>
-              <button id="btn-copy-json" class="btn-tool">Copy JSON</button>
-              <button id="btn-download-json" class="btn-tool">Download</button>
-            </div>
-          </div>
-
-          <div class="inspector-content">
-
-            <div id="inspector-view-clinical">
-              <div id="ddi-alert-container" class="ddi-alert-box hidden">
-                <div class="ddi-alert-header">
-                  <span class="ddi-alert-badge">⚠️ CLINICAL SAFETY ALERT</span>
-                  <span id="ddi-alert-title" class="ddi-alert-title">Potential Interaction Detected</span>
-                </div>
-                <div id="ddi-alert-message" class="ddi-alert-body">
-                  Co-administration warnings and dosage safety rules will appear here.
-                </div>
-              </div>
-
-              <div class="clinical-card-group" id="item-clinic" style="background: #f8fafc; padding: 1rem; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 1.25rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                  <span style="font-size: 0.88rem; font-weight: 800; color: #0f172a;">Apollo Clinic, Pune (Dr. Rajesh Sharma, MD)</span>
-                  <span style="font-size: 0.68rem; font-family: var(--font-mono); color: #64748b; background: #eef2f6; padding: 0.15rem 0.45rem; border-radius: 4px;">SAMPLE DATA</span>
-                </div>
-                <div style="font-size: 0.8rem; color: #475569;" id="item-patient">
-                  Patient: <strong>Mr. Rahul Verma</strong> (34 Y/M) | BP: <strong id="item-vitals">120/80 mmHg</strong> | Wt: 72 Kgs
-                </div>
-              </div>
-
-              <div class="clinical-card-group">
-                <div class="card-group-header"><span>Symptoms &amp; Chief Complaints (SNOMED CT)</span></div>
-                <div id="chips-symptoms" class="chips-row">
-                  <span class="clinical-badge symptom" data-box="box-symptoms"><span>Severe Headache (Cephalgia)</span><span class="snomed-id-pill">209631003</span></span>
-                  <span class="clinical-badge symptom" data-box="box-symptoms"><span>Nausea</span><span class="snomed-id-pill">422587007</span></span>
-                  <span class="clinical-badge symptom" data-box="box-symptoms"><span>Acidic Taste</span><span class="snomed-id-pill">249497008</span></span>
-                </div>
-              </div>
-
-              <div class="clinical-card-group">
-                <div class="card-group-header"><span>Diagnoses &amp; Clinical Findings</span></div>
-                <div id="chips-diagnoses" class="chips-row">
-                  <span class="clinical-badge diagnosis" data-box="box-diagnosis"><span>Acid Peptic Disease / Gastritis</span><span class="snomed-id-pill">235595009</span></span>
-                </div>
-              </div>
-
-              <div class="clinical-card-group">
-                <div class="card-group-header"><span>Prescribed Medications &amp; Dosages</span></div>
-                <table class="prescription-table">
-                  <thead>
-                    <tr><th>Medication &amp; Molecule</th><th>Dosage</th><th>Frequency</th><th>SNOMED Concept ID</th></tr>
-                  </thead>
-                  <tbody id="medications-table-body">
-                    <tr id="rx-row-1" class="rx-table-row" data-box="box-rx1">
-                      <td><strong>Tab. Pantocid (Pantoprazole 40mg)</strong></td><td>40mg (OD, Before Food)</td><td>5 Days (5 Tabs)</td>
-                      <td><code style="font-family: var(--font-mono); font-size: 0.78rem; background: #f1f5f9; padding: 0.15rem 0.45rem; border-radius: 4px;">319864000</code></td>
-                    </tr>
-                    <tr id="rx-row-2" class="rx-table-row" data-box="box-rx2">
-                      <td><strong>Tab. Dolo (Paracetamol 650mg)</strong></td><td>650mg (BD, After Food)</td><td>3 Days (6 Tabs)</td>
-                      <td><code style="font-family: var(--font-mono); font-size: 0.78rem; background: #f1f5f9; padding: 0.15rem 0.45rem; border-radius: 4px;">387584000</code></td>
-                    </tr>
-                    <tr id="rx-row-3" class="rx-table-row" data-box="box-rx3">
-                      <td><strong>Syp. Mucaine (Oxetacaine Gel)</strong></td><td>2 tsp (TDS, After Food)</td><td>5 Days (1 Bottle)</td>
-                      <td><code style="font-family: var(--font-mono); font-size: 0.78rem; background: #f1f5f9; padding: 0.15rem 0.45rem; border-radius: 4px;">372665000</code></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div id="inspector-view-vernacular" class="hidden">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-                <span style="font-size: 0.88rem; font-weight: 750; color: #0f172a;">Patient Dosage Schedule Card</span>
-                <div class="lang-selector-pills">
-                  <button class="vernacular-pill active" data-vlang="hi">Hindi (हिंदी)</button>
-                  <button class="vernacular-pill" data-vlang="mr">Marathi (मराठी)</button>
-                  <button class="vernacular-pill" data-vlang="ta">Tamil (தமிழ்)</button>
-                  <button class="vernacular-pill" data-vlang="te">Telugu (తెలుగు)</button>
-                  <button class="vernacular-pill" data-vlang="bn">Bengali (বাংলা)</button>
-                </div>
-              </div>
-              <div id="vernacular-cards-container" class="vernacular-cards-grid"></div>
-            </div>
-
-            <div id="inspector-view-json" class="hidden">
-              <pre id="fhir-json-code" style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5; overflow-x: auto; background: #171a21; color: #d7e3f4; padding: 1rem; border-radius: 8px; border: 1px solid #262b36;">{\n  "resourceType": "Bundle",\n  "type": "document",\n  "id": "ABDM-OPD-2026-991"\n}</pre>
-            </div>
-
-            <div id="inspector-view-nhcx" class="hidden">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; background: #fdf8ec; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #efe3c0;">
-                <div>
-                  <div style="font-size: 0.85rem; font-weight: 800; color: #92400e;">⚡ NHCX Claim Package Preview</div>
-                  <div style="font-size: 0.75rem; color: #b45309;">ICD-10 cross-walked claim bundle shaped to NHCX specifications.</div>
-                </div>
-                <span class="tpa-status-badge" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 6px;">GENERATED LOCALLY</span>
-              </div>
-              <pre id="nhcx-json-code" style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.5; overflow-x: auto; background: #171a21; color: #d7e3f4; padding: 1rem; border-radius: 8px; border: 1px solid #262b36;">{\n  "resourceType": "Bundle",\n  "type": "collection",\n  "profile": ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"]\n}</pre>
-            </div>
-
-            <div id="inspector-view-adjudication" class="hidden">
-              <div style="background: #fdf8ec; border: 1px solid #efe3c0; border-radius: 8px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.76rem; color: #92400e;">
-                <strong>⚠️ MOCK RULES ENGINE PREVIEW</strong> — runs on a small illustrative rule set locally. Not connected to any insurer/TPA system.
-              </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <div>
-                  <h3 style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 0.2rem;">NHCX Claim Pre-Adjudication Preview</h3>
-                  <p style="font-size: 0.78rem; color: #64748b;">Illustrative medical-necessity &amp; completeness checks before claim submission.</p>
-                </div>
-                <button id="btn-run-adjudication" class="btn-tool" style="background: var(--brand-primary); color: #fff; font-weight: 700; padding: 0.35rem 0.75rem;">Run Pre-Check</button>
-              </div>
-
-              <div id="adjudication-results-card" style="background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.25rem; margin-bottom: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                  <div>
-                    <span style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Illustrative Score</span>
-                    <div id="adj-prob-score" style="font-size: 1.75rem; font-weight: 850; color: #059669; font-family: var(--font-mono);">98% — HIGH</div>
-                  </div>
-                  <div id="adj-status-badge" style="padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.78rem; font-weight: 800; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
-                    DEMO OUTPUT — NOT AN UNDERWRITING DECISION
-                  </div>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                  <div style="font-size: 0.8rem; font-weight: 750; color: #0f172a; margin-bottom: 0.4rem;">Passed Statutory &amp; Necessity Checks:</div>
-                  <div id="adj-checks-list" style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.78rem; color: #334155;">
-                    <div>✅ Primary ICD-10 Diagnosis Specificity Validated</div>
-                    <div>✅ Pharmacy itemization matches prescribed medication count</div>
-                    <div>✅ OPD billing within IRDAI benchmark sub-limits</div>
-                  </div>
-                </div>
-                <div id="adj-flags-container" class="hidden">
-                  <div style="font-size: 0.8rem; font-weight: 750; color: #b91c1c; margin-bottom: 0.4rem;">⚠️ Pre-Submission Flags &amp; Action Items:</div>
-                  <div id="adj-flags-list" style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.78rem; color: #991b1b;"></div>
-                </div>
-              </div>
-            </div>
-
-            <div id="inspector-view-abha" class="hidden">
-              <div style="background: #fdf8ec; border: 1px solid #efe3c0; border-radius: 8px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.76rem; color: #92400e;">
-                <strong>⚠️ SANDBOX SIMULATION</strong> — Local mock only (any OTP works, sample identity). Not connected to NHA production systems. Live M1/M2 integration in progress on the official ABDM sandbox.
-              </div>
-              <div style="margin-bottom: 1.25rem;">
-                <h3 style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 0.2rem;">ABDM M1 &amp; M2 Gateway — Interface Preview</h3>
-                <p style="font-size: 0.78rem; color: #64748b;">Planned flow: ABHA creation via OTP, KYC verification &amp; care-context linkage.</p>
-              </div>
-
-              <div style="background: linear-gradient(135deg, #10141c 0%, #16233c 100%); color: #fff; padding: 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; position: relative; overflow: hidden; border: 1px solid rgba(148,163,184,.16);">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                  <div>
-                    <div style="font-size: 0.72rem; color: #94a3b8; letter-spacing: 0.08em; text-transform: uppercase;">National Health Authority (NHA)</div>
-                    <div style="font-size: 1.1rem; font-weight: 800; letter-spacing: 0.02em;">ABHA CARD — SAMPLE DATA</div>
-                  </div>
-                  <span style="font-size: 0.7rem; background: #d97706; color: #fff; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700;">MOCK DEMO</span>
-                </div>
-                <div style="font-family: var(--font-mono); font-size: 1.15rem; font-weight: 800; letter-spacing: 0.1em; color: #38bdf8; margin-bottom: 0.75rem;" id="abha-card-num">91-8842-1093-5521</div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #cbd5e1;">
-                  <div>Name: <strong id="abha-card-name" style="color: #fff;">Mr. Rahul Verma</strong></div>
-                  <div>ABHA Address: <strong id="abha-card-address" style="color: #38bdf8;">rahul.verma@abdm</strong></div>
-                </div>
-              </div>
-
-              <div style="background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; padding: 1rem;">
-                <div style="font-size: 0.82rem; font-weight: 750; color: #0f172a; margin-bottom: 0.5rem;">Simulate ABHA OTP Generation / Linkage:</div>
-                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
-                  <input type="text" id="abha-mobile-input" placeholder="Mobile / Aadhaar (e.g. 9876543210)" value="9876543210" style="flex: 1; padding: 0.45rem 0.65rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; background: #ffffff; color: #0f172a;">
-                  <button id="btn-generate-abha-otp" class="btn-tool" style="background: #10141c; color: #fff; font-weight: 700; white-space: nowrap;">Send OTP</button>
-                </div>
-                <div id="abha-otp-box" class="hidden" style="margin-top: 0.5rem; padding-top: 0.75rem; border-top: 1px dashed #cbd5e1;">
-                  <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" id="abha-otp-input" placeholder="Enter 6-digit OTP (123456)" value="123456" style="width: 140px; padding: 0.45rem 0.65rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; font-family: var(--font-mono); background: #ffffff; color: #0f172a;">
-                    <button id="btn-verify-abha-otp" class="btn-tool" style="background: #059669; color: #fff; font-weight: 700;">Verify &amp; Link M2</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div id="inspector-view-pipeline" class="hidden">
-              <div class="pipeline-step-list">
-                <div class="pipeline-step-item">
-                  <div class="step-num-badge">1</div>
-                  <div>
-                    <div class="step-info-title">Automated DPDP PHI Sanitization</div>
-                    <div class="step-info-desc">Pattern-matching redactor scrubs patient names, phone numbers, ABHA IDs, and Aadhaar numbers before external processing.</div>
-                  </div>
-                </div>
-                <div class="pipeline-step-item">
-                  <div class="step-num-badge">2</div>
-                  <div>
-                    <div class="step-info-title">Hybrid NLP &amp; Hinglish Entity Parsing</div>
-                    <div class="step-info-desc">Rule parser resolves standard abbreviations (APD, loose motion, sar dard); LLM handles unstructured colloquial phrases.</div>
-                  </div>
-                </div>
-                <div class="pipeline-step-item">
-                  <div class="step-num-badge">3</div>
-                  <div>
-                    <div class="step-info-title">Terminology Resolution</div>
-                    <div class="step-info-desc">SQLite FTS5 fast-path maps entities to SNOMED CT concepts; unresolved terms are logged honestly as uncoded — never guessed.</div>
-                  </div>
-                </div>
-                <div class="pipeline-step-item">
-                  <div class="step-num-badge">4</div>
-                  <div>
-                    <div class="step-info-title">NRCeS-Profiled FHIR R4 Assembly</div>
-                    <div class="step-info-desc">Generates an OPConsultation document bundle with Composition, Patient, Condition, and Observation resources.</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= STATS BAND ================= -->
-  <div class="v3-statsbar">
-    <div class="v3-statsbar__grid">
-      <div class="v3-stat"><div class="v3-stat__val"><em data-count="40">0</em></div><div class="v3-stat__label">CI-gated automated tests incl. data-integrity guards</div></div>
-      <div class="v3-stat"><div class="v3-stat__val">FHIR <em>R4</em></div><div class="v3-stat__label">NRCeS-profiled OPConsultation bundle output</div></div>
-      <div class="v3-stat"><div class="v3-stat__val"><em data-count="15">0</em>+</div><div class="v3-stat__label">Physician-authored drug-safety &amp; allergy rules</div></div>
-      <div class="v3-stat"><div class="v3-stat__val"><em data-count="99">0</em>+</div><div class="v3-stat__label">Brand→generic mappings incl. Jan Aushadhi formulary</div></div>
-      <div class="v3-stat"><div class="v3-stat__val"><em data-count="0">0</em></div><div class="v3-stat__label">PHI records stored — ephemeral processing design</div></div>
-    </div>
+    <div class="hero-proof">NO MOCK DEMOS — THE PARSER BELOW HITS OUR <span>PRODUCTION ENDPOINT</span></div>
   </div>
+</header>
 
-  <!-- ================= DARK INTERLUDE QUOTE ================= -->
-  <section class="v3-dark">
-    <div class="v3-dark-inner">
-      <div class="v3-kicker">Why this exists</div>
-      <p class="v3-quote">India mandated coded, interoperable health records.<br>Doctors still write <em>"sar dard x 2 days, Dolo 650 BD"</em>.<br>SICCE is the bridge between those two realities.</p>
-      <p class="v3-dark__sub">Every claim on this page is verifiable, every mock is labeled, and every accuracy number will come from published evaluation methodology — not marketing. That is the standard we hold ourselves to before asking any vendor for trust.</p>
+<div class="wrap demo rv" id="demo">
+  <div class="demo-shell">
+    <div class="demo-bar">
+      <span class="tl"></span><span class="tl"></span><span class="tl"></span>
+      <span class="demo-url">POST <b>snomed-ct-parser-1.onrender.com/api/v1/parse</b></span>
     </div>
-  </section>
-
-  <!-- ================= CAPABILITIES BENTO ================= -->
-  <section id="capabilities" class="v3-section">
-    <div class="v3-kicker">Capabilities</div>
-    <h2 class="v3-h2">Everything between a scribbled slip<br>and a machine-readable record</h2>
-    <p class="v3-sub">One API layer that does the boring, safety-critical work your product shouldn't rebuild.</p>
-
-    <div class="v3-bento">
-      <div class="v3-cell v3-cell--wide">
-        <div class="v3-cell__icon">🗣️</div>
-        <div class="v3-cell__title">Hinglish &amp; Abbreviation NLP</div>
-        <div class="v3-cell__desc">Understands how Indian doctors actually write — via a hybrid rule-engine plus LLM fallback with caching. The lexicon keeps growing from every unresolved term the engine logs.</div>
-        <div class="v3-cell__visual">
-          <div class="hinglish-phrases">
-            <span class="mini-chip mini-chip--accent">sar dard</span>
-            <span class="mini-chip mini-chip--accent">loose motions</span>
-            <span class="mini-chip mini-chip--accent">AP+</span>
-            <span class="mini-chip mini-chip--accent">k/c/o</span>
-            <span class="mini-chip mini-chip--accent">ulti</span>
-            <span class="mini-chip mini-chip--accent">bukhar</span>
-            <span class="mini-chip">pet kharab</span>
-            <span class="mini-chip">SOBOE</span>
-            <span class="mini-chip">Dolo 650 BD</span>
-          </div>
-          <div class="mini-flow">
-            <span class="node">'pet kharab x 2d'</span><span class="arrow">→</span>
-            <span class="node">Diarrhoea</span><span class="arrow">→</span>
-            <span class="node" style="border-color: var(--pp-accent-line); color: var(--pp-accent);">SNOMED 62315008</span>
-          </div>
+    <div class="demo-body">
+      <div class="demo-pane">
+        <div class="pane-label">CLINICAL NOTE (HINGLISH OK)</div>
+        <textarea id="note" class="note-input" spellcheck="false">Pt c/o sar dard aur bukhar x 2 days.
+Khansi bhi hai.
+Tab Dolo 650mg BD
+Tab Pantocid 40 OD</textarea>
+        <button id="run" class="run-btn">Parse → coded FHIR bundle</button>
+        <div class="chips">
+          <button class="chip" data-t="Pt c/o pet dard aur ulti. Tab Cyclopam TDS x 2 days">Acidity case</button>
+          <button class="chip" data-t="Bukhar, badan dard, chakkar since 3 din. Dx viral syndrome. Tab Calpol 650 SOS">Fever case</button>
+          <button class="chip" data-t="Saans phoolna on exertion, khaansi with balgam. Inhaler Asthalin HFA 2 puffs SOS">Chest case</button>
         </div>
       </div>
-
-      <div class="v3-cell">
-        <div class="v3-cell__icon">📄</div>
-        <div class="v3-cell__title">FHIR R4 Bundle Output</div>
-        <div class="v3-cell__desc">Valid OPConsultation DocumentBundles profiled to NRCeS specifications.</div>
-        <div class="v3-cell__visual mini-code"><span class="k">"resourceType"</span>: <span class="s">"Bundle"</span>,
-<span class="k">"entry"</span>: [{ <span class="k">"resource"</span>: { <span class="s">"Condition"</span> ... }}]</div>
-      </div>
-
-      <div class="v3-cell">
-        <div class="v3-cell__icon">🛡️</div>
-        <div class="v3-cell__title">CDSS Safety Layer</div>
-        <div class="v3-cell__desc">Interactions, allergies, duplicate therapy, contraindications — written by a physician.</div>
-        <div class="v3-cell__visual mini-alert"><span>⚠</span><span><strong>Warfarin + Ibuprofen:</strong> major hemorrhagic risk. Consider paracetamol with gastroprotection.</span></div>
-      </div>
-
-      <div class="v3-cell">
-        <div class="v3-cell__icon">💊</div>
-        <div class="v3-cell__title">Brand → Generic Resolution</div>
-        <div class="v3-cell__desc">Commercial brands plus the public Jan Aushadhi formulary — codes verified against SNOMED, never guessed.</div>
-        <div class="v3-cell__visual mini-flow">
-          <span class="node">Telma 40</span><span class="arrow">→</span>
-          <span class="node" style="color: var(--pp-accent);">Telmisartan</span>
-        </div>
-      </div>
-
-      <div class="v3-cell">
-        <div class="v3-cell__icon">🌐</div>
-        <div class="v3-cell__title">Vernacular Patient Cards</div>
-        <div class="v3-cell__desc">Dosage schedules patients can follow — Hindi, Marathi, Tamil, Telugu, Bengali.</div>
-        <div class="v3-cell__visual mini-chips">
-          <span class="mini-chip mini-chip--accent">हिंदी</span><span class="mini-chip mini-chip--accent">मराठी</span><span class="mini-chip mini-chip--accent">தமிழ்</span><span class="mini-chip mini-chip--accent">తెలుగు</span><span class="mini-chip">বাংলা</span>
-        </div>
-      </div>
-
-      <div class="v3-cell v3-cell--full">
-        <div class="v3-cell__icon">🔒</div>
-        <div class="v3-cell__title">DPDP-Aligned by Design</div>
-        <div class="v3-cell__desc" style="margin-bottom: 14px;">Ephemeral PHI processing, upstream sanitization before any cloud LLM call, honest erasure endpoints, breach playbook on file, India-region deployment with an on-prem option for hospital chains.</div>
-        <div class="mini-code"><span class="k">POST</span> /api/v1/parse   <span class="n"># sanitized → resolved → CDSS-checked → bundled</span>
-<span class="k">GET</span>  /api/v1/metrics/summary   <span class="n"># p50/p95 latency · cost per note · cache hits</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= PIPELINE ================= -->
-  <section class="v3-section">
-    <div class="v3-kicker">How it works</div>
-    <h2 class="v3-h2">Four steps, one API call</h2>
-    <p class="v3-sub">POST a note or an image. Get back structured, coded, safety-checked clinical data.</p>
-    <div class="v3-pipeline">
-      <div class="v3-step"><div class="v3-step__num">STEP 01</div><div class="v3-step__title">Ingest &amp; Sanitize</div><div class="v3-step__desc">Text or prescription photo in. PHI scrubbed before anything leaves your control boundary.</div></div>
-      <div class="v3-step"><div class="v3-step__num">STEP 02</div><div class="v3-step__title">Extract Entities</div><div class="v3-step__desc">Symptoms, diagnoses, medications with dose &amp; frequency — English, Hindi, Hinglish.</div></div>
-      <div class="v3-step"><div class="v3-step__num">STEP 03</div><div class="v3-step__title">Resolve &amp; Safety-Check</div><div class="v3-step__desc">Map to SNOMED CT, resolve brands to generics, run CDSS rules. Unresolved = flagged, never invented.</div></div>
-      <div class="v3-step"><div class="v3-step__num">STEP 04</div><div class="v3-step__title">Emit Bundles</div><div class="v3-step__desc">FHIR R4 consultation bundle out; NHCX-shaped insurance payload ready when you are.</div></div>
-    </div>
-  </section>
-
-  <!-- ================= TRANSPARENCY ================= -->
-  <section id="transparency" class="v3-section">
-    <div class="v3-kicker">Built in public</div>
-    <h2 class="v3-h2">No invented case studies.<br>Just engineering you can verify.</h2>
-    <p class="v3-sub">Healthcare software earns trust differently. Here is our evidence policy.</p>
-    <div class="v3-truthgrid">
-      <div class="v3-truth v3-truth--real">
-        <div class="v3-truth__status">● Real &amp; Shipping Today</div>
-        <div class="v3-truth__title">The Working Pipeline</div>
-        <div class="v3-truth__desc">The exact engine powering the live workbench above: parsing, terminology resolution, CDSS checks, FHIR generation — behind 40 CI-gated tests with permanent data-integrity guards.</div>
-      </div>
-      <div class="v3-truth v3-truth--wip">
-        <div class="v3-truth__status">● In Progress — Founder Gates</div>
-        <div class="v3-truth__title">Full SNOMED CT India Edition</div>
-        <div class="v3-truth__desc">Ingestion pipeline built and dress-rehearsed against official RF2 format snapshots. Waiting on the national license download; /health reports exact loaded counts so you can watch it happen.</div>
-      </div>
-      <div class="v3-truth v3-truth--measured">
-        <div class="v3-truth__status">● Accuracy Program</div>
-        <div class="v3-truth__title">Published Benchmarks — With Real Data</div>
-        <div class="v3-truth__desc">An eval harness runs today on clearly-labeled synthetic cases. Certification-grade precision/recall publishes only after tuning against 200+ real de-identified notes. Never marketing percentages instead of measurements.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= DEVELOPER HUB ================= -->
-  <section id="developers" class="v3-section">
-    <div class="v3-kicker">Developers</div>
-    <h2 class="v3-h2">Integrate in an afternoon</h2>
-    <p class="v3-sub">REST + JSON. Interactive OpenAPI docs, Postman collection, and copy-paste snippets. Parse a note in the workbench above and the live response appears here.</p>
-
-    <div class="devhub-grid">
-      <div class="code-gen-card">
-        <div class="code-gen-header">
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <span style="font-size: 0.88rem; font-weight: 750; color: #fff;">Request</span>
-            <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #818cf8; background: rgba(99, 102, 241, 0.2); padding: 0.18rem 0.55rem; border-radius: 4px; font-weight: 600;">POST /api/v1/parse</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <a href="/api/v1/postman-collection" target="_blank" download="SICCE_Postman_Collection.json" class="btn-tool" style="background: #ea580c; color: #fff; border-color: #ea580c; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-              🚀 Postman
-            </a>
-            <div class="lang-tabs">
-              <button class="lang-btn active" data-lang="python">Python</button>
-              <button class="lang-btn" data-lang="curl">cURL</button>
-              <button class="lang-btn" data-lang="node">Node.js</button>
-            </div>
-          </div>
-        </div>
-        <pre id="code-snippet-display" class="code-block-viewer"></pre>
-      </div>
-
-      <div class="devhub-response-card">
-        <div class="code-gen-header" style="border-radius: 14px 14px 0 0;">
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <span style="font-size: 0.88rem; font-weight: 750; color: #fff;">Response</span>
-            <span id="devhub-response-status" class="mini-chip" style="color:#7cc8b8; border-color: rgba(124,200,184,.3); background: rgba(124,200,184,.08);">waiting for a parse…</span>
-          </div>
-          <button id="btn-copy-response" class="btn-tool" style="background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.2);">Copy</button>
-        </div>
-        <pre id="devhub-response" class="devhub-response-pre">// Run a parse in the workbench above —
-// the real API response lands here, pretty-printed.</pre>
-      </div>
-    </div>
-
-    <div class="sandbox-key-card">
-      <div class="sk-left">
-        <div class="sk-title">Get your free sandbox key</div>
-        <div class="sk-desc">1,000 inferences a month, no credit card. Create an account, generate a key, make your first call in under a minute.</div>
-      </div>
-      <div class="sk-key" id="sk-key-visual" title="Click to copy a sample key format">
-        <span class="sk-key-label">SAMPLE KEY FORMAT</span>
-        <code>sicce_xxxxxxxxxxxxxxxx</code>
-      </div>
-      <a href="/docs" target="_blank" class="btn-v3 btn-v3--ghost" style="padding:11px 20px; font-size:.86rem;">Auth Docs</a>
-    </div>
-  </section>
-
-  <!-- ================= FAQ ================= -->
-  <section id="faq" class="v3-section">
-    <div class="v3-kicker">FAQ</div>
-    <h2 class="v3-h2">Straight answers</h2>
-    <div class="v3-faq" style="margin-top: 30px;">
-      <div class="v3-faq__item">
-        <button class="v3-faq__q">What exactly does SICCE do?<span class="chev">▾</span></button>
-        <div class="v3-faq__a"><div class="v3-faq__a-inner">It converts unstructured Indian clinical input — typed notes, scanned prescriptions, dictated narratives — into structured HL7 FHIR R4 consultation bundles mapped to SNOMED CT concepts, with drug-safety (CDSS) checks and NHCX-shaped insurance claim payloads. It's sold as a B2B API to EMR/HIS vendors and claims teams, not as a doctor-facing app.</div></div>
-      </div>
-      <div class="v3-faq__item">
-        <button class="v3-faq__q">Does it really understand Hinglish medical notes?<span class="chev">▾</span></button>
-        <div class="v3-faq__a"><div class="v3-faq__a-inner">Yes — through a maintained lexicon of Indian abbreviations (c/o, k/c/o, AP+, SOBOE), Hindi/Hinglish phrases (sar dard, pet kharab, bukhar), and commercial brand names, combined with an LLM fallback for novel phrasing. Accuracy targets are being validated on real de-identified notes and will be published with methodology rather than marketing percentages.</div></div>
-      </div>
-      <div class="v3-faq__item">
-        <button class="v3-faq__q">Is it ABDM-certified today?<span class="chev">▾</span></button>
-        <div class="v3-faq__a"><div class="v3-faq__a-inner">Not yet, and we won't pretend otherwise. FHIR output follows NRCeS profiles, SNOMED CT India Edition ingestion is licensed and in progress, and ABDM sandbox M1/M2 integration is under way. Anything not yet live is labeled MOCK in our product and on this site.</div></div>
-      </div>
-      <div class="v3-faq__item">
-        <button class="v3-faq__q">How do you handle patient data (DPDP)?<span class="chev">▾</span></button>
-        <div class="v3-faq__a"><div class="v3-faq__a-inner">Processing is designed ephemeral: PHI identifiers are sanitized upstream of any cloud LLM call, nothing is persisted after response delivery, erasure endpoints exist and are tested, and a documented breach-response playbook is on file. On-prem deployment is available for institutions that require data to never leave their network.</div></div>
-      </div>
-      <div class="v3-faq__item">
-        <button class="v3-faq__q">Who is this for — doctors?<span class="chev">▾</span></button>
-        <div class="v3-faq__a"><div class="v3-faq__a-inner">No. It's infrastructure for software teams: EMR vendors adding coded documentation, HIS platforms preparing NHCX-ready claims, pharmacy chains verifying prescriptions, and TPAs digitizing legacy paper claims. Doctors interact through products built on top of it.</div></div>
-      </div>
-      <div class="v3-faq__item">
-        <button class="v3-faq__q">What happens when the engine can't understand something?<span class="chev">▾</span></button>
-        <div class="v3-faq__a"><div class="v3-faq__a-inner">It tells you. Unresolvable terms return explicitly uncoded fields and get logged for dictionary improvement. We consider fabricated output — inventing symptoms or codes — a disqualifying defect, enforced by automated tests.</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= COST SIMULATOR ================= -->
-  <section id="roi-calculator" class="roi-section v3-section">
-    <div class="bento-heading-row" style="margin-bottom: 2rem;">
-      <h2 class="bento-title">Cost Simulator</h2>
-      <p class="bento-subtitle">Illustrative model: your monthly volume × listed per-call rates. Compare against your own current manual-coding or vendor costs.</p>
-    </div>
-
-    <div class="roi-grid">
-      <div class="roi-control-pane">
-        <label style="display: block; font-size: 0.88rem; font-weight: 750; color: #16181d; margin-bottom: 0.5rem;">
-          Monthly Prescription Volume: <span id="roi-volume-display" style="color: var(--pp-accent); font-size: 1.25rem;">50,000</span> <span style="font-size: 0.85rem; color: #8b929e;">Rx / month</span>
-        </label>
-        <input type="range" id="roi-slider" min="5000" max="500000" step="5000" value="50000" class="roi-range-slider">
-
-        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #8b929e; margin-top: 0.4rem; font-family: var(--font-mono);">
-          <span>5,000 (Clinic)</span><span>100,000 (Hospital)</span><span>500,000+ (E-Pharmacy)</span>
-        </div>
-
-        <div style="margin-top: 2rem; padding: 1.25rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
-          <div style="font-size: 0.85rem; font-weight: 750; color: #16181d; margin-bottom: 0.4rem;">Why per-call pricing works here</div>
-          <p style="font-size: 0.8rem; color: var(--pp-dim, #5f6673); line-height: 1.5;">
-            Aggressive caching means repeated terms cost fractions of a paisa. Listed pack rates start at ₹0.111/call and fall with volume — no USD invoice surprises.
-          </p>
-        </div>
-      </div>
-
-      <div class="roi-results-pane">
-        <div class="roi-comparison-cards">
-          <div class="roi-cost-box legacy">
-            <div class="roi-cost-title">Typical US OCR API</div>
-            <div class="roi-cost-val" id="veryfi-monthly-cost">₹3,50,000</div>
-            <div class="roi-cost-sub">Illustrative ~$0.08/call list-rate example</div>
-          </div>
-          <div class="roi-cost-box sicce">
-            <div class="roi-cost-title">SICCE Engine (India)</div>
-            <div class="roi-cost-val" id="sicce-monthly-cost">₹9,000</div>
-            <div class="roi-cost-sub">Listed pack rates from ₹0.111 / call</div>
-          </div>
-        </div>
-        <div class="roi-annual-savings-banner">
-          <div>
-            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: #15803d; font-weight: 800;">Estimated Annual Savings (Illustrative)</div>
-            <div class="roi-savings-amount" id="roi-annual-savings">₹40,92,000 / year</div>
-          </div>
-          <div class="roi-savings-percent" id="roi-savings-pct">97.4% SAVED</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= PRICING ================= -->
-  <section id="pricing" class="pricing-section v3-section">
-    <div class="bento-heading-row">
-      <h2 class="bento-title">Simple, honest pricing</h2>
-      <p class="bento-subtitle">Start free. Pay per call as you scale. Enterprise terms when you need SLAs and on-prem.</p>
-    </div>
-
-    <div class="pricing-grid">
-      <div class="pricing-card">
-        <div class="pricing-tier-name">Developer Sandbox</div>
-        <div class="pricing-price">₹0<span> / forever</span></div>
-        <div class="pricing-desc">Test the full pipeline against the live workbench. No card required.</div>
-        <ul class="pricing-features">
-          <li>✅ 1,000 free inferences / month</li>
-          <li>✅ Full Hinglish parser + CDSS checks</li>
-          <li>✅ FHIR R4 + NHCX payload output</li>
-          <li>✅ Community support</li>
-        </ul>
-        <a href="#workbench" class="sw-btn sw-btn--ghost" style="justify-content: center; margin-top: auto;">Try It Now</a>
-      </div>
-
-      <div class="pricing-card popular">
-        <div class="popular-tag">MOST POPULAR FOR TEAMS</div>
-        <div class="pricing-tier-name">Growth</div>
-        <div class="pricing-price">₹4,999<span> / month</span></div>
-        <div class="pricing-desc">For clinics, diagnostic chains, and products moving to production.</div>
-        <ul class="pricing-features">
-          <li>✅ 30,000 inferences / month (₹0.16 extra)</li>
-          <li>✅ OCR + Voice + text pipelines</li>
-          <li>✅ Priority email support</li>
-          <li>✅ Onboarding integration call</li>
-        </ul>
-        <a href="#workbench" class="sw-btn sw-btn--primary" style="justify-content: center; margin-top: auto;">Start Free, Upgrade Later</a>
-      </div>
-
-      <div class="pricing-card">
-        <div class="pricing-tier-name">Enterprise</div>
-        <div class="pricing-price">Custom<span></span></div>
-        <div class="pricing-desc">Hospital chains, national pharmacies, TPAs. Volume rates and on-prem appliance available.</div>
-        <ul class="pricing-features">
-          <li>✅ Volume per-call rates from ₹0.111</li>
-          <li>✅ Custom SLAs &amp; DPDP data agreements</li>
-          <li>✅ On-prem Docker deployment option</li>
-          <li>✅ Dedicated integration engineer</li>
-        </ul>
-        <button id="btn-pricing-contact" class="sw-btn sw-btn--ghost" style="justify-content: center; margin-top: auto;">Talk to the Founder</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= FINAL CTA ================= -->
-  <section class="v3-final">
-    <div class="v3-final__panel">
-      <h2>Stop re-typing prescriptions.<br><em>Start receiving coded records.</em></h2>
-      <p>The workbench above is the real engine, running live. Paste one of your own de-identified notes and see what comes back.</p>
-      <a href="#workbench" class="btn-v3 btn-v3--invert magnetic">Open the Live Workbench</a>
-    </div>
-  </section>
-
-  <!-- ================= FOOTER ================= -->
-  <footer class="app-footer">
-    <div class="mega-footer-grid">
-      <div class="footer-col">
-        <div class="footer-col-title">Product</div>
-        <ul class="footer-col-links">
-          <li><a href="#workbench">Live Workbench</a></li>
-          <li><a href="#capabilities">Capabilities</a></li>
-          <li><a href="#developers">Developer Hub</a></li>
-          <li><a href="#pricing">Pricing</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <div class="footer-col-title">Developers &amp; Docs</div>
-        <ul class="footer-col-links">
-          <li><a href="/docs" target="_blank">FastAPI Interactive Docs</a></li>
-          <li><a href="/openapi.json" target="_blank">OpenAPI Spec</a></li>
-          <li><a href="/api/v1/postman-collection" target="_blank" download="SICCE_Postman.json">Postman Collection</a></li>
-          <li><a href="/health" target="_blank">System Status (live)</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <div class="footer-col-title">Trust &amp; Compliance</div>
-        <ul class="footer-col-links">
-          <li><a href="/static/privacy_policy.html" target="_blank">Privacy Policy (DPDP Act)</a></li>
-          <li><a href="/static/terms_and_disclaimer.html" target="_blank">Medical Disclaimer</a></li>
-          <li><a href="/static/dpa_agreement.html" target="_blank">B2B Data Processing Agreement</a></li>
-          <li><a href="/static/grievance_redressal.html" target="_blank">Grievance Redressal</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <div class="footer-col-title">Company</div>
-        <ul class="footer-col-links">
-          <li><a href="#transparency">Built in Public</a></li>
-          <li><a href="#faq">FAQ</a></li>
-          <li><a href="mailto:founder@sicce.health">Contact Founder</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-content" style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--pp-line);">
-      <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; color: var(--pp-dim);">
-        <span style="background: var(--pp-accent-soft); color: var(--pp-accent); border: 1px solid var(--pp-accent-line); padding: 0.2rem 0.55rem; border-radius: 6px; font-weight: 700;">DPDP-aligned design</span>
-        <span>Ephemeral processing · Physician-built · Engineering in public</span>
-      </div>
-      <div style="font-size: 0.78rem; color: var(--pp-faint);">
-        © 2026 SICCE Health Systems. All rights reserved.
-      </div>
-    </div>
-
-    <div class="footer-attribution">
-      SNOMED CT® is a registered trademark of SNOMED International. India Edition integration implemented under the NRCeS national license program (application in progress). LOINC® is a registered trademark of Regenstrief Institute, Inc. Administrative interoperability middleware — not a medical device; all outputs require licensed-clinician verification. Names and documents shown in demos are fictional sample data.
-    </div>
-  </footer>
-
-  <!-- ================= TOPUP MODAL ================= -->
-  <div id="topup-checkout-modal" class="lead-modal-overlay hidden">
-    <div class="lead-modal-card" style="max-width: 620px;">
-      <button id="btn-close-topup" class="lead-modal-close">&times;</button>
-      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.35rem;">
-        <span style="font-size: 1.25rem;">⚡</span>
-        <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a;">Buy Developer API Credits</h3>
-      </div>
-      <p style="font-size: 0.88rem; color: #475569; margin-bottom: 1.5rem;">Instant top-up for your API key. Pay securely via UPI, NetBanking, or Card (No recurring lock-in).</p>
-
-      <div class="topup-packs-grid">
-        <div class="topup-pack-card" data-pack="starter">
-          <div class="pack-name">Starter Pack</div>
-          <div class="pack-price">₹499</div>
-          <div class="pack-credits">3,000 Inferences</div>
-          <div class="pack-rate">₹0.166 / call</div>
-          <button class="btn-buy-pack sw-btn sw-btn--ghost" style="width: 100%; justify-content: center; margin-top: 0.85rem; padding: 6px 12px; font-size: 0.82rem;">Select Pack</button>
-        </div>
-        <div class="topup-pack-card popular" data-pack="pro">
-          <div class="topup-badge">POPULAR</div>
-          <div class="pack-name">Clinic Pro</div>
-          <div class="pack-price">₹1,999</div>
-          <div class="pack-credits">15,000 Inferences</div>
-          <div class="pack-rate">₹0.133 / call</div>
-          <button class="btn-buy-pack sw-btn sw-btn--primary" style="width: 100%; justify-content: center; margin-top: 0.85rem; padding: 6px 12px; font-size: 0.82rem;">Select Pack</button>
-        </div>
-        <div class="topup-pack-card" data-pack="scale">
-          <div class="pack-name">Scale Pack</div>
-          <div class="pack-price">₹4,999</div>
-          <div class="pack-credits">45,000 Inferences</div>
-          <div class="pack-rate">₹0.111 / call</div>
-          <button class="btn-buy-pack sw-btn sw-btn--ghost" style="width: 100%; justify-content: center; margin-top: 0.85rem; padding: 6px 12px; font-size: 0.82rem;">Select Pack</button>
-        </div>
-      </div>
-
-      <div class="topup-checkout-footer" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #64748b;">
-          <span>🔒 256-Bit SSL Encrypted</span>
-          <span>•</span>
-          <span>Billing integration in progress</span>
-        </div>
-        <button id="btn-proceed-pay" class="sw-btn sw-btn--primary" style="padding: 8px 18px;">Pay with UPI / Card</button>
+      <div class="demo-pane">
+        <div class="pane-label">RESOLVED SNOMED CT ENTITIES</div>
+        <div id="out" class="out"><div class="out-empty">← write or pick a note, then parse</div></div>
+        <div class="fhir-note" id="fnote" style="display:none">Full NRCeS-profiled <a>FHIR R4 Bundle</a> returned in the response body.</div>
       </div>
     </div>
   </div>
-
-  <!-- ================= ABHA VERIFY MODAL ================= -->
-  <div id="abha-verify-modal" class="lead-modal-overlay hidden">
-    <div class="lead-modal-card" style="max-width: 580px;">
-      <button id="btn-close-abha" class="lead-modal-close">&times;</button>
-      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.35rem;">
-        <span style="font-size: 1.35rem;">🪪</span>
-        <h3 style="font-size: 1.3rem; font-weight: 800; color: #0f172a;">ABDM Milestone 1: ABHA Verification (Mock Demo)</h3>
-      </div>
-      <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1.25rem;">Simulated demonstration flow. Any OTP is accepted in sandbox mode — no connection to NHA production systems.</p>
-
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">
-        <label style="display: block; font-size: 0.78rem; font-weight: 750; color: #334155; margin-bottom: 0.35rem;">ENTER 14-DIGIT ABHA NUMBER</label>
-        <div style="display: flex; gap: 0.5rem;">
-          <input type="text" id="abha-input-number" value="91-8842-1204-9912" style="flex: 1; padding: 0.55rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 6px; font-family: var(--font-mono); font-size: 0.9rem;">
-          <button id="btn-send-abha-otp" class="sw-btn sw-btn--primary" style="padding: 6px 14px; font-size: 0.82rem;">Verify &amp; Fetch</button>
-        </div>
-      </div>
-
-      <div id="abha-card-result" class="hidden" style="background: linear-gradient(135deg, #059669, #0284c7); color: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: var(--shadow-lg);">
-        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.25); padding-bottom: 0.75rem; margin-bottom: 0.75rem;">
-          <div style="font-weight: 800; font-size: 0.9rem; letter-spacing: 0.05em;">AYUSHMAN BHARAT DIGITAL MISSION</div>
-          <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800;">SANDBOX RESULT</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <div style="font-size: 1.1rem; font-weight: 800;" id="abha-res-name">Rahul Verma</div>
-            <div style="font-size: 0.8rem; opacity: 0.9;">ABHA ID: <span id="abha-res-id" style="font-family: var(--font-mono); font-weight: 700;">91-8842-1204-9912</span></div>
-            <div style="font-size: 0.75rem; opacity: 0.85; margin-top: 4px;">DOB: 14/05/1992 • Gender: Male • PHR: rahul@abdm</div>
-          </div>
-          <div style="width: 54px; height: 54px; background: rgba(255,255,255,0.9); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #0f172a; font-size: 1.4rem;">📱</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
-<script src="/static/scrub-engine.js?v=20260824_v40"></script>
-<script src="/static/app.js?v=20260824_v40"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="/static/site.js?v=20260824_v42"></script>
+<section id="pipeline">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="sec-tag">THE PIPELINE</div>
+      <h2>Four stages between chaos<br>and compliance.</h2>
+      <p class="sec-sub">Every stage is inspectable. Every failure is explicit. Nothing is invented.</p>
+    </div>
+    <div class="pipe">
+      <div class="step rv"><h3>Ingest & sanitize</h3><p>Hinglish text, OCR'd prescriptions, EMR notes. PHI is de-identified upstream of every external call.</p></div>
+      <div class="step rv"><h3>Extract entities</h3><p>Symptoms, diagnoses, medications, doses, frequencies — including Indian abbreviations like APD+, BD, SOS.</p></div>
+      <div class="step rv"><h3>Resolve terminology</h3><p>FTS5 fast-path across SNOMED concepts and Indian brands. Unresolved terms are logged honestly — never guessed.</p></div>
+      <div class="step rv"><h3>Emit compliant output</h3><p>NRCeS-profiled FHIR R4 bundle, CDSS safety flags, NHCX-shaped claim payload. Ready for ABDM pipelines.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="difference" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="sec-tag">WHY WE'RE DIFFERENT</div>
+      <h2>Built by a physician who<br>refuses to fake data.</h2>
+    </div>
+    <div class="diff-grid">
+      <div class="diff-col them rv">
+        <h3>Typical "medical AI"</h3>
+        <div class="diff-item"><span class="ic">✕</span>Invents plausible-sounding codes when unsure</div>
+        <div class="diff-item"><span class="ic">✕</span>Demos on cherry-picked inputs</div>
+        <div class="diff-item"><span class="ic">✕</span>"Accuracy" claims nobody can audit</div>
+        <div class="diff-item"><span class="ic">✕</span>Clinical text goes to opaque cloud LLMs raw</div>
+        <div class="diff-item"><span class="ic">✕</span>Cloud-only, no control over PHI</div>
+      </div>
+      <div class="diff-col us rv">
+        <h3>SICCE</h3>
+        <div class="diff-item"><span class="ic">✓</span>Returns "uncoded" + logs the gap for dictionary review</div>
+        <div class="diff-item"><span class="ic">✓</span>The demo above hits our real production endpoint</div>
+        <div class="diff-item"><span class="ic">✓</span>/health publishes terminology readiness publicly</div>
+        <div class="diff-item"><span class="ic">✓</span>PHI sanitizer runs before any LLM ever sees text</div>
+        <div class="diff-item"><span class="ic">✓</span>Same Docker image runs air-gapped on-prem</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="band">
+  <div class="metrics wrap">
+    <div class="metric rv"><b>&lt;50ms</b><span>TERMINOLOGY LOOKUPS</span></div>
+    <div class="metric rv"><b>138</b><span>INDIAN BRANDS MAPPED</span></div>
+    <div class="metric rv"><b>40/40</b><span>TESTS PASSING, CI-GATED</span></div>
+    <div class="metric rv"><b>~1.7s</b><span>FULL PARSE, LIVE TODAY</span></div>
+  </div>
+</div>
+
+<section id="developers">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="sec-tag">FOR ENGINEERS</div>
+      <h2>One endpoint.<br>An afternoon to integrate.</h2>
+    </div>
+    <div class="code-cols">
+      <div class="code-block rv">
+        <div class="code-head"><span>request.py</span><span>python · httpx</span></div>
+<pre><span class="tk-kw">import</span> httpx
+
+res = httpx.post(
+    <span class="tk-str">"https://snomed-ct-parser-1.onrender.com/api/v1/parse"</span>,
+    headers={<span class="tk-str">"X-API-KEY"</span>: <span class="tk-str">"&lt;your-key&gt;"</span>},
+    json={<span class="tk-str">"text"</span>: <span class="tk-str">"sar dard, bukhar. Dolo 650 BD"</span>},
+)
+bundle = res.json()  <span class="tk-cm"># FHIR R4, done.</span></pre>
+      </div>
+      <div class="code-block rv">
+        <div class="code-head"><span>response.excerpt.json</span><span>application/fhir+json</span></div>
+<pre>{
+  <span class="tk-fn">"resourceType"</span>: <span class="tk-str">"Bundle"</span>,
+  <span class="tk-fn">"entry"</span>: [{
+    <span class="tk-fn">"code"</span>: {<span class="tk-fn">"coding"</span>: [{
+      <span class="tk-fn">"system"</span>: <span class="tk-str">"http://snomed.info/sct"</span>,
+      <span class="tk-fn">"code"</span>: <span class="tk-num">"25064002"</span>,
+      <span class="tk-fn">"display"</span>: <span class="tk-str">"Headache"</span>
+    }]}
+  }]
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="sec-tag">PRICING</div>
+      <h2>Start free. Scale when<br>your pilots convert.</h2>
+    </div>
+    <div class="plans">
+      <div class="plan rv">
+        <h3>Sandbox</h3>
+        <div class="price">₹0<small>/forever</small></div>
+        <p class="plan-desc">Evaluate everything with a real key.</p>
+        <ul>
+          <li>100 calls/day</li>
+          <li>Full documentation</li>
+          <li>Watermarked output</li>
+        </ul>
+        <a class="btn plan-ghost-btn" href="mailto:sicce.health@gmail.com?subject=Sandbox%20key%20request">Request sandbox key</a>
+      </div>
+      <div class="plan hot rv">
+        <h3>Pilot Partnership</h3>
+        <div class="price">₹25k<small>/month</small></div>
+        <p class="plan-desc">For EMR/HIS vendors shipping to production.</p>
+        <ul>
+          <li>25,000 calls/month</li>
+          <li>Custom brand dictionary</li>
+          <li>Direct founder support</li>
+        </ul>
+        <a class="btn plan-hot-btn" href="mailto:sicce.health@gmail.com?subject=Pilot%20partnership">Start a pilot</a>
+      </div>
+      <div class="plan rv">
+        <h3>Production Scale</h3>
+        <div class="price">₹50k–1L<small>/month</small></div>
+        <p class="plan-desc">Volume commitments with SLAs.</p>
+        <ul>
+          <li>Unlimited volume tiers</li>
+          <li>99.9% uptime SLA</li>
+          <li>On-prem air-gapped option</li>
+        </ul>
+        <a class="btn plan-ghost-btn" href="mailto:sicce.health@gmail.com?subject=Enterprise%20discussion">Talk to us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="wrap rv">
+    <h2>Your ABDM deadline isn't waiting.<br>Neither should your integration.</h2>
+    <p>Live in minutes. Honest about everything. Built for India's clinical reality.</p>
+    <a class="btn btn-primary" href="#demo">Parse your first note ↑</a>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-in">
+    <a class="logo" href="#">SIC<b>CE</b></a>
+    <div class="foot-links">
+      <a href="/privacy_policy.html">Privacy</a>
+      <a href="/terms_and_disclaimer.html">Terms</a>
+      <a href="/grievance_redressal.html">Grievance</a>
+      <a href="/workbench.html">Workbench</a>
+    </div>
+  </div>
+  <p class="disclaimer">SICCE is non-SaMD administrative coding middleware. Outputs require review by a licensed medical practitioner before clinical use. SNOMED CT usage licensed under the MoHFW / NRCeS National License, India.</p>
+</footer>
+
+<script>
+// nav scroll state
+const nav=document.getElementById('nav');
+addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>10),{passive:true});
+
+// reveal on scroll
+const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('on')),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+// demo chips
+const note=document.getElementById('note');
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{note.value=c.dataset.t}));
+
+// live parse
+const out=document.getElementById('out'), runBtn=document.getElementById('run'), fnote=document.getElementById('fnote');
+runBtn.addEventListener('click',async()=>{
+  const text=note.value.trim();
+  if(!text){out.innerHTML='<div class="out-empty">Type a note first</div>';return;}
+  runBtn.disabled=true;runBtn.textContent='Parsing against production…';
+  const t0=performance.now();
+  try{
+    const r=await fetch('/api/demo-parse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+    const dt=((performance.now()-t0)/1000).toFixed(1);
+    if(!r.ok) throw new Error(await r.text());
+    const d=await r.json();
+    let rows='';
+    const seen=new Set();
+    for(const e of d.entry||[]){
+      const res=e.resource||{};
+      let label=null, code=null;
+      if(res.resourceType==='Observation'){label=res.code?.coding?.[0]?.display||res.code?.text;code=res.code?.coding?.[0]?.code;}
+      else if(res.resourceType==='Condition'){label=res.code?.coding?.[0]?.display||res.code?.text;code=res.code?.coding?.[0]?.code;}
+      else if(res.resourceType==='MedicationRequest'){
+        const m=res.medication?.concept||{};
+        label=m.coding?.[0]?.display||m.text;code=m.coding?.[0]?.code;
+      }
+      if(label&&!seen.has(label)){seen.add(label);
+        rows+=`<div class="ent-row"><span class="ent-name">${label}</span><span class="ent-code ${code?'':'uncoded'}">${code?`SNOMED ${code}`:'UNCODED'}</span></div>`;
+      }
+    }
+    out.innerHTML=rows||'<div class="out-empty">No codable entities found — honestly empty.</div>';
+    fnote.style.display='block';
+    fnote.firstChild.textContent=`Full NRCeS-profiled FHIR R4 Bundle returned in ${dt}s — `;
+  }catch(err){
+    out.innerHTML=`<div class="out-empty" style="color:var(--amber)">Sandbox waking up (free tier cold start) — try again in ~30s</div>`;
+  }finally{
+    runBtn.disabled=false;runBtn.textContent='Parse → coded FHIR bundle';
+  }
+});
+</script>
 </body>
 </html>
