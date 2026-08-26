@@ -916,5 +916,23 @@
   "code_status": "generic_mapping_only",
   "typical_doses": "",
   "synonyms": "sinarest tablet"
+ },
+ {
+  "brand_name": "Ascoril LS Syrup",
+  "generic_name": "Levosalbutamol and Ambroxol and Guaifenesin",
+  "category": "Bronchodilator expectorant",
+  "snomed_id": "",
+  "code_status": "generic_mapping_only",
+  "typical_doses": "5ml TDS",
+  "synonyms": "ascoril ls, ascoril, ascoril syrup, ascoril d plus"
+ },
+ {
+  "brand_name": "Grilinctus",
+  "generic_name": "Dextromethorphan and Chlorpheniramine and Ammonium chloride",
+  "category": "Antitussive combination",
+  "snomed_id": "",
+  "code_status": "generic_mapping_only",
+  "typical_doses": "5ml TDS",
+  "synonyms": "grilinctus, grilinctus softlets"
  }
 ]
