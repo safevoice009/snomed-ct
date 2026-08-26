@@ -401,11 +401,21 @@ def load_seeds(conn: sqlite3.Connection):
                     item["brand_name"],
                     item["generic_name"],
                     item.get("category", "Generic Formulation"),
-                    item.get("snomed_id", "387517004"),
+                    item.get("snomed_id", ""),  # NEVER default to another drug's code (Law #1)
                     item.get("typical_doses", ""),
                     item.get("synonyms", "")
                 ))
-            cursor.executemany("INSERT OR REPLACE INTO brands VALUES (?, ?, ?, ?, ?, ?);", pmbjp_brands)
+            cursor.executemany("""
+                INSERT INTO brands (brand_name, generic_name, category, snomed_id, typical_doses, synonyms)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(brand_name) DO UPDATE SET
+                    generic_name = excluded.generic_name,
+                    category = excluded.category,
+                    typical_doses = excluded.typical_doses,
+                    synonyms = excluded.synonyms,
+                    -- Preserve an existing verified code unless the incoming row carries one
+                    snomed_id = CASE WHEN excluded.snomed_id != '' THEN excluded.snomed_id ELSE brands.snomed_id END;
+            """, pmbjp_brands)
             logger.info(f"Loaded PMBJP Jan Aushadhi Formulary: {len(pmbjp_brands)} public generic medicines.")
         except Exception as e:
             logger.warning(f"Failed to load PMBJP Formulary: {e}")
