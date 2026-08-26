@@ -49,9 +49,12 @@ class AuthService:
         self._local_users: Dict[str, Dict[str, Any]] = {}
         self._local_accounts: Dict[str, str] = {} # email -> hashed password
         self._local_sessions: Dict[str, Dict[str, Any]] = {} # token -> session data
-        self._local_api_keys: Dict[str, Dict[str, Any]] = {
-            "test-dev-key": {"user_id": "usr_demo", "name": "Default Test Key", "is_active": True, "requests_count": 0}
-        }
+        self._local_api_keys: Dict[str, Dict[str, Any]] = {}
+        # Seed the local fallback store ONLY from explicit env config (never hardcoded).
+        _env_keys = [k.strip() for k in os.getenv("API_KEYS", "").split(",") if k.strip()]
+        if _env_keys:
+            for i, k in enumerate(_env_keys):
+                self._local_api_keys[k] = {"user_id": f"usr_env_{i}", "name": f"Env Key #{i+1}", "is_active": True, "requests_count": 0}
         
         if SUPABASE_AVAILABLE and self.supabase_url and self.supabase_key:
             try:
@@ -295,8 +298,10 @@ class AuthService:
         if not key_value:
             return False
             
-        # Check static dev keys
-        static_keys = set(os.getenv("API_KEYS", "test-dev-key").split(","))
+        # Static keys come ONLY from the API_KEYS env var (comma-separated).
+        # No baked-in defaults: an unconfigured deployment accepts no static keys.
+        raw_keys = os.getenv("API_KEYS", "")
+        static_keys = {k.strip() for k in raw_keys.split(",") if k.strip()}
         if key_value in static_keys:
             return True
 
