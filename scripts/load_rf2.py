@@ -302,7 +302,7 @@ CORE_SEEDS = {
         ("Atorva 10", "Atorvastatin", "Statin / Lipid Lowering", "387544009", "10mg", "atorva, atorva 10, atorlip, storvas, lipitor"),
         ("Rosuvas 10", "Rosuvastatin", "Statin / Lipid Lowering", None, "10mg", "rosuvas, rosuvas 10, rozavel, novastat, rosuvastatin"),
         ("Levocet-M", "Levocetirizine and montelukast", "Antihistamine + Antileukotriene", None, "5mg/10mg", "levocet m, levocet-m, montek-lc, montair-lc, telekast-l"),
-        ("Ascoril-D", "Dextromethorphan, phenylephrine and chlorpheniramine", "Cough Syrup", None, "100ml", "ascoril d, ascoril-d, benadryl dr, chericof"),
+        ("Ascoril-D", "Dextromethorphan, phenylephrine and chlorpheniramine", "Cough Syrup", None, "100ml", "ascoril d, ascoril-d"),
         ("Cifran 500", "Ciprofloxacin", "Antibiotic", None, "500mg", "cifran, cifran 500, ciplox, ciprobid"),
         ("Taxim-O 200", "Cefixime", "Antibiotic", "372833008", "200mg", "taxim o, taxim-o, taxim-o 200, zifi 200, mahacef 200"),
         ("Monocef 1g", "Ceftriaxone", "Injectable Antibiotic", None, "1g", "monocef, monocef 1g, oframax, xone"),
