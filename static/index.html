@@ -3,441 +3,473 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SICCE — Clinical Coding Infrastructure for Indian Healthcare</title>
-<meta name="description" content="Turn messy Indian clinical notes into ABDM-compliant FHIR R4 bundles with verified SNOMED CT codes. One API. Measured accuracy. Zero fabricated data.">
+<title>SICCE — The prescription, returned in code.</title>
+<meta name="description" content="SICCE turns messy Indian clinical notes into ABDM-compliant FHIR R4 bundles with verified SNOMED CT codes. Measured accuracy. Zero fabricated data.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@350;400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0a0e14; --bg2:#0e131b; --bg3:#131926;
-  --line:rgba(148,163,184,.10); --line2:rgba(148,163,184,.18);
-  --fg:#e6edf3; --muted:#8b98a9; --dim:#5c6878;
-  --teal:#2dd4bf; --teal-dim:rgba(45,212,191,.12);
-  --amber:#fbbf24; --red:#f87171;
-  --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  --paper:#f3eee3; --paper2:#ebe4d3; --paper3:#e2dac6;
+  --ink:#1b1812; --ink2:#4a443a; --ink3:#7d7565;
+  --red:#b23a26; --green:#22694f;
+  --line:rgba(27,24,18,.14); --line-soft:rgba(27,24,18,.08);
+  --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace; --hand:'Caveat',cursive;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-weight:400;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-::selection{background:rgba(45,212,191,.25)}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:400;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+/* paper grain */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .04 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+::selection{background:rgba(178,58,38,.22)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 28px}
 
-/* ---------- nav ---------- */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;border-bottom:1px solid transparent;transition:.3s;background:transparent}
-nav.scrolled{background:rgba(10,14,20,.82);backdrop-filter:blur(16px);border-bottom-color:var(--line)}
-.nav-in{max-width:1120px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-family:var(--mono);font-weight:500;font-size:17px;letter-spacing:.08em;color:var(--fg);text-decoration:none}
-.logo b{color:var(--teal);font-weight:500}
-.nav-links{display:flex;gap:32px;align-items:center}
-.nav-links a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:450;transition:color .2s}
-.nav-links a:hover{color:var(--fg)}
-.btn-nav{background:var(--teal);color:#04211c!important;padding:9px 18px;border-radius:8px;font-weight:600!important;font-size:13px!important}
-.btn-nav:hover{filter:brightness(1.1)}
+/* ---------- top rule ---------- */
+.toprule{border-bottom:1px solid var(--ink);background:var(--paper);position:sticky;top:0;z-index:100}
+.top-in{max-width:1140px;margin:0 auto;padding:14px 28px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.14em;text-decoration:none;color:var(--ink)}
+.brand span{color:var(--red)}
+.top-right{display:flex;gap:26px;align-items:center;font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+.top-right a{color:var(--ink2);text-decoration:none}
+.top-right a:hover{color:var(--ink)}
+.live-dot{display:inline-flex;align-items:center;gap:7px;color:var(--green);font-weight:500}
+.live-dot i{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blip 2.2s infinite}
+@keyframes blip{0%,100%{opacity:1}50%{opacity:.3}}
+.keybtn{border:1.5px solid var(--ink);padding:8px 16px;border-radius:3px;font-weight:500;color:var(--ink)!important;transition:.15s}
+.keybtn:hover{background:var(--ink);color:var(--paper)!important}
 
 /* ---------- hero ---------- */
-.hero{position:relative;padding:190px 0 110px;text-align:center}
-.hero::before{content:"";position:absolute;inset:0;background:
-  radial-gradient(ellipse 70% 55% at 50% -5%, rgba(45,212,191,.09), transparent 65%),
-  radial-gradient(ellipse 40% 40% at 80% 30%, rgba(56,132,255,.05), transparent 60%);
-  pointer-events:none}
-.hero-grid{position:absolute;inset:0;background-image:
-  linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
-  background-size:72px 72px;
-  mask-image:radial-gradient(ellipse 75% 62% at 50% 28%, black 15%, transparent 70%);
-  pointer-events:none}
-.kicker{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;color:var(--teal);
-  border:1px solid rgba(45,212,191,.3);background:var(--teal-dim);border-radius:99px;padding:7px 16px;margin-bottom:34px;letter-spacing:.06em}
-.kicker .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-h1{font-family:var(--serif);font-weight:400;font-size:clamp(44px,7vw,78px);line-height:1.05;letter-spacing:-.02em;margin-bottom:26px}
-h1 em{font-style:italic;color:var(--teal)}
-.sub{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:620px;margin:0 auto 42px;font-weight:350}
-.sub b{color:var(--fg);font-weight:500}
-.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.btn{padding:14px 30px;border-radius:10px;font-size:15px;font-weight:550;text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:9px}
-.btn-primary{background:var(--teal);color:#04211c;font-weight:650}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(45,212,191,.25)}
-.btn-ghost{border:1px solid var(--line2);color:var(--fg)}
-.btn-ghost:hover{border-color:var(--muted);background:rgba(255,255,255,.03)}
-.hero-proof{margin-top:64px;font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.04em}
-.hero-proof span{color:var(--teal)}
+.hero{position:relative;border-bottom:1px solid var(--ink)}
+.hero-in{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;padding:84px 0 72px;align-items:center}
+@media(max-width:920px){.hero-in{grid-template-columns:1fr}}
+.vol{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--ink3);margin-bottom:26px;display:flex;align-items:center;gap:14px}
+.vol::after{content:"";flex:1;height:1px;background:var(--line)}
+h1{font-family:var(--serif);font-weight:380;font-size:clamp(40px,5.4vw,66px);line-height:1.06;letter-spacing:-.02em;margin-bottom:26px}
+h1 em{font-style:italic;font-weight:480}
+h1 .code-word{font-family:var(--mono);font-size:.62em;font-weight:500;color:var(--red);letter-spacing:-.01em;white-space:nowrap}
+.hero-sub{font-size:17px;color:var(--ink2);max-width:520px;font-weight:350;margin-bottom:36px;line-height:1.7}
+.hero-sub b{font-weight:550;color:var(--ink)}
+.hero-ctas{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:34px}
+.btn{font-family:var(--mono);font-size:13px;letter-spacing:.04em;padding:15px 30px;border-radius:3px;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:.18s;cursor:pointer;border:1.5px solid var(--ink)}
+.btn-solid{background:var(--ink);color:var(--paper)}
+.btn-solid:hover{background:var(--red);border-color:var(--red);transform:translateY(-2px)}
+.btn-line{color:var(--ink)}
+.btn-line:hover{background:var(--paper2)}
+.hand-note{font-family:var(--hand);font-size:21px;color:var(--red);transform:rotate(-2deg)}
 
-/* ---------- live demo ---------- */
-.demo{margin:-30px auto 0;max-width:900px;position:relative;z-index:2}
-.demo-shell{background:var(--bg2);border:1px solid var(--line2);border-radius:16px;overflow:hidden;
-  box-shadow:0 30px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(45,212,191,.04)}
-.demo-bar{display:flex;align-items:center;gap:8px;padding:13px 18px;border-bottom:1px solid var(--line);background:var(--bg3)}
-.tl{width:11px;height:11px;border-radius:50%;background:#2d3744}
-.tl:nth-child(1){background:#f87171aa}.tl:nth-child(2){background:#fbbf24aa}.tl:nth-child(3){background:#34d399aa}
-.demo-url{margin-left:12px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-.demo-url b{color:var(--muted);font-weight:500}
-.demo-body{display:grid;grid-template-columns:1fr 1fr;min-height:320px}
-@media(max-width:760px){.demo-body{grid-template-columns:1fr}}
-.demo-pane{padding:22px}
-.demo-pane+.demo-pane{border-left:1px solid var(--line)}
-@media(max-width:760px){.demo-pane+.demo-pane{border-left:none;border-top:1px solid var(--line)}}
-.pane-label{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.12em;margin-bottom:14px}
-.note-input{width:100%;min-height:120px;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--fg);
-  font-family:var(--mono);font-size:13px;line-height:1.7;padding:16px;resize:vertical;outline:none;transition:border .2s}
-.note-input:focus{border-color:rgba(45,212,191,.45)}
-.run-btn{margin-top:14px;width:100%;padding:12px;border:none;border-radius:9px;background:var(--teal);color:#04211c;
-  font-family:var(--sans);font-size:14px;font-weight:650;cursor:pointer;transition:.2s}
-.run-btn:hover{filter:brightness(1.08)}
-.run-btn:disabled{opacity:.55;cursor:wait}
-.chips{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
-.chip{font-family:var(--mono);font-size:10.5px;padding:5px 11px;border-radius:6px;border:1px solid var(--line2);
-  color:var(--muted);cursor:pointer;background:none;transition:.2s}
-.chip:hover{color:var(--teal);border-color:rgba(45,212,191,.4)}
-.out{font-family:var(--mono);font-size:12.5px;line-height:2}
-.ent-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 12px;border-radius:7px;background:var(--bg);border:1px solid var(--line);margin-bottom:7px}
-.ent-name{color:var(--fg);font-size:12.5px}
-.ent-code{font-size:11px;color:var(--teal);white-space:nowrap}
-.ent-code.uncoded{color:var(--amber)}
-.out-empty{color:var(--dim);text-align:center;padding-top:90px;font-size:12px}
-.fhir-note{margin-top:14px;padding-top:13px;border-top:1px dashed var(--line);font-family:var(--mono);font-size:11px;color:var(--dim)}
-.fhir-note a{color:var(--teal);text-decoration:none}
+/* ---- rx slip (hero art + demo shell) ---- */
+.rxslip{position:relative;background:#faf7ef;border:1px solid var(--ink);box-shadow:6px 6px 0 rgba(27,24,18,.16);transform:rotate(1.2deg);padding:26px 26px 20px 52px}
+.rxslip::before{content:"";position:absolute;top:0;bottom:0;left:36px;width:1px;background:var(--red);opacity:.55}
+.rxslip .rxglyph{position:absolute;left:-16px;top:-22px;font-family:var(--serif);font-style:italic;font-size:64px;color:var(--red);background:var(--paper);padding:0 6px;transform:rotate(-6deg);line-height:1}
+.slip-head{display:flex;justify-content:space-between;border-bottom:1.5px solid var(--ink);padding-bottom:10px;margin-bottom:16px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink3)}
+.slip-line{font-family:var(--hand);font-size:22px;line-height:2;color:#23201a}
+.slip-x{position:relative;display:inline-block}
+.slip-x.done::after{content:"";position:absolute;left:-2px;right:-2px;top:54%;height:1.6px;background:var(--red);transform:rotate(-1.5deg);animation:strike .45s ease forwards}
+@keyframes strike{from{width:0}to{width:100%}}
+.slip-code{font-family:var(--mono);font-size:11px;color:var(--green);margin-left:10px;letter-spacing:.03em;opacity:0;animation:fadein .4s .25s forwards}
+@keyframes fadein{to{opacity:1}}
+.stamp{position:absolute;right:14px;top:44%;transform:rotate(-11deg) scale(.6);opacity:0;border:3px double var(--red);color:var(--red);
+  font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.24em;padding:9px 16px;border-radius:4px;animation:stampin .4s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes stampin{to{opacity:.88;transform:rotate(-11deg) scale(1)}}
+.slip-foot{margin-top:18px;padding-top:12px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.1em}
+
+/* ---------- ticker ---------- */
+.ticker{overflow:hidden;border-bottom:1px solid var(--ink);background:var(--ink);color:var(--paper)}
+.ticker-track{display:flex;gap:0;white-space:nowrap;animation:tick 42s linear infinite;padding:11px 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em}
+.ticker-track:hover{animation-play-state:paused}
+.tk{display:inline-flex;align-items:center;gap:12px;padding:0 26px;border-right:1px solid rgba(243,238,227,.2)}
+.tk b{color:#e8b4a8;font-weight:400}
+.tk i{font-style:normal;color:#9fd6bf}
+@keyframes tick{to{transform:translateX(-50%)}}
 
 /* ---------- sections ---------- */
-section{padding:96px 0}
-.sec-head{text-align:center;margin-bottom:64px}
-.sec-tag{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--teal);margin-bottom:16px}
-h2{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4vw,44px);letter-spacing:-.015em;line-height:1.15}
-.sec-sub{color:var(--muted);max-width:560px;margin:16px auto 0;font-weight:350;font-size:16px}
+section{padding:92px 0}
+.sec-head{display:flex;align-items:baseline;gap:22px;margin-bottom:54px;border-bottom:1px solid var(--ink);padding-bottom:18px}
+.sec-no{font-family:var(--serif);font-style:italic;font-size:clamp(40px,4vw,56px);color:var(--red);line-height:1}
+h2{font-family:var(--serif);font-weight:420;font-size:clamp(28px,3.6vw,42px);letter-spacing:-.015em;line-height:1.12}
+.sec-side{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink3);text-align:right}
 
-/* pipeline */
-.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:step}
-@media(max-width:900px){.pipe{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.pipe{grid-template-columns:1fr}}
-.step{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:28px 24px;position:relative;transition:.25s;counter-increment:step}
-.step:hover{border-color:rgba(45,212,191,.35);transform:translateY(-3px)}
-.step::before{content:"0" counter(step);font-family:var(--mono);font-size:11px;color:var(--teal);letter-spacing:.1em}
-.step h3{font-size:16.5px;font-weight:550;margin:14px 0 9px}
-.step p{font-size:13.5px;color:var(--muted);font-weight:350;line-height:1.6}
+/* ledger pipeline */
+.ledger{border:1px solid var(--ink);background:#faf7ef;box-shadow:6px 6px 0 rgba(27,24,18,.12)}
+.row{display:grid;grid-template-columns:110px 250px 1fr;gap:24px;padding:26px 30px;border-bottom:1px solid var(--line);align-items:start;transition:background .2s}
+.row:last-child{border-bottom:none}
+.row:hover{background:var(--paper)}
+@media(max-width:860px){.row{grid-template-columns:70px 1fr}.row .row-desc{grid-column:2}}
+.row-no{font-family:var(--serif);font-style:italic;font-size:30px;color:var(--ink3)}
+.row h3{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.row p{font-size:14.5px;color:var(--ink2);font-weight:350;margin-top:6px;line-height:1.65}
+.row .tagchip{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--green);border:1px solid currentColor;padding:3px 9px;border-radius:2px}
 
-/* honesty / diff table */
-.diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:800px){.diff-grid{grid-template-columns:1fr}}
-.diff-col{border-radius:16px;padding:34px 30px;border:1px solid var(--line)}
-.diff-col.them{background:var(--bg2)}
-.diff-col.us{background:linear-gradient(160deg,rgba(45,212,191,.07),rgba(45,212,191,.02));border-color:rgba(45,212,191,.3)}
-.diff-col h3{font-family:var(--serif);font-size:21px;font-weight:500;margin-bottom:22px}
-.diff-col.us h3{color:var(--teal)}
-.diff-item{display:flex;gap:12px;padding:11px 0;font-size:14px;color:var(--muted);border-top:1px solid var(--line);line-height:1.55}
-.diff-item:last-child{border-bottom:1px solid var(--line)}
-.diff-item .ic{flex-shrink:0;font-family:var(--mono);font-size:13px}
-.them .ic{color:var(--red)}
-.us .ic{color:var(--teal)}
+/* honesty two-column */
+.refusal{display:grid;grid-template-columns:1fr 1fr;min-height:380px;border:1px solid var(--ink);box-shadow:6px 6px 0 rgba(27,24,18,.12)}
+@media(max-width:880px){.refusal{grid-template-columns:1fr}}
+.rf-col{padding:40px 38px}
+.rf-col.left{background:var(--ink);color:var(--paper)}
+.rf-col.right{background:#faf7ef}
+.rf-col h3{font-family:var(--serif);font-size:24px;font-weight:450;margin-bottom:8px}
+.rf-col .rf-sub{font-family:var(--hand);font-size:20px;opacity:.75;margin-bottom:26px}
+.rf-item{display:flex;gap:14px;padding:13px 0;border-top:1px solid rgba(127,117,101,.25);font-size:14.5px;line-height:1.55;font-weight:350}
+.rf-item .mk{font-family:var(--mono);font-weight:700;flex-shrink:0}
+.left .mk{color:#e8a08e}.right .mk{color:var(--green)}
 
-/* metrics band */
-.band{border-block:1px solid var(--line);background:var(--bg2);padding:64px 0}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
-@media(max-width:700px){.metrics{grid-template-columns:repeat(2,1fr)}}
-.metric b{display:block;font-family:var(--serif);font-size:clamp(30px,4vw,42px);font-weight:500;color:var(--teal);letter-spacing:-.02em}
-.metric span{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.08em}
+/* metrics */
+.band{background:var(--paper2);border-block:1px solid var(--ink);padding:58px 0}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+@media(max-width:720px){.metrics{grid-template-columns:repeat(2,1fr)}}
+.metric{text-align:center;border-left:1px solid var(--line)}
+.metric:first-child{border-left:none}
+@media(max-width:720px){.metric:nth-child(3){border-left:none}}
+.metric b{display:block;font-family:var(--serif);font-weight:480;font-size:clamp(34px,4.4vw,52px);line-height:1.05;letter-spacing:-.02em}
+.metric b sub{font-size:.4em;color:var(--red)}
+.metric span{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ink3)}
+.metric small{display:block;font-family:var(--hand);font-size:17px;color:var(--ink3);margin-top:4px}
 
-/* code section */
-.code-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
-@media(max-width:860px){.code-cols{grid-template-columns:1fr}}
-.code-block{background:#070a0f;border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.code-head{display:flex;justify-content:space-between;padding:11px 18px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--dim)}
-.code-block pre{padding:20px;font-family:var(--mono);font-size:12.5px;line-height:1.85;color:#a8b6c8;overflow-x:auto}
-.tk-kw{color:#7dd3fc}.tk-str{color:#86efac}.tk-cm{color:#4b5b6e}.tk-fn{color:#c4b5fd}.tk-num{color:#fbbf24}
+/* demo section */
+.demo-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:44px;align-items:start}
+@media(max-width:920px){.demo-grid{grid-template-columns:1fr}}
+.demo-note{font-size:15px;color:var(--ink2);font-weight:350;margin-bottom:22px;max-width:440px}
+.demo-note b{font-weight:550;color:var(--ink)}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.chip{font-family:var(--hand);font-size:18px;background:none;border:1px dashed var(--ink3);color:var(--ink2);padding:6px 14px;border-radius:3px;cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--red);color:var(--red);transform:rotate(-1deg)}
+.runbtn{margin-top:20px;width:100%;font-family:var(--mono);font-size:13px;letter-spacing:.06em;font-weight:700;padding:16px;background:var(--red);color:#fdf9f0;border:none;border-radius:3px;cursor:pointer;transition:.18s;box-shadow:3px 3px 0 rgba(27,24,18,.35)}
+.runbtn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 rgba(27,24,18,.35)}
+.runbtn:active{transform:translate(2px,2px);box-shadow:0 0 0}
+.runbtn:disabled{opacity:.6;cursor:wait}
+#rx-input{width:100%;min-height:150px;background:#faf7ef;border:1px solid var(--ink);border-radius:2px;padding:16px 16px 16px 46px;
+  font-family:var(--hand);font-size:21px;line-height:1.85;color:#23201a;resize:vertical;outline:none;position:relative;box-shadow:4px 4px 0 rgba(27,24,18,.12);
+  background-image:repeating-linear-gradient(transparent,transparent 37px,rgba(27,24,18,.09) 38px)}
+.rx-wrap{position:relative}
+.rx-wrap::before{content:"℞";position:absolute;left:10px;top:12px;font-family:var(--serif);font-style:italic;font-size:26px;color:var(--red)}
+.out-slip{min-height:320px;position:relative}
+.out-empty{color:var(--ink3);font-family:var(--hand);font-size:21px;text-align:center;padding-top:120px}
+.ent-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 4px;border-bottom:1px solid var(--line-soft);animation:slideup .35s both}
+@keyframes slideup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ent-kind{font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--ink3);display:block}
+.ent-name{font-family:var(--serif);font-size:17px;font-weight:480}
+.ent-code{font-family:var(--mono);font-size:11.5px;color:var(--green);white-space:nowrap}
+.ent-code.uncoded{color:var(--red)}
+.out-meta{margin-top:16px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink3);display:flex;justify-content:space-between}
 
 /* pricing */
-.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
 @media(max-width:860px){.plans{grid-template-columns:1fr}}
-.plan{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:36px 30px;display:flex;flex-direction:column;transition:.25s}
-.plan:hover{transform:translateY(-3px)}
-.plan.hot{border-color:rgba(45,212,191,.45);background:linear-gradient(170deg,rgba(45,212,191,.06),transparent 50%);position:relative}
-.plan.hot::before{content:"MOST POPULAR";position:absolute;top:-11px;left:50%;transform:translateX(-50%);
-  font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#04211c;background:var(--teal);padding:4px 14px;border-radius:99px;font-weight:600}
-.plan h3{font-size:16px;font-weight:550;color:var(--muted)}
-.price{font-family:var(--serif);font-size:40px;font-weight:500;margin:14px 0 4px}
-.price small{font-size:14px;color:var(--dim);font-family:var(--sans)}
-.plan-desc{font-size:13.5px;color:var(--dim);margin-bottom:24px;font-weight:350}
-.plan ul{list-style:none;margin-bottom:30px;flex:1}
-.plan li{font-size:14px;color:var(--muted);padding:7px 0;display:flex;gap:10px}
-.plan li::before{content:"→";color:var(--teal);font-family:var(--mono)}
+.plan{border:1.5px solid var(--ink);background:#faf7ef;padding:34px 30px;position:relative;box-shadow:5px 5px 0 rgba(27,24,18,.12);display:flex;flex-direction:column;transition:.18s}
+.plan:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 rgba(27,24,18,.18)}
+.plan.hot{background:var(--ink);color:var(--paper)}
+.plan.hot .plan-desc,.plan.hot li{color:#bdb5a4}
+.plan.hot .price small{color:#8d8676}
+.plan-flag{position:absolute;top:-13px;right:18px;background:var(--red);color:#fdf9f0;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;padding:5px 12px;transform:rotate(2deg)}
+.plan h3{font-family:var(--mono);font-size:12px;letter-spacing:.18em;font-weight:500;color:var(--ink3)}
+.price{font-family:var(--serif);font-size:44px;font-weight:430;margin:14px 0 2px;letter-spacing:-.02em}
+.price small{font-size:14px;color:var(--ink3);font-family:var(--sans)}
+.plan-desc{font-size:13.5px;font-weight:350;margin-bottom:22px}
+.plan ul{list-style:none;margin-bottom:28px;flex:1}
+.plan li{font-size:14px;padding:7px 0;display:flex;gap:10px;color:var(--ink2);font-weight:350;border-top:1px dashed var(--line)}
+.plan li::before{content:"·";color:var(--red);font-weight:900;font-size:20px;line-height:.8}
 .plan .btn{justify-content:center}
-.plan-hot-btn{background:var(--teal);color:#04211c;font-weight:650}
-.plan-hot-btn:hover{box-shadow:0 8px 30px rgba(45,212,191,.25)}
-.plan-ghost-btn{border:1px solid var(--line2);color:var(--fg)}
-.plan-ghost-btn:hover{border-color:var(--muted)}
+.hot .btn{background:var(--red);border-color:var(--red);color:#fdf9f0}
+.hot .btn:hover{filter:brightness(1.12)}
 
-/* cta + footer */
-.final-cta{text-align:center;padding:120px 0}
-.final-cta h2{margin-bottom:18px}
-.final-cta p{color:var(--muted);margin-bottom:38px;font-weight:350}
-footer{border-top:1px solid var(--line);padding:44px 0;color:var(--dim);font-size:13px}
-.foot-in{max-width:1120px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:18px;align-items:center}
-.foot-links{display:flex;gap:24px}
-.foot-links a{color:var(--dim);text-decoration:none;transition:.2s}
-.foot-links a:hover{color:var(--muted)}
-.disclaimer{max-width:1120px;margin:26px auto 0;padding:0 24px;font-size:11.5px;color:#48535f;line-height:1.6}
+/* final cta + footer */
+.final{background:var(--ink);color:var(--paper);text-align:center;padding:120px 0}
+.final h2{font-size:clamp(32px,4.6vw,54px);margin-bottom:20px}
+.final h2 em{color:#e8a08e}
+.final p{color:#a49c8b;margin-bottom:40px;font-weight:350}
+.final .btn-solid{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.final .btn-solid:hover{background:var(--red);color:#fdf9f0;border-color:var(--red)}
+footer{padding:44px 0 30px}
+.foot-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.foot-links{display:flex;gap:26px;font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+.foot-links a{color:var(--ink3);text-decoration:none}
+.foot-links a:hover{color:var(--red)}
+.fineprint{padding-top:20px;font-family:var(--mono);font-size:10px;color:var(--ink3);line-height:1.8;letter-spacing:.03em;opacity:.75}
 
-/* reveal anim */
-.rv{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+/* reveal */
+.rv{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease}
 .rv.on{opacity:1;transform:none}
 </style>
 </head>
 <body>
 
-<nav id="nav">
-  <div class="nav-in">
-    <a class="logo" href="#">SIC<b>CE</b></a>
-    <div class="nav-links">
-      <a href="#pipeline">How it works</a>
-      <a href="#difference">Why different</a>
-      <a href="#pricing">Pricing</a>
-      <a href="/workbench.html">Workbench</a>
-      <a class="btn-nav" href="#pricing">Get API key</a>
+<div class="toprule">
+  <div class="top-in">
+    <a class="brand" href="#">SICCE<span>.</span></a>
+    <div class="top-right">
+      <span class="live-dot"><i></i>ENGINE LIVE</span>
+      <a href="#pipeline">PIPELINE</a>
+      <a href="#pricing">TARIFF</a>
+      <a href="/workbench.html">WORKBENCH</a>
+      <a class="keybtn" href="#pricing">GET SANDBOX KEY</a>
     </div>
   </div>
-</nav>
+</div>
 
+<!-- ============ HERO ============ -->
 <header class="hero">
-  <div class="hero-grid"></div>
-  <div class="wrap" style="position:relative">
-    <div class="kicker"><span class="dot"></span>LIVE · ABDM FHIR R4 · SNOMED CT · NHCX-READY</div>
-    <h1>Messy Indian prescriptions,<br><em>coded</em> in one call.</h1>
-    <p class="sub">SICCE turns Hinglish clinical notes into <b>ABDM-compliant FHIR R4 bundles</b> with verified SNOMED CT codes — <b>measured accuracy, zero fabricated data.</b></p>
-    <div class="hero-cta">
-      <a class="btn btn-primary" href="#demo">Try the live parser ↓</a>
-      <a class="btn btn-ghost" href="#pricing">Get a sandbox key</a>
+  <div class="wrap hero-in">
+    <div>
+      <div class="vol">VOL. I — CLINICAL CODING INFRASTRUCTURE FOR INDIA</div>
+      <h1>The prescription is written in <em>chaos.</h1>
+      <p class="hero-sub">SICCE reads what Indian clinics actually write — <b>Hinglish, abbreviations, brand names</b> — and returns <b>ABDM-compliant FHIR R4 bundles</b> with verified SNOMED CT codes.</p>
+      <p class="hero-sub" style="margin-top:-18px"><b>We never invent a code.</b> If we can't resolve a term, we say so — and log it for review. That's the whole company.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-solid" href="#demo">PARSE A REAL NOTE ↓</a>
+        <a class="btn btn-line" href="#pricing">GET A SANDBOX KEY</a>
+      </div>
+      <div class="hand-note">no signup needed for the demo — it's live, right there →</div>
     </div>
-    <div class="hero-proof">NO MOCK DEMOS — THE PARSER BELOW HITS OUR <span>PRODUCTION ENDPOINT</span></div>
+
+    <div class="rxslip rv on" id="heroslip">
+      <div class="rxglyph">℞</div>
+      <div class="slip-head"><span>OPD SLIP · UNSTRUCTURED INPUT</span><span>PT. ANON</span></div>
+      <div class="slip-line">
+        <span class="slip-x" data-code="SNOMED 25064002">sar dard x 2 days,</span><br>
+        <span class="slip-x" data-code="SNOMED 386661006">bukhar bhi hai.</span><br>
+        <span class="slip-x" data-code="SNOMED 387517004">Tab Dolo 650mg BD</span><br>
+        <span class="slip-x" data-code="PARACETAMOL ✓">—</span>
+      </div>
+      <div class="stamp" id="stamp">CODED&nbsp;✓</div>
+      <div class="slip-foot"><span>SICCE ENGINE v2.0</span><span>FHIR R4 OUT</span></div>
+    </div>
   </div>
 </header>
 
-<div class="wrap demo rv" id="demo">
-  <div class="demo-shell">
-    <div class="demo-bar">
-      <span class="tl"></span><span class="tl"></span><span class="tl"></span>
-      <span class="demo-url">POST <b>snomed-ct-parser-1.onrender.com/api/v1/parse</b></span>
-    </div>
-    <div class="demo-body">
-      <div class="demo-pane">
-        <div class="pane-label">CLINICAL NOTE (HINGLISH OK)</div>
-        <textarea id="note" class="note-input" spellcheck="false">Pt c/o sar dard aur bukhar x 2 days.
-Khansi bhi hai.
-Tab Dolo 650mg BD
-Tab Pantocid 40 OD</textarea>
-        <button id="run" class="run-btn">Parse → coded FHIR bundle</button>
-        <div class="chips">
-          <button class="chip" data-t="Pt c/o pet dard aur ulti. Tab Cyclopam TDS x 2 days">Acidity case</button>
-          <button class="chip" data-t="Bukhar, badan dard, chakkar since 3 din. Dx viral syndrome. Tab Calpol 650 SOS">Fever case</button>
-          <button class="chip" data-t="Saans phoolna on exertion, khaansi with balgam. Inhaler Asthalin HFA 2 puffs SOS">Chest case</button>
-        </div>
-      </div>
-      <div class="demo-pane">
-        <div class="pane-label">RESOLVED SNOMED CT ENTITIES</div>
-        <div id="out" class="out"><div class="out-empty">← write or pick a note, then parse</div></div>
-        <div class="fhir-note" id="fnote" style="display:none">Full NRCeS-profiled <a>FHIR R4 Bundle</a> returned in the response body.</div>
-      </div>
-    </div>
-  </div>
+<!-- ============ TICKER ============ -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="ticker"></div>
 </div>
 
+<!-- ============ PIPELINE ============ -->
 <section id="pipeline">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="sec-tag">THE PIPELINE</div>
-      <h2>Four stages between chaos<br>and compliance.</h2>
-      <p class="sec-sub">Every stage is inspectable. Every failure is explicit. Nothing is invented.</p>
+      <div class="sec-no">i.</div>
+      <h2>Chaos in.<br>Compliance out.</h2>
+      <div class="sec-side">FOUR STAGES<br>EVERY ONE INSPECTABLE</div>
     </div>
-    <div class="pipe">
-      <div class="step rv"><h3>Ingest & sanitize</h3><p>Hinglish text, OCR'd prescriptions, EMR notes. PHI is de-identified upstream of every external call.</p></div>
-      <div class="step rv"><h3>Extract entities</h3><p>Symptoms, diagnoses, medications, doses, frequencies — including Indian abbreviations like APD+, BD, SOS.</p></div>
-      <div class="step rv"><h3>Resolve terminology</h3><p>FTS5 fast-path across SNOMED concepts and Indian brands. Unresolved terms are logged honestly — never guessed.</p></div>
-      <div class="step rv"><h3>Emit compliant output</h3><p>NRCeS-profiled FHIR R4 bundle, CDSS safety flags, NHCX-shaped claim payload. Ready for ABDM pipelines.</p></div>
+    <div class="ledger rv">
+      <div class="row"><div class="row-no">01</div><div><h3>Ingest &amp; sanitize</h3></div><div class="row-desc"><p>Hinglish text, photographed prescriptions, EMR notes. Patient identifiers are stripped before anything leaves the building — PHI never reaches an external API raw.</p><span class="tagchip">PHI-SAFE UPSTREAM</span></div></div>
+      <div class="row"><div class="row-no">02</div><div><h3>Extract entities</h3></div><div class="row-desc"><p>Symptoms, diagnoses, medications, doses, frequencies — including the abbreviations Indian doctors actually write: APD+, BD, SOS, SOBOE, c/o.</p><span class="tagchip">HINGLISH-NATIVE</span></div></div>
+      <div class="row"><div class="row-no">03</div><div><h3>Resolve terminology</h3></div><div class="row-desc"><p>A fast-path FTS5 matcher across SNOMED concepts and 138 mapped Indian brands. Unresolved terms are logged honestly for dictionary review — never guessed, never invented.</p><span class="tagchip">ZERO FABRICATION</span></div></div>
+      <div class="row"><div class="row-no">04</div><div><h3>Emit compliant output</h3></div><div class="row-desc"><p>NRCeS-profiled FHIR R4 bundle, CDSS drug-safety flags, NHCX-shaped claim payload. Drop it straight into your ABDM pipeline.</p><span class="tagchip">ABDM · NHCX READY</span></div></div>
     </div>
   </div>
 </section>
 
-<section id="difference" style="padding-top:0">
+<!-- ============ HONESTY ============ -->
+<section style="padding-top:0">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="sec-tag">WHY WE'RE DIFFERENT</div>
-      <h2>Built by a physician who<br>refuses to fake data.</h2>
+      <div class="sec-no">ii.</div>
+      <h2>Built by a physician<br>who refuses to fake data.</h2>
+      <div class="sec-side">THE DIFFERENCE IS<br>WHAT WE WON'T DO</div>
     </div>
-    <div class="diff-grid">
-      <div class="diff-col them rv">
-        <h3>Typical "medical AI"</h3>
-        <div class="diff-item"><span class="ic">✕</span>Invents plausible-sounding codes when unsure</div>
-        <div class="diff-item"><span class="ic">✕</span>Demos on cherry-picked inputs</div>
-        <div class="diff-item"><span class="ic">✕</span>"Accuracy" claims nobody can audit</div>
-        <div class="diff-item"><span class="ic">✕</span>Clinical text goes to opaque cloud LLMs raw</div>
-        <div class="diff-item"><span class="ic">✕</span>Cloud-only, no control over PHI</div>
+    <div class="refusal rv">
+      <div class="rf-col left">
+        <h3>Every other "medical AI"</h3>
+        <div class="rf-sub">the halluzination economy ↓</div>
+        <div class="rf-item"><span class="mk">✕</span>Invents plausible-looking codes when unsure — silently</div>
+        <div class="rf-item"><span class="mk">✕</span>Demos on cherry-picked inputs behind a fake playground</div>
+        <div class="rf-item"><span class="mk">✕</span>Claims accuracy nobody can audit</div>
+        <div class="rf-item"><span class="mk">✕</span>Ships raw patient text to opaque cloud LLMs</div>
+        <div class="rf-item"><span class="mk">✕</span>Cloud-only. Your PHI, their terms</div>
       </div>
-      <div class="diff-col us rv">
-        <h3>SICCE</h3>
-        <div class="diff-item"><span class="ic">✓</span>Returns "uncoded" + logs the gap for dictionary review</div>
-        <div class="diff-item"><span class="ic">✓</span>The demo above hits our real production endpoint</div>
-        <div class="diff-item"><span class="ic">✓</span>/health publishes terminology readiness publicly</div>
-        <div class="diff-item"><span class="ic">✓</span>PHI sanitizer runs before any LLM ever sees text</div>
-        <div class="diff-item"><span class="ic">✓</span>Same Docker image runs air-gapped on-prem</div>
+      <div class="rf-col right">
+        <h3 style="color:var(--green)">SICCE</h3>
+        <div class="rf-sub" style="color:var(--ink3)">the honest engine ↓</div>
+        <div class="rf-item"><span class="mk">✓</span>Returns "UNCODED" and logs the gap — a human reviews it later</div>
+        <div class="rf-item"><span class="mk">✓</span>The demo below hits our real production endpoint. Right now.</div>
+        <div class="rf-item"><span class="mk">✓</span>/health publishes terminology readiness publicly, warts included</div>
+        <div class="rf-item"><span class="mk">✓</span>Sanitizer runs before any LLM ever sees a word</div>
+        <div class="rf-item"><span class="mk">✓</span>Same Docker image runs air-gapped inside your hospital</div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ============ METRICS ============ -->
 <div class="band">
   <div class="metrics wrap">
-    <div class="metric rv"><b>&lt;50ms</b><span>TERMINOLOGY LOOKUPS</span></div>
-    <div class="metric rv"><b>138</b><span>INDIAN BRANDS MAPPED</span></div>
-    <div class="metric rv"><b>40/40</b><span>TESTS PASSING, CI-GATED</span></div>
-    <div class="metric rv"><b>~1.7s</b><span>FULL PARSE, LIVE TODAY</span></div>
+    <div class="metric rv"><b>&lt;50<sub>ms</sub></b><span>TERMINOLOGY LOOKUP</span><small>local FTS5, no round-trips</small></div>
+    <div class="metric rv"><b>138</b><span>INDIAN BRANDS MAPPED</span><small>dolo se telma tak</small></div>
+    <div class="metric rv"><b>40/40</b><span>TESTS GREEN, CI-GATED</span><small>we commit nothing red</small></div>
+    <div class="metric rv"><b>~1.7<sub>s</sub></b><span>FULL PARSE, LIVE NOW</span><small>measured today, not promised</small></div>
   </div>
 </div>
 
-<section id="developers">
+<!-- ============ DEMO ============ -->
+<section id="demo">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="sec-tag">FOR ENGINEERS</div>
-      <h2>One endpoint.<br>An afternoon to integrate.</h2>
+      <div class="sec-no">iii.</div>
+      <h2>Don't take our word.<br>Take the engine's.</h2>
+      <div class="sec-side">LIVE PRODUCTION ENDPOINT<br>NO SIGNUP · NO MOCK DATA</div>
     </div>
-    <div class="code-cols">
-      <div class="code-block rv">
-        <div class="code-head"><span>request.py</span><span>python · httpx</span></div>
-<pre><span class="tk-kw">import</span> httpx
-
-res = httpx.post(
-    <span class="tk-str">"https://snomed-ct-parser-1.onrender.com/api/v1/parse"</span>,
-    headers={<span class="tk-str">"X-API-KEY"</span>: <span class="tk-str">"&lt;your-key&gt;"</span>},
-    json={<span class="tk-str">"text"</span>: <span class="tk-str">"sar dard, bukhar. Dolo 650 BD"</span>},
-)
-bundle = res.json()  <span class="tk-cm"># FHIR R4, done.</span></pre>
+    <div class="demo-grid">
+      <div class="rv">
+        <p class="demo-note"><b>Write like a doctor writes.</b> Hinglish, shorthand, brand names — whatever lands in a real OPD slip. The parser runs on production, same engine paying customers call.</p>
+        <div class="rx-wrap">
+          <textarea id="rx-input" spellcheck="false">Pt c/o sar dard aur bukhar x 2 days.
+Khansi bhi hai.
+Tab Dolo 650mg BD
+Tab Pantocid 40 OD</textarea>
+        </div>
+        <button class="runbtn" id="run">PARSE ℞ → RETURN CODED FHIR BUNDLE</button>
+        <div class="chips">
+          <button class="chip" data-t="Pet dard aur ulti ho rahi hai. Tab Cyclopam TDS x 2 din">acidity case…</button>
+          <button class="chip" data-t="Bukhar badan dard chakkar since 3 din. Viral syndrome. Tab Calpol 650 SOS">fever case…</button>
+          <button class="chip" data-t="Saans phoolna on exertion, khaansi with balgam. Asthalin HFA 2 puffs SOS">chest case…</button>
+        </div>
       </div>
-      <div class="code-block rv">
-        <div class="code-head"><span>response.excerpt.json</span><span>application/fhir+json</span></div>
-<pre>{
-  <span class="tk-fn">"resourceType"</span>: <span class="tk-str">"Bundle"</span>,
-  <span class="tk-fn">"entry"</span>: [{
-    <span class="tk-fn">"code"</span>: {<span class="tk-fn">"coding"</span>: [{
-      <span class="tk-fn">"system"</span>: <span class="tk-str">"http://snomed.info/sct"</span>,
-      <span class="tk-fn">"code"</span>: <span class="tk-num">"25064002"</span>,
-      <span class="tk-fn">"display"</span>: <span class="tk-str">"Headache"</span>
-    }]}
-  }]
-}</pre>
+      <div class="rv">
+        <div class="rxslip out-slip" style="transform:rotate(-.8deg)">
+          <div class="rxglyph">℞</div>
+          <div class="slip-head"><span>SICCE OUTPUT · RESOLVED ENTITIES</span><span id="out-time"></span></div>
+          <div id="out"><div class="out-empty">parse a note → codes appear here</div></div>
+          <div class="slip-foot"><span id="out-count"></span><span>NRCeS FHIR R4 PROFILE</span></div>
+        </div>
+        <p style="font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:16px;letter-spacing:.06em;line-height:1.9">
+          FREE TIER: 100 CALLS/DAY · WATERMARKED OUTPUT · YOUR TEXT IS SANITIZED BEFORE PROCESSING AND NEVER STORED AS PHI
+        </p>
       </div>
     </div>
   </div>
 </section>
 
-<section id="pricing" style="padding-top:0">
+<!-- ============ PRICING ============ -->
+<section id="pricing" style="padding-top:20px">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="sec-tag">PRICING</div>
-      <h2>Start free. Scale when<br>your pilots convert.</h2>
+      <div class="sec-no">iv.</div>
+      <h2>Plain tariffs.<br>No sales call required.</h2>
+      <div class="sec-side">PUBLISHED PRICES ARE<br>A TRUST DECISION</div>
     </div>
     <div class="plans">
       <div class="plan rv">
-        <h3>Sandbox</h3>
-        <div class="price">₹0<small>/forever</small></div>
+        <h3>SANDBOX</h3>
+        <div class="price">₹0<small> /forever</small></div>
         <p class="plan-desc">Evaluate everything with a real key.</p>
         <ul>
-          <li>100 calls/day</li>
+          <li>100 calls per day</li>
           <li>Full documentation</li>
           <li>Watermarked output</li>
+          <li>No credit card. No call.</li>
         </ul>
-        <a class="btn plan-ghost-btn" href="mailto:sicce.health@gmail.com?subject=Sandbox%20key%20request">Request sandbox key</a>
+        <a class="btn btn-line" href="mailto:sicce.health@gmail.com?subject=Sandbox%20key%20request">REQUEST KEY</a>
       </div>
       <div class="plan hot rv">
-        <h3>Pilot Partnership</h3>
-        <div class="price">₹25k<small>/month</small></div>
+        <div class="plan-flag">MOST INTEGRATED</div>
+        <h3 style="color:#8d8676">PILOT PARTNERSHIP</h3>
+        <div class="price">₹25k<small> /month</small></div>
         <p class="plan-desc">For EMR/HIS vendors shipping to production.</p>
         <ul>
-          <li>25,000 calls/month</li>
-          <li>Custom brand dictionary</li>
+          <li>25,000 calls / month</li>
+          <li>Custom brand dictionary for your prescribers</li>
           <li>Direct founder support</li>
         </ul>
-        <a class="btn plan-hot-btn" href="mailto:sicce.health@gmail.com?subject=Pilot%20partnership">Start a pilot</a>
+        <a class="btn" href="mailto:sicce.health@gmail.com?subject=Pilot%20partnership">START A PILOT</a>
       </div>
       <div class="plan rv">
-        <h3>Production Scale</h3>
-        <div class="price">₹50k–1L<small>/month</small></div>
+        <h3>PRODUCTION SCALE</h3>
+        <div class="price">₹50k–1L<small> /month</small></div>
         <p class="plan-desc">Volume commitments with SLAs.</p>
         <ul>
-          <li>Unlimited volume tiers</li>
-          <li>99.9% uptime SLA</li>
-          <li>On-prem air-gapped option</li>
+          <li>Volume tiers, uptime SLA</li>
+          <li>Air-gapped on-prem option</li>
+          <li>NHCX claim pipeline support</li>
         </ul>
-        <a class="btn plan-ghost-btn" href="mailto:sicce.health@gmail.com?subject=Enterprise%20discussion">Talk to us</a>
+        <a class="btn btn-line" href="mailto:sicce.health@gmail.com?subject=Enterprise">TALK TO US</a>
       </div>
     </div>
   </div>
 </section>
 
-<section class="final-cta">
+<!-- ============ FINAL ============ -->
+<section class="final">
   <div class="wrap rv">
-    <h2>Your ABDM deadline isn't waiting.<br>Neither should your integration.</h2>
-    <p>Live in minutes. Honest about everything. Built for India's clinical reality.</p>
-    <a class="btn btn-primary" href="#demo">Parse your first note ↑</a>
+    <h2>Your ABDM deadline won't wait.<br><em>Your integration takes one afternoon.</em></h2>
+    <p>One endpoint. Honest failures. Built for how India actually prescribes.</p>
+    <a class="btn btn-solid" href="#demo">PARSE YOUR FIRST NOTE ↑</a>
   </div>
 </section>
 
 <footer>
-  <div class="foot-in">
-    <a class="logo" href="#">SIC<b>CE</b></a>
-    <div class="foot-links">
-      <a href="/privacy_policy.html">Privacy</a>
-      <a href="/terms_and_disclaimer.html">Terms</a>
-      <a href="/grievance_redressal.html">Grievance</a>
-      <a href="/workbench.html">Workbench</a>
+  <div class="wrap">
+    <div class="foot-top">
+      <a class="brand" href="#">SICCE<span>.</span></a>
+      <div class="foot-links">
+        <a href="/privacy_policy.html">PRIVACY</a>
+        <a href="/terms_and_disclaimer.html">TERMS</a>
+        <a href="/grievance_redressal.html">GRIEVANCE</a>
+        <a href="/workbench.html">WORKBENCH</a>
+      </div>
     </div>
+    <p class="fineprint">
+      SICCE IS NON-SAMD ADMINISTRATIVE CODING MIDDLEWARE. ALL OUTPUTS REQUIRE REVIEW BY A LICENSED MEDICAL PRACTITIONER BEFORE CLINICAL USE.
+      SNOMED CT USAGE LICENSED UNDER THE MOHFW / NRCES NATIONAL LICENSE, INDIA. MEASURED FIGURES ON THIS PAGE WERE VERIFIED 2026-08-26 — ASK US FOR THE RAW EVIDENCE ANYTIME.
+    </p>
   </div>
-  <p class="disclaimer">SICCE is non-SaMD administrative coding middleware. Outputs require review by a licensed medical practitioner before clinical use. SNOMED CT usage licensed under the MoHFW / NRCeS National License, India.</p>
 </footer>
 
 <script>
-// nav scroll state
-const nav=document.getElementById('nav');
-addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>10),{passive:true});
+// ---------- ticker ----------
+const pairs=[['sar dard','25064002'],['bukhar','386661006'],['khansi','49727002'],['ulti','249497008'],['pet kharab','736190009'],['chakkar aana','404640003'],['kamar dard','161891006'],['piliya','40570003'],['mirgi','84757009'],['damma','195967001'],['Dolo 650','PARACETAMOL'],['Montek LC','MONTELUKAST+LEVOCET'],['Pantocid 40','PANTOPRAZOLE']];
+const track=document.getElementById('ticker');
+let html='';
+for(let rep=0;rep<2;rep++) pairs.forEach(([hin,code])=>{html+=`<span class="tk"><b>${hin}</b> → <i>${code}</i></span>`});
+track.innerHTML=html;
 
-// reveal on scroll
+// ---------- hero slip animation ----------
+const slips=document.querySelectorAll('#heroslip .slip-x');
+slips.forEach((el,i)=>setTimeout(()=>{el.classList.add('done');const c=document.createElement('span');c.className='slip-code';c.textContent=el.dataset.code;if(el.dataset.code!=='—')el.appendChild(c)},900+i*750));
+setTimeout(()=>document.getElementById('stamp').style.animationPlayState='running',4200);
+
+// ---------- reveal ----------
 const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('on')),{threshold:.12});
 document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 
-// demo chips
-const note=document.getElementById('note');
-document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{note.value=c.dataset.t}));
+// ---------- demo chips ----------
+const rx=document.getElementById('rx-input');
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{rx.value=c.dataset.t}));
 
-// live parse
-const out=document.getElementById('out'), runBtn=document.getElementById('run'), fnote=document.getElementById('fnote');
-runBtn.addEventListener('click',async()=>{
-  const text=note.value.trim();
-  if(!text){out.innerHTML='<div class="out-empty">Type a note first</div>';return;}
-  runBtn.disabled=true;runBtn.textContent='Parsing against production…';
+// ---------- live parse ----------
+const out=document.getElementById('out'),run=document.getElementById('run');
+run.addEventListener('click',async()=>{
+  const text=rx.value.trim();
+  if(!text){out.innerHTML='<div class="out-empty">write something first, doctor ji</div>';return}
+  run.disabled=true;run.textContent='RUNNING PRODUCTION ENGINE…';
   const t0=performance.now();
   try{
     const r=await fetch('/api/demo-parse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
-    const dt=((performance.now()-t0)/1000).toFixed(1);
-    if(!r.ok) throw new Error(await r.text());
+    if(!r.ok){
+      const msg=r.status===429?'easy, doctor ji — rate limit is 6/min':(r.status>=500?'engine hiccup — nothing invented, try again':'check the input');
+      throw new Error(msg);
+    }
     const d=await r.json();
-    let rows='';
-    const seen=new Set();
+    const dt=((performance.now()-t0)/1000).toFixed(1);
+    let rows='',seen=new Set(),coded=0,total=0;
+    const kind={Observation:'FINDING',Condition:'DIAGNOSIS',MedicationRequest:'RX'};
     for(const e of d.entry||[]){
       const res=e.resource||{};
-      let label=null, code=null;
-      if(res.resourceType==='Observation'){label=res.code?.coding?.[0]?.display||res.code?.text;code=res.code?.coding?.[0]?.code;}
-      else if(res.resourceType==='Condition'){label=res.code?.coding?.[0]?.display||res.code?.text;code=res.code?.coding?.[0]?.code;}
-      else if(res.resourceType==='MedicationRequest'){
-        const m=res.medication?.concept||{};
-        label=m.coding?.[0]?.display||m.text;code=m.coding?.[0]?.code;
-      }
-      if(label&&!seen.has(label)){seen.add(label);
-        rows+=`<div class="ent-row"><span class="ent-name">${label}</span><span class="ent-code ${code?'':'uncoded'}">${code?`SNOMED ${code}`:'UNCODED'}</span></div>`;
-      }
+      if(!kind[res.resourceType])continue;
+      let label=null,code=null;
+      if(res.resourceType==='MedicationRequest'){const m=res.medication?.concept||{};label=m.coding?.[0]?.display||m.text;code=m.coding?.[0]?.code;}
+      else{label=res.code?.coding?.[0]?.display||res.code?.text;code=res.code?.coding?.[0]?.code;}
+      if(!label||seen.has(label))continue;
+      seen.add(label);total++;if(code)coded++;
+      rows+=`<div class="ent-row" style="animation-delay:${total*90}ms">
+        <span><span class="ent-kind">${kind[res.resourceType]}</span><span class="ent-name">${label}</span></span>
+        <span class="ent-code ${code?'':'uncoded'}">${code?'SNOMED '+code:'UNCODED — LOGGED'}</span></div>`;
     }
-    out.innerHTML=rows||'<div class="out-empty">No codable entities found — honestly empty.</div>';
-    fnote.style.display='block';
-    fnote.firstChild.textContent=`Full NRCeS-profiled FHIR R4 Bundle returned in ${dt}s — `;
+    document.getElementById('out-time').textContent=dt+'s';
+    document.getElementById('out-count').textContent=`${coded}/${total} CODED · ${new Date().toLocaleTimeString()}`;
+    out.innerHTML=rows||'<div class="out-empty">nothing codable found — honestly empty</div>';
   }catch(err){
-    out.innerHTML=`<div class="out-empty" style="color:var(--amber)">Sandbox waking up (free tier cold start) — try again in ~30s</div>`;
+    out.innerHTML=`<div class="out-empty">${err.message==='Failed to fetch'?'free-tier engine waking up… retry in 30s':err.message}</div>`;
   }finally{
-    runBtn.disabled=false;runBtn.textContent='Parse → coded FHIR bundle';
+    run.disabled=false;run.textContent='PARSE ℞ → RETURN CODED FHIR BUNDLE';
   }
 });
 </script>
