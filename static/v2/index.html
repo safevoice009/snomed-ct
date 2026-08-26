@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SICCE NADI — The pulse under the hospital</title>
+<meta name="description" content="Hinglish in. SNOMED CT out. ABDM-compliant FHIR R4. SICCE is the language vital-signs monitor for Indian healthcare.">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;450;500&family=IBM+Plex+Sans+Devanagari:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white:#F4F5F1; --panel:#E8EAE4; --ink:#15181B;
+  --glass:#0B100E; --glass2:#101713;
+  --green:#19E68C; --amber:#FFB000; --coral:#FF4B3E;
+  --mut:#5b6259; --hair:rgba(21,24,27,.12);
+  --sg:'Space Grotesk',sans-serif; --ps:'IBM Plex Sans','IBM Plex Sans Devanagari',sans-serif; --pm:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+body{background:var(--white);color:var(--ink);font-family:var(--ps);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:rgba(25,230,140,.3)}
+.mono{font-family:var(--pm)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+
+/* ===== top bar ===== */
+.top{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(244,245,241,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--hair)}
+.top-in{max-width:1180px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:28px}
+.logo{font-family:var(--pm);font-weight:500;font-size:14px;letter-spacing:.18em}
+.logo i{font-style:normal;color:#0a9e5c}
+.top-links{margin-left:auto;display:flex;gap:22px;font-family:var(--pm);font-size:11px;letter-spacing:.1em}
+.top-links a{color:var(--mut);text-decoration:none}
+.top-links a:hover{color:var(--ink)}
+.pulse-led{display:inline-flex;align-items:center;gap:7px;color:#0a9e5c;font-size:11px}
+.pulse-led b{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 72/60*1s infinite;animation-duration:.83s}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.82)}}
+
+/* ===== HERO : monitor glass ===== */
+.hero{padding:120px 0 80px;background:
+  radial-gradient(120% 90% at 50% 0%, #dfe3da 0%, var(--white) 60%)}
+.hero-grid{display:grid;grid-template-columns:1fr;gap:40px}
+.bezel{background:var(--glass);border-radius:18px;padding:14px;box-shadow:0 30px 80px rgba(21,24,27,.28), inset 0 0 0 1px rgba(255,255,255,.06);position:relative;overflow:hidden}
+.bezel-top{display:flex;align-items:center;gap:14px;padding:6px 12px 14px;font-family:var(--pm);font-size:10px;letter-spacing:.18em;color:#5f6f66}
+.led-row{display:flex;gap:6px}
+.led{width:7px;height:7px;border-radius:50%}
+.led.g{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse .83s infinite}
+.led.a{background:var(--amber)}.led.r{background:var(--coral);opacity:.35}
+.board{margin-left:auto;display:flex;gap:26px;color:#9fb3a8}
+.board b{display:block;color:#e6efe9;font-size:13px;font-weight:500;letter-spacing:.02em}
+.bezel-body{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.07)}
+@media(max-width:860px){.bezel-body{grid-template-columns:1fr}}
+.scan-col{background:var(--glass2);padding:26px 26px 20px;min-height:340px;display:flex;flex-direction:column}
+.col-label{font-family:var(--pm);font-size:10px;letter-spacing:.2em;color:#5f6f66;margin-bottom:16px}
+.stream{font-family:var(--pm);font-size:14px;line-height:2.15;color:#cfe3d7;flex:1;white-space:pre-wrap}
+.stream .phi{background:rgba(255,75,62,.16);color:#ff9d94;border-radius:3px;padding:0 4px;text-decoration:line-through;text-decoration-color:rgba(255,75,62,.7);text-decoration-thickness:1.5px}
+.caret{display:inline-block;width:8px;height:16px;background:var(--green);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.code-col{background:var(--glass2);padding:26px 26px 20px;min-height:340px}
+.fhir-out{font-family:var(--pm);font-size:12px;line-height:1.95;color:#9fb3a8}
+.fhir-out .k{color:#7ce8b8}.fik{color:#57856d}
+.fhir-out .v{color:#e6efe9}.fcode{color:var(--green);font-weight:500}
+.tracebar{height:44px;background:var(--glass);border-top:1px solid rgba(255,255,255,.06);position:relative}
+.tracebar svg{position:absolute;inset:0;width:100%;height:100%}
+.hero-copy{text-align:center;padding:64px 20px 8px}
+.kick{font-family:var(--pm);font-size:11px;letter-spacing:.26em;color:var(--mut);margin-bottom:22px}
+h1{font-family:var(--sg);font-weight:700;font-size:clamp(38px,6vw,74px);letter-spacing:-.03em;line-height:1.02}
+.deva{font-family:'IBM Plex Sans Devanagari',var(--ps);font-weight:450;font-size:clamp(17px,2.3vw,26px);color:var(--mut);margin-top:16px}
+.hero-sub{max-width:600px;margin:26px auto 34px;color:var(--mut);font-size:16.5px}
+.hero-sub b{color:var(--ink);font-weight:500}
+.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{font-family:var(--pm);font-size:12.5px;letter-spacing:.08em;padding:15px 28px;border-radius:6px;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:.18s;display:inline-block}
+.btn-g{background:var(--ink);color:#fff}
+.btn-g:hover{background:#000;transform:translateY(-2px)}
+.btn-o{border-color:var(--hair);color:var(--ink)}
+.btn-o:hover{border-color:var(--ink)}
+
+/* ===== JOURNEY (scrollytelling) ===== */
+#journey{height:700vh;position:relative;background:var(--glass)}
+.stage{position:sticky;top:0;height:100vh;overflow:hidden}
+.hud{position:absolute;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:18px;padding:18px 28px;font-family:var(--pm);font-size:11px;letter-spacing:.16em;color:#5f6f66;background:linear-gradient(rgba(11,16,14,.85),transparent)}
+.hud .stage-label{color:#cfe3d7}
+.hud-bar{flex:1;height:2px;background:rgba(255,255,255,.09);border-radius:2px;overflow:hidden}
+.hud-fill{height:100%;width:0%;background:var(--green)}
+.scene-layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:90px 24px 60px;opacity:0;visibility:hidden}
+html.js .scene-layer{opacity:0}
+.no-js-visible{opacity:1!important;visibility:visible!important;position:static!important;padding:70px 24px;min-height:auto}
+/* scene 0 */
+.note-card{width:min(430px,86vw);background:#faf7ef;color:#23201a;border-radius:4px;padding:30px 30px 26px 58px;transform:rotate(-3deg);
+  box-shadow:0 24px 70px rgba(0,0,0,.5);position:relative;font-family:'Segoe Script','Comic Sans MS',cursive}
+.note-card::before{content:"";position:absolute;top:0;bottom:0;left:42px;width:1.5px;background:#b23a26;opacity:.5}
+.note-rx{position:absolute;left:8px;top:14px;font-family:Georgia,serif;font-style:italic;font-size:38px;color:#b23a26}
+.note-line{font-size:19px;line-height:2.05;white-space:nowrap;overflow:hidden}
+.intake-slot{position:absolute;left:50%;bottom:-4vh;transform:translateX(-50%);width:min(520px,92vw);height:9vh;background:#000;border-radius:8px 8px 0 0;box-shadow:0 -8px 40px rgba(25,230,140,.12), inset 0 6px 18px rgba(0,0,0,.9)}
+.slot-light{position:absolute;top:0;left:10%;right:10%;height:2px;background:var(--green);opacity:.7;filter:blur(1px)}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:60}
+.scene-cap{position:absolute;bottom:7vh;left:0;right:0;text-align:center;font-family:var(--pm);font-size:12px;letter-spacing:.14em;color:#5f6f66}
+/* shared digitized note */
+.digi-note{width:min(480px,88vw);background:var(--glass2);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:26px 30px;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.digi-note h4{font-family:var(--pm);font-size:10px;letter-spacing:.22em;color:#5f6f66;margin-bottom:16px;font-weight:400}
+.tokline{font-family:var(--pm);font-size:14px;line-height:2.3;color:#cfe3d7;white-space:nowrap;overflow:hidden}
+.phi-chip{display:inline-block;background:rgba(255,181,0,.13);border:1px solid rgba(255,176,0,.4);color:var(--amber);border-radius:3px;padding:0 6px;margin-left:6px;font-size:11px}
+/* scene 2 tiles */
+.tiles{display:flex;flex-direction:column;gap:12px;width:min(480px,88vw)}
+.tilepair{display:flex;justify-content:space-between;perspective:800px}
+.tile{background:var(--glass2);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:13px 18px;font-family:var(--pm);font-size:13px;color:#cfe3d7;min-width:150px;text-align:center;backface-visibility:hidden}
+.tile.back{position:absolute;visibility:hidden}
+.tile.flipped{background:rgba(25,230,140,.08);border-color:rgba(25,230,140,.4)}
+.tile .fv{color:var(--green)}
+/* scene 3 */
+.resolve-wrap{width:min(560px,92vw);text-align:center}
+.cand-group{margin:18px 0;position:relative;padding:10px 0}
+.cands{display:inline-flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.cand{font-family:var(--pm);font-size:12.5px;color:#8ba397;border:1px dashed rgba(139,163,151,.4);padding:7px 14px;border-radius:99px;background:var(--glass2)}
+.winner{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.6);opacity:0;font-family:var(--pm);font-size:13px;color:var(--glass);background:var(--green);padding:8px 18px;border-radius:99px;font-weight:500;box-shadow:0 0 30px rgba(25,230,140,.4)}
+/* scene 4 json */
+.json-card{width:min(560px,92vw);background:var(--glass2);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:26px 28px;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.jline{font-family:var(--pm);font-size:12.5px;line-height:2;color:#9fb3a8;clip-path:inset(0 100% 0 0);white-space:nowrap;overflow:hidden}
+.jline .jk{color:#7ce8b8}.jline .jv{color:#e6efe9}.jline .jc{color:var(--green);font-weight:500}
+.ghost-note{position:absolute;right:6vw;bottom:12vh;width:180px;opacity:.16;transform:rotate(6deg);background:#faf7ef;color:#23201a;padding:16px 16px 12px 34px;border-radius:3px;font-family:'Segoe Script',cursive;font-size:11px;line-height:1.9}
+
+/* ===== light sections ===== */
+section.light{padding:100px 0}
+.sec-head{display:flex;align-items:baseline;gap:20px;border-bottom:1px solid var(--hair);padding-bottom:16px;margin-bottom:48px}
+.sec-no{font-family:var(--pm);font-size:11px;letter-spacing:.2em;color:var(--mut)}
+h2{font-family:var(--sg);font-weight:600;font-size:clamp(28px,3.8vw,46px);letter-spacing:-.025em;line-height:1.08}
+h2 .deva-inline{font-family:'IBM Plex Sans Devanagari';font-size:.5em;color:var(--mut);font-weight:450;display:block;margin-top:8px}
+.sec-side{margin-left:auto;font-family:var(--pm);font-size:10px;letter-spacing:.18em;color:var(--mut);text-align:right;line-height:2}
+
+/* live demo */
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+@media(max-width:860px){.demo-grid{grid-template-columns:1fr}}
+.demo-panel{background:var(--glass);border-radius:14px;padding:22px;box-shadow:0 20px 60px rgba(21,24,27,.18)}
+.demo-panel textarea{width:100%;min-height:170px;background:var(--glass2);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#cfe3d7;font-family:var(--pm);font-size:13.5px;line-height:2;padding:16px;resize:vertical;outline:none}
+.demo-panel textarea:focus{border-color:rgba(25,230,140,.5)}
+.demo-run{margin-top:14px;width:100%;background:var(--green);color:var(--glass);border:none;border-radius:7px;font-family:var(--pm);font-weight:500;font-size:13px;letter-spacing:.06em;padding:15px;cursor:pointer;transition:.15s}
+.demo-run:hover{filter:brightness(1.08)}
+.demo-run:disabled{opacity:.55;cursor:wait}
+.chiprow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.dchip{background:none;border:1px dashed rgba(255,255,255,.25);color:#8ba397;font-family:var(--pm);font-size:11px;padding:6px 12px;border-radius:99px;cursor:pointer}
+.dchip:hover{border-color:var(--green);color:var(--green)}
+.out-panel .col-label b{color:var(--green);font-weight:400}
+.ent{display:flex;justify-content:space-between;align-items:baseline;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.06);animation:ein .3s both}
+@keyframes ein{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.ent .ek{font-family:var(--pm);font-size:9px;letter-spacing:.2em;color:#5f6f66;display:block}
+.ent .en{font-family:var(--sg);font-size:16px;color:#e6efe9;font-weight:500}
+.ent .ecode{font-family:var(--pm);font-size:11px;color:var(--green)}
+.ent .ecode.bad{color:var(--amber)}
+.demo-foot{margin-top:14px;display:flex;justify-content:space-between;font-family:var(--pm);font-size:10px;letter-spacing:.14em;color:#5f6f66}
+
+/* honesty */
+.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:860px){.trust-grid{grid-template-columns:1fr}}
+.trust{background:var(--panel);border-radius:12px;padding:30px 26px}
+.trust h3{font-family:var(--sg);font-size:19px;font-weight:600;margin-bottom:10px}
+.trust p{font-size:14px;color:var(--mut)}
+.trust .tstat{font-family:var(--pm);font-size:11px;letter-spacing:.14em;color:#0a9e5c;margin-bottom:16px;display:block}
+.trust.warn .tstat{color:var(--amber)}
+
+/* metrics band */
+.band{background:var(--glass);padding:64px 0}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+@media(max-width:720px){.metrics{grid-template-columns:repeat(2,1fr)}}
+.metric{text-align:center}
+.metric b{display:block;font-family:var(--sg);font-weight:700;font-size:clamp(30px,4vw,46px);color:#e6efe9;letter-spacing:-.02em}
+.metric b sub{font-size:.45em;color:var(--green)}
+.metric span{font-family:var(--pm);font-size:10px;letter-spacing:.18em;color:#5f6f66}
+
+/* pricing */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:860px){.plans{grid-template-columns:1fr}}
+.plan{border:1px solid var(--hair);border-radius:14px;padding:34px 30px;background:#fff;display:flex;flex-direction:column;transition:.2s}
+.plan:hover{box-shadow:0 18px 50px rgba(21,24,27,.1)}
+.plan.hot{background:var(--glass);color:#e6efe9;border-color:transparent}
+.plan-flag{font-family:var(--pm);font-size:9.5px;letter-spacing:.22em;color:var(--glass);background:var(--green);display:inline-block;padding:5px 12px;border-radius:99px;margin-bottom:16px;font-weight:500}
+.plan h3{font-family:var(--pm);font-size:11px;letter-spacing:.22em;color:inherit;opacity:.6;font-weight:500}
+.price{font-family:var(--sg);font-weight:700;font-size:42px;margin:14px 0 4px;letter-spacing:-.02em}
+.price small{font-size:14px;font-family:var(--ps);opacity:.5;font-weight:400}
+.plan-desc{font-size:13.5px;opacity:.65;margin-bottom:22px}
+.plan ul{list-style:none;margin-bottom:28px;flex:1}
+.plan li{font-size:14px;padding:8px 0;border-top:1px dashed var(--hair);display:flex;gap:10px}
+.hot li{border-color:rgba(255,255,255,.1);opacity:.85}
+.plan li::before{content:"·";color:#0a9e5c;font-weight:900;font-size:20px;line-height:.9}
+.hot li::before{color:var(--green)}
+.plan .btn{text-align:center}
+.hot .btn{background:var(--green);color:var(--glass)}
+.hot .btn:hover{filter:brightness(1.1)}
+
+/* final */
+.final{text-align:center;padding:130px 0;background:linear-gradient(var(--white),#dfe3da)}
+.final h2{margin-bottom:18px}
+.final .deva{margin-bottom:36px}
+footer{background:var(--glass);color:#5f6f66;padding:40px 0}
+.foot-in{max-width:1180px;margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:18px;font-family:var(--pm);font-size:10.5px;letter-spacing:.1em}
+.foot-links{display:flex;gap:22px}
+.foot-links a{color:#5f6f66;text-decoration:none}
+.foot-links a:hover{color:#cfe3d7}
+.fineprint{max-width:1180px;margin:22px auto 0;padding:18px 28px 0;border-top:1px solid rgba(255,255,255,.06);font-family:var(--pm);font-size:9.5px;line-height:2;color:#41493f;letter-spacing:.04em}
+
+/* reveal */
+html.js .rv{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+html.js .rv.on{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  html.js .rv{opacity:1;transform:none;transition:none}
+  .pulse-led b,.led.g,.caret{animation:none}
+  #journey{height:auto}
+  .stage{position:static;height:auto}
+  .hud{display:none}
+  .scene-layer{position:static;opacity:1;visibility:visible;padding:40px 24px}
+  .jline{clip-path:none}
+  .flash,.intake-slot{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <span class="logo">SICCE<i>/NADI</i></span>
+    <span class="pulse-led"><b></b>ENGINE LIVE</span>
+    <nav class="top-links">
+      <a href="#demo">LIVE DEMO</a>
+      <a href="#trust">PROOF</a>
+      <a href="#pricing">TARIFF</a>
+      <a href="/workbench.html">WORKBENCH</a>
+    </nav>
+  </div>
+</div>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div class="bezel">
+      <div class="bezel-top">
+        <span>NADI&nbsp;v2.0</span>
+        <div class="led-row"><span class="led g"></span><span class="led a"></span><span class="led r"></span></div>
+        <div class="board">
+          <span>TESTS<b>40 / 40 ✓</b></span>
+          <span>BRANDS<b>138</b></span>
+          <span>PARSE<b>~1.7s</b></span>
+        </div>
+      </div>
+      <div class="bezel-body">
+        <div class="scan-col">
+          <div class="col-label">INPUT // WARD 4 BED 12 — DE-IDENTIFIED</div>
+          <div class="stream" id="stream"></div>
+        </div>
+        <div class="code-col">
+          <div class="col-label">OUTPUT // FHIR R4 BUNDLE — BUILDING</div>
+          <div class="fhir-out" id="fhirout"></div>
+        </div>
+      </div>
+      <div class="tracebar">
+        <svg viewBox="0 0 600 44" preserveAspectRatio="none" aria-hidden="true">
+          <path id="ecgpath" d="" fill="none" stroke="#19E68C" stroke-width="1.6" opacity=".85"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="hero-copy">
+      <div class="kick">CLINICAL LANGUAGE MONITOR · ABDM FHIR R4 · SNOMED CT · NHCX</div>
+      <h1>The hospital speaks.<br>SICCE translates.</h1>
+      <p class="deva">अस्पताल बोलता है। SICCE समझता है।</p>
+      <p class="hero-sub">One API between <b>how Indian doctors actually write</b> — Hinglish, abbreviations, brand names — and <b>machine-ready ABDM FHIR R4</b>. We never invent a code. Unresolved terms are logged, reviewed by humans, and added properly.</p>
+      <div class="cta-row">
+        <a class="btn btn-g" href="#journey">WATCH A NOTE TRAVEL ↓</a>
+        <a class="btn btn-o" href="#demo">SKIP TO LIVE ENGINE</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= JOURNEY ================= -->
+<section id="journey" aria-label="Journey of a prescription through the engine">
+  <div class="stage">
+    <div class="hud">
+      <span>SICCE/NADI</span>
+      <span class="stage-label" id="stagelabel">BOOT · AWAITING NOTE</span>
+      <div class="hud-bar"><div class="hud-fill" id="hudfill"></div></div>
+      <span id="hudpct">0%</span>
+    </div>
+
+    <!-- SCENE 0 -->
+    <div class="scene-layer" data-scene="0">
+      <div style="position:relative;width:100%;height:100%">
+        <div class="note-card" id="thenote">
+          <div class="note-rx">℞</div>
+          <div class="note-line">Mrs. Rao, 54y — DM f/u</div>
+          <div class="note-line">sugars high x 1 week,</div>
+          <div class="note-line">kamzor bhi lagti hai.</div>
+          <div class="note-line">Tab Metformin 500 BD</div>
+          <div class="note-line">continue, HbA1c karwa lo</div>
+        </div>
+        <div class="intake-slot"><div class="slot-light"></div></div>
+        <div class="scene-cap">EVERY NOTE BEGINS AS HANDWRITING</div>
+      </div>
+    </div>
+
+    <!-- SCENE 1 -->
+    <div class="scene-layer" data-scene="1">
+      <div class="digi-note">
+        <h4>STAGE 01 // SANITIZE — PHI SCRUB</h4>
+        <div class="tokline">&gt; patient: <span class="phispan">Mrs. Rao</span><span class="phi-chip" hidden>[NAME REMOVED]</span>, 54y</div>
+        <div class="tokline">&gt; context: <span class="phispan">DM follow-up</span><span class="phi-chip" hidden>[CONTEXT KEPT]</span></div>
+        <div class="tokline">&gt; complaint: sugars high × 1 week</div>
+        <div class="tokline">&gt; weakness — "kamzor"</div>
+        <div class="tokline">&gt; rx: Metformin 500mg <b style="color:var(--green)">BD</b></div>
+        <div class="tokline">&gt; advice: HbA1c</div>
+      </div>
+      <div class="scene-cap">PERSONAL IDENTIFIERS NEVER LEAVE THE BUILDING</div>
+    </div>
+
+    <!-- SCENE 2 -->
+    <div class="scene-layer" data-scene="2">
+      <div class="tiles">
+        <h4 style="font-family:var(--pm);font-size:10px;letter-spacing:.22em;color:#5f6f66;margin-bottom:6px">STAGE 02 // EXTRACTION — FIELD SCAN</h4>
+        <div class="tilepair"><div class="tile" data-f="drug">metformin</div><div class="tile" data-f="dose">500 mg</div></div>
+        <div class="tilepair"><div class="tile" data-f="freq">BD <span style="color:#5f6f66">(twice daily)</span></div><div class="tile" data-f="cond">"sugars high" → hyperglycaemia</div></div>
+        <div class="tilepair"><div class="tile" data-f="weak">"kamzor" → fatigue</div><div class="tile" data-f="adv">HbA1c → lab order</div></div>
+      </div>
+      <div class="scene-cap">ABBREVIATIONS ARE NOT NOISE. THEY ARE SIGNAL.</div>
+    </div>
+
+    <!-- SCENE 3 -->
+    <div class="scene-layer" data-scene="3">
+      <div class="resolve-wrap">
+        <h4 style="font-family:var(--pm);font-size:10px;letter-spacing:.22em;color:#5f6f66;margin-bottom:4px">STAGE 03 // RESOLUTION — CODE COLLAPSE</h4>
+        <div class="cand-group">
+          <div class="cands"><span class="cand">metformin HCl</span><span class="cand">GLUCOPHAGE®</span><span class="cand">Glycomet 500 SR</span></div>
+          <span class="winner" data-w>SNOMED 372574004 · Metformin</span>
+        </div>
+        <div class="cand-group">
+          <div class="cands"><span class="cand">hyperglycaemia NOS</span><span class="cand">T2DM uncontrolled?</span></div>
+          <span class="winner" data-w>SNOMED 719216001 · Hyperglycaemia</span>
+        </div>
+        <div class="cand-group">
+          <div class="cands"><span class="cand">asthenia</span><span class="cand">"kamzor" colloq.</span></div>
+          <span class="winner" data-w>SNOMED 84229001 · Fatigue</span>
+        </div>
+      </div>
+      <div class="scene-cap">AMBIGUITY IS RESOLVED BY RULES — OR MARKED FOR HUMAN REVIEW</div>
+    </div>
+
+    <!-- SCENE 4 -->
+    <div class="scene-layer" data-scene="4">
+      <div class="json-card">
+        <h4 style="font-family:var(--pm);font-size:10px;letter-spacing:.22em;color:#5f6f66;margin-bottom:14px;font-weight:400">STAGE 04 // OUTPUT — ABDM FHIR R4 BUNDLE ✓</h4>
+        <div class="jline">{ <span class="jk">"resourceType"</span>: <span class="jv">"Bundle"</span>,</div>
+        <div class="jline">&nbsp;&nbsp;<span class="jk">"meta"</span>: { profile: nrces.in/ndhm/fhir/r4 }</div>
+        <div class="jline">&nbsp;&nbsp;<span class="jk">"MedicationRequest"</span>: {</div>
+        <div class="jline">&nbsp;&nbsp;&nbsp;&nbsp;medication: <span class="jc">SNOMED 372574004</span> Metformin</div>
+        <div class="jline">&nbsp;&nbsp;&nbsp;&nbsp;dosage: 500mg · <span class="jc">BD</span> · after food</div>
+        <div class="jline">&nbsp;&nbsp;},</div>
+        <div class="jline">&nbsp;&nbsp;<span class="jk">"Condition"</span>: <span class="jc">SNOMED 719216001</span> Hyperglycaemia</div>
+        <div class="jline">&nbsp;&nbsp;<span class="jk">"cdss"</span>: { interactions: none · renal: ok }</div>
+        <div class="jline">} <span style="color:#5f6f66">// 1 note → 1 bundle → 3 coded concepts</span></div>
+      </div>
+      <div class="ghost-note" aria-hidden="true">℞ source<br>preserved<br>— Dr. R—</div>
+      <div class="scene-cap">READY FOR YOUR ABDM PIPELINE · NHCX CLAIM PAYLOAD INCLUDED</div>
+    </div>
+
+    <div class="flash" id="flash"></div>
+  </div>
+</section>
+
+<!-- ================= LIVE DEMO ================= -->
+<section class="light" id="demo">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-no">SEC.01 // LIVE</span>
+      <h2>The replay was cinema.<br>This is the real monitor.</h2>
+      <div class="sec-side">POST /api/demo-parse<br>PRODUCTION ENGINE · NO SIGNUP</div>
+    </div>
+    <div class="demo-grid rv">
+      <div class="demo-panel">
+        <div class="col-label" style="color:#5f6f66">YOUR NOTE — WRITE LIKE A DOCTOR WRITES</div>
+        <textarea id="rx-input" spellcheck="false">Pt c/o sar dard aur bukhar x 2 days.
+Khansi bhi hai.
+Tab Dolo 650mg BD
+Tab Pantocid 40 OD</textarea>
+        <button class="demo-run" id="run">RUN ON PRODUCTION →</button>
+        <div class="chiprow">
+          <button class="dchip" data-t="Pet dard aur ulti ho rahi hai. Tab Cyclopam TDS x 2 din">acidity case…</button>
+          <button class="dchip" data-t="Bukhar badan dard chakkar since 3 din. Viral syndrome. Tab Calpol 650 SOS">fever case…</button>
+          <button class="dchip" data-t="Saans phoolna on exertion, khaansi with balgam. Asthalin HFA 2 puffs SOS">chest case…</button>
+        </div>
+      </div>
+      <div class="demo-panel out-panel">
+        <div class="col-label" style="color:#5f6f66">RESOLVED ENTITIES — <b>LIVE</b></div>
+        <div id="out" class="fhir-out" style="min-height:220px;color:#9fb3a8;font-family:var(--pm);font-size:13px">awaiting input…</div>
+        <div class="demo-foot"><span id="ocount"></span><span id="otime"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TRUST ================= -->
+<section class="light" id="trust" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-no">SEC.02 // PROOF</span>
+      <h2>Trust is a telemetry page,<br>not a badge wall.</h2>
+      <div class="sec-side">EVERY NUMBER DATED<br>ASK FOR RAW EVIDENCE</div>
+    </div>
+    <div class="trust-grid">
+      <div class="trust rv">
+        <span class="tstat">VERIFIED 2026-08-26</span>
+        <h3>Honest failure modes</h3>
+        <p>Feed the engine garbage and it returns an empty bundle — never invented symptoms, never fabricated codes. Every unresolved term lands in a public review queue and becomes dictionary v-next.</p>
+      </div>
+      <div class="trust rv">
+        <span class="tstat">CI-GATED · MAIN BRANCH</span>
+        <h3>Nothing ships red</h3>
+        <p>40/40 tests pass on every push, including an 8-case medication-safety suite that specifically hunts wrong-drug fuzzy matches. Deploys are blocked until green.</p>
+      </div>
+      <div class="trust warn rv">
+        <span class="tstat">REPORTED PUBLICLY VIA /HEALTH</span>
+        <h3>We show our own gaps</h3>
+        <p>Today's bootstrap tier carries 127 curated concepts + 138 brand mappings. The full India Edition RF2 (~350k concepts) loader is built, rehearsed, and waiting on license paperwork. Our /health endpoint says all of this openly — because monitors that hide readings aren't monitors.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= METRICS ================= -->
+<div class="band">
+  <div class="metrics wrap">
+    <div class="metric rv"><b>&lt;50<sub>ms</sub></b><span>TERMINOLOGY LOOKUP</span></div>
+    <div class="metric rv"><b>138</b><span>BRAND MAPPINGS</span></div>
+    <div class="metric rv"><b>40/40</b><span>TESTS GREEN</span></div>
+    <div class="metric rv"><b>~1.7<sub>s</sub></b><span>FULL PARSE TODAY</span></div>
+  </div>
+</div>
+
+<!-- ================= PRICING ================= -->
+<section class="light" id="pricing">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-no">SEC.03 // TARIFF</span>
+      <h2>Published prices.<br>No discovery call theatre.</h2>
+      <div class="sec-side">SANDBOX FREE FOREVER<br>PILOTS IN ₹, NOT "% SAVINGS"</div>
+    </div>
+    <div class="plans">
+      <div class="plan rv">
+        <h3>SANDBOX</h3>
+        <div class="price">₹0<small>/forever</small></div>
+        <p class="plan-desc">Evaluate on the real engine.</p>
+        <ul><li>100 calls/day</li><li>Full documentation</li><li>Watermarked output</li></ul>
+        <a class="btn btn-o" href="mailto:sicce.health@gmail.com?subject=Sandbox%20key">REQUEST KEY</a>
+      </div>
+      <div class="plan hot rv">
+        <span class="plan-flag">MOST INTEGRATED</span>
+        <h3>PILOT PARTNERSHIP</h3>
+        <div class="price">₹25k<small>/month</small></div>
+        <p class="plan-desc">EMR/HIS vendors shipping to production.</p>
+        <ul><li>25,000 calls/month</li><li>Custom brand dictionary</li><li>Direct founder support</li></ul>
+        <a class="btn" href="mailto:sicce.health@gmail.com?subject=Pilot%20partnership">START PILOT</a>
+      </div>
+      <div class="plan rv">
+        <h3>PRODUCTION SCALE</h3>
+        <div class="price">₹50k–1L<small>/month</small></div>
+        <p class="plan-desc">Volume with SLAs, air-gap optional.</p>
+        <ul><li>Uptime SLA tiers</li><li>On-prem Docker profile</li><li>NHCX pipeline support</li></ul>
+        <a class="btn btn-o" href="mailto:sicce.health@gmail.com?subject=Enterprise">TALK TO US</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap rv">
+    <h2>Wire the pulse into your product<br>this afternoon.</h2>
+    <p class="deva">एक API। हर नोट कोडेड।</p>
+    <a class="btn btn-g" href="#demo">RUN YOUR FIRST NOTE ↑</a>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-in">
+    <span class="logo" style="color:#e6efe9">SICCE<i>/NADI</i></span>
+    <div class="foot-links">
+      <a href="/privacy_policy.html">PRIVACY</a>
+      <a href="/terms_and_disclaimer.html">TERMS</a>
+      <a href="/grievance_redressal.html">GRIEVANCE</a>
+      <a href="/">V1 SITE</a>
+    </div>
+  </div>
+  <p class="fineprint">SICCE IS NON-SAMD ADMINISTRATIVE CODING MIDDLEWARE — ALL OUTPUTS REQUIRE REVIEW BY A LICENSED MEDICAL PRACTITIONER BEFORE CLINICAL USE. SNOMED CT USED UNDER THE MOHFW / NRCES NATIONAL LICENSE, INDIA. FIGURES VERIFIED 2026-08-26; RAW COMMAND EVIDENCE AVAILABLE ON REQUEST. THE INTRO TRACE IS A LABELED REPLAY — THE DEMO SECTION RUNS ON PRODUCTION.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+<script>
+(function(){
+"use strict";
+/* ---------------- hero: ecg trace ---------------- */
+var ecg=document.getElementById('ecgpath');
+if(ecg){var d='M0,22 ';for(var x=0;x<600;x+=60){d+='l'+(x===0?'':'')+'';} 
+// build a repeating beat waveform
+var seg='';function beat(ox){return 'M'+ox+',22 h14 l4,-3 l4,6 l5,-22 l5,30 l4,-11 h'+(600-32)+' ';}
+var paths='';for(var ox=0;ox<600;ox+=200){paths+=beat(ox);}
+// simpler: single continuous polyline
+var dd='M0,22';for(var cx=0;cx<600;cx+=200){dd+=' h70 l5,-4 l5,8 l6,-26 l6,34 l5,-12 h'+(200-97);}
+ecg.setAttribute('d',dd);}
+
+/* ---------------- hero: replay stream (LABELED as replay in footer) ---------------- */
+var streamEl=document.getElementById('stream');
+var fhirEl=document.getElementById('fhirout');
+// linear replay script: [lineText, firesOutputLine]
+var LINES=[
+ ['admit note · ward 4 · 12/08 — ',0],
+ ['patient ko 2 din se fever hai, ',0],
+ ['BP 150/90. sar dard bhi.\n',0],
+ ['rx: Tab Dolo 650mg BD\n',1],
+ ['     Tab Pantocid 40mg OD\n',1],
+ ['ph: [REDACTED] · mrn: [REDACTED]\n',2],
+ ['advice: CBC, dengue NS1\n',0],
+ ['follow-up: 5 din\n',0]
+];
+var OUT=[
+ '<span class="fik">&gt;</span> <span class="k">Observation</span>: <span class="v">Fever</span> <span class="fcode">SNOMED 386661006</span>\n',
+ '<span class="fik">&gt;</span> <span class="k">Observation</span>: <span class="v">Headache</span> <span class="fcode">SNOMED 25064002</span>\n',
+ '<span class="fik">&gt;</span> <span class="k">MedicationRequest</span>: <span class="v">Paracetamol</span> <span class="fcode">SNOMED 387517004</span> · BD\n',
+ '<span class="fik">&gt;</span> <span class="k">MedicationRequest</span>: <span class="v">Pantoprazole</span> <span class="fcode">SNOMED 387584000</span> · OD\n',
+ '<span class="fik">&gt;</span> <span class="k">cdss</span>: no interactions flagged ✓\n'
+];
+var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function typeReplay(){
+  if(!streamEl)return;
+  var li=0,ci=0,buf='',ob='',oi=0;
+  function tick(){
+    if(li>=LINES.length){
+      setTimeout(typeReplay,9000);return; // loop forever
+    }
+    var line=LINES[li][0],cls=LINES[li][1];
+    buf+=line.charAt(ci++);
+    streamEl.innerHTML=buf.replace(/\[REDACTED\]/g,'<span class="phi">[REDACTED]</span>')+'<span class="caret"></span>';
+    if(cls===1&&ci===line.length&&!LINES[li].done){LINES[li].done=true;if(OUT[oi])ob+=OUT[oi++];fhirEl.innerHTML=ob;}
+    if(ci>=line.length){li++;ci=0;}
+    setTimeout(tick,reduce?0:(14+(Math.random()*26)));
+  }
+  tick();
+}
+typeReplay();
+
+/* ---------------- live demo ---------------- */
+var rxInput=document.getElementById('rx-input'),runBtn=document.getElementById('run'),outEl=document.getElementById('out');
+document.querySelectorAll('.dchip').forEach(function(c){c.addEventListener('click',function(){rxInput.value=c.dataset.t;});});
+var KIND={Observation:'FINDING',Condition:'DIAGNOSIS',MedicationRequest:'RX'};
+runBtn.addEventListener('click',function(){
+  var text=rxInput.value.trim();
+  if(!text){outEl.textContent='write something first, doctor ji';return;}
+  runBtn.disabled=true;runBtn.textContent='RUNNING PRODUCTION ENGINE…';
+  var t0=performance.now();
+  fetch('/api/demo-parse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text})})
+  .then(function(r){if(!r.ok){return r.text().then(function(t){throw new Error(r.status===429?'easy — rate limit 6/min':(r.status>=500?'engine hiccup — nothing invented, retry':'input rejected'));});}return r.json();})
+  .then(function(d){
+    var dt=((performance.now()-t0)/1000).toFixed(1);
+    var seen={},rows='',total=0,coded=0;
+    (d.entry||[]).forEach(function(e){
+      var res=e.resource||{};if(!KIND[res.resourceType])return;
+      var label=null,code=null;
+      if(res.resourceType==='MedicationRequest'){var m=(res.medication||{}).concept||{};label=(m.coding&&m.coding[0]?m.coding[0].display:null)||m.text;code=m.coding&&m.coding[0]?m.coding[0].code:null;}
+      else{label=(res.code&&res.code.coding&&res.code.coding[0])?res.code.coding[0].display:(res.code&&res.code.text);code=res.code&&res.code.coding&&res.code.coding[0]?res.code.coding[0].code:null;}
+      if(!label||seen[label])return;
+      seen[label]=1;total++;if(code)coded++;
+      rows+='<div class="ent" style="animation-delay:'+(total*70)+'ms"><span><span class="ek">'+KIND[res.resourceType]+'</span><span class="en">'+label+'</span></span>'+(code?'<span class="ecode">SNOMED '+code+'</span>':'<span class="ecode bad">UNCODED — LOGGED</span>')+'</div>';
+    });
+    document.getElementById('ocount').textContent=coded+'/'+total+' CODED';
+    document.getElementById('otime').textContent=dt+'s · LIVE';
+    outEl.innerHTML=rows||'<div style="padding-top:70px;text-align:center;color:#5f6f66">nothing codable found — honestly empty</div>';
+  })
+  .catch(function(err){outEl.innerHTML='<div style="padding-top:70px;text-align:center;color:var(--amber)">'+(err.message==='Failed to fetch'?'free-tier engine waking up… retry in ~30s':err.message)+'</div>';})
+  .finally(function(){runBtn.disabled=false;runBtn.textContent='RUN ON PRODUCTION →';});
+});
+
+/* ---------------- reveal on scroll ---------------- */
+var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting)en.target.classList.add('on');});},{threshold:.12});
+document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
+
+/* ---------------- scrollytelling journey ---------------- */
+if(window.gsap&&window.ScrollTrigger){
+  gsap.registerPlugin(ScrollTrigger);
+  var layers=document.querySelectorAll('.scene-layer');
+  function showLayer(i){
+    layers.forEach(function(l,idx){
+      if(idx===i){l.style.visibility='visible';}
+      gsap.to(l,{opacity:idx===i?1:0,duration:.35,ease:'power1.inOut',
+        onStart:(function(target,idx){return function(){if(idx===i)target.style.visibility='visible';};})(l,idx),
+        onComplete:(function(target,idx){return function(){if(idx!==i)target.style.visibility='hidden';};})(l,idx)});
+    });
+  }
+  var hudLabel=document.getElementById('stagelabel'),hudFill=document.getElementById('hudfill'),hudPct=document.getElementById('hudpct');
+  var STAGES=[[0,'INTAKE · RECEIVING NOTE'],[0.16,'STAGE 01/04 · SANITIZE'],[0.36,'STAGE 02/04 · EXTRACT'],[0.56,'STAGE 03/04 · RESOLVE'],[0.76,'STAGE 04/04 · BUNDLE READY ✓']];
+  function setStage(p){
+    for(var i=STAGES.length-1;i>=0;i--){if(p>=STAGES[i][0]){hudLabel.textContent=STAGES[i][1];break;}}
+    hudFill.style.width=(p*100).toFixed(1)+'%';hudPct.textContent=Math.round(p*100)+'%';
+  }
+  if(reduce){
+    // static stacked cards already handled by CSS; just mark visible
+    layers.forEach(function(l,i){showLayer(i);showLayerStatic(i);});
+    function showLayerStatic(){/* css handles */}
+    return;
+  }
+  var mm=gsap.matchMedia();
+  mm.add('(prefers-reduced-motion: no-preference)',function(){
+    showLayer(0);
+    var tl=gsap.timeline({
+      scrollTrigger:{trigger:'#journey',start:'top top',end:'+=600%',pin:'.stage',scrub:0.5,
+        snap:{snapTo:'labels',duration:0.3,ease:'power2.out'},invalidateOnRefresh:true,
+        onUpdate:function(self){setStage(self.progress);}}
+    });
+    /* S0 intake */
+    tl.addLabel('intake',0)
+      .to('#thenote',{rotation:1,scale:1.06,duration:0.6},0)
+      .to('#thenote',{y:function(){return window.innerHeight*0.62;},scale:0.72,rotation:0,duration:1.0,ease:'power2.in'},0.6)
+      .to('#flash',{opacity:.9,duration:0.05},1.52)
+      .to('#flash',{opacity:0,duration:0.25},1.58);
+    /* S1 sanitize */
+    tl.addLabel('sanitize',1.7)
+      .call(showLayer,[1],1.7)
+      .from('.digi-note',{y:60,opacity:0,duration:0.5},1.75)
+      .from('.phispan',{backgroundColor:'rgba(255,75,62,.35)',duration:0.4,stagger:{each:0.12}},2.2)
+      .call(function(){document.querySelectorAll('.phi-chip').forEach(function(c){c.hidden=false;});document.querySelectorAll('.phispan').forEach(function(s){s.style.textDecoration='line-through';s.style.opacity=.45;});},null,2.6);
+    /* S2 extract */
+    tl.addLabel('extract',3.4)
+      .call(showLayer,[2],3.4)
+      .from('.tile',{y:40,opacity:0,duration:0.35,stagger:{each:0.12}},3.5)
+      .call(function(){document.querySelectorAll('.tile').forEach(function(t){t.classList.add('flipped');});},null,4.3);
+    /* S3 resolve */
+    tl.addLabel('resolve',5.2)
+      .call(showLayer,[3],5.2)
+      .from('.cands .cand',{scale:.7,opacity:0,duration:0.4,stagger:{each:0.08}},5.3);
+    document.querySelectorAll('.winner').forEach(function(w,i){
+      tl.to(w,{opacity:1,scale:1,duration:0.35,ease:'back.out(2)'},5.9+i*0.5)
+        .to(w.parentElement.querySelector('.cands'),{opacity:.25,duration:0.3},5.9+i*0.5);
+    });
+    /* S4 bundle */
+    tl.addLabel('bundle',7.2)
+      .call(showLayer,[4],7.2)
+      .to('.jline',{clipPath:'inset(0 0% 0 0)',duration:1.6,stagger:{each:0.14},ease:'none'},7.4)
+      .from('.ghost-note',{opacity:0,rotate:0,y:30,duration:0.5},8.6)
+      .addLabel('end',9.2);
+    /* keyboard stepping */
+    document.addEventListener('keydown',function(e){
+      var labels=['intake','sanitize','extract','resolve','bundle'];
+      var idx=labels.findIndex(function(l){try{return gsap.getById?false:false;}catch(_){return false;}});
+      if(e.key==='j'||e.key==='PageDown'){window.scrollBy({top:window.innerHeight*0.9,behavior:'smooth'});}
+      if(e.key==='k'||e.key==='PageUp'){window.scrollBy({top:-window.innerHeight*0.9,behavior:'smooth'});}
+    });
+    document.fonts&&document.fonts.ready.then(function(){ScrollTrigger.refresh();});
+    return function(){tl.scrollTrigger&&tl.scrollTrigger.kill();tl.kill();};
+  });
+}else{
+  // No GSAP: static stacked view
+  document.querySelectorAll('.scene-layer').forEach(function(l){l.classList.add('no-js-visible');});
+}
+})();
+</script>
+</body>
+</html>
