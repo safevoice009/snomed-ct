@@ -1,5 +1,9 @@
 <div align="center">
 
+<img src="docs/assets/sicce_social_preview.png" alt="SICCE Header Banner" width="100%" style="border-radius: 12px; max-width: 1000px;" />
+
+<br><br>
+
 # 🏥 SICCE: SNOMED-India Clinical Coding Engine & ABDM/FHIR Middleware
 
 **A high-throughput, privacy-first Clinical NLP and Terminology Resolution Gateway bridging unstructured point-of-care clinical documentation into validated, semantically coded HL7 FHIR R4 Bundles and NHCX Insurance Claim Payloads.**
@@ -18,6 +22,10 @@
 [![Tests: 40/40 Passing](https://img.shields.io/badge/Tests-40%2F40%20Passing-brightgreen)](tests/)
 
 <br>
+
+[![Tech Stack](https://skillicons.dev/icons?i=python,fastapi,docker,sqlite,git,github,markdown)](https://skillicons.dev)
+
+<br><br>
 
 [🌐 **Live Web Platform**](https://snomed-ct-parser-1.onrender.com/) • 
 [⚡ **Developer Workbench**](https://snomed-ct-parser-1.onrender.com/workbench.html) • 
@@ -95,7 +103,22 @@ Government mandates (**ABDM** in India, **EHDS** in the European Union) require 
 
 ---
 
-## 💡 Interactive Demo & Translation Example
+## 💡 Interactive Demo & Visual Inspection
+
+<table width="100%">
+<tr>
+<td width="50%" align="center" valign="top">
+  <img src="docs/assets/sicce_hero_preview.png" alt="Optical Prescription Intake" width="100%" style="border-radius: 8px; border: 1px solid #334155;" /><br>
+  <sub><b>Figure 1:</b> Point-of-Care Prescription Optical Intake & Normalization Pipeline</sub>
+</td>
+<td width="50%" align="center" valign="top">
+  <img src="docs/assets/sicce_workbench_preview.png" alt="Developer Workbench Console" width="100%" style="border-radius: 8px; border: 1px solid #334155;" /><br>
+  <sub><b>Figure 2:</b> Interactive Developer Workbench with Real-Time FHIR R4 JSON Inspector</sub>
+</td>
+</tr>
+</table>
+
+<br>
 
 ### Input Clinical Narrative (Doctor's Note)
 ```text
