@@ -1,21 +1,43 @@
-MIT License
+# PolyForm Noncommercial License 1.0.0 & Academic Evaluation Agreement
 
-Copyright (c) 2026 SICCE Open Source Contributors
+**Copyright (c) 2025–2026 Dr. Baddam Sucharith Reddy. All Rights Reserved.**  
+**Project**: SICCE — SNOMED-India Clinical Coding Engine & ABDM/FHIR Middleware  
+**Author**: Dr. Baddam Sucharith Reddy (Physician & Clinical Informaticist)  
+**Contact for Commercial Licensing**: founder@sicce.health
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+---
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+## 1. Grant of License for Academic Evaluation & Non-Commercial Use
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Subject to the terms and conditions of this License, the Author hereby grants to any individual, academic institution, or evaluation committee (including the Admissions Committee and Faculty of **Universitat Rovira i Virgili - URV**, Spain) a worldwide, non-exclusive, non-sublicensable, royalty-free license to:
+
+1. **Inspect and Review**: View, browse, analyze, and evaluate the source code, architecture, and documentation.
+2. **Academic Verification**: Compile, execute, and run the automated test suites (`pytest`) and local server instances solely for academic assessment, peer review, scientific research, and verification of technical competencies.
+3. **Educational Reference**: Study the software architecture and terminology resolution design for non-commercial educational purposes.
+
+---
+
+## 2. Strict Prohibition on Commercial Use
+
+**COMMERCIAL USE OF THIS SOFTWARE IS STRICTLY PROHIBITED WITHOUT A SEPARATE WRITTEN COMMERCIAL LICENSE FROM THE AUTHOR.**
+
+You may NOT:
+1. Use this software, or any portion thereof, to provide a commercial service, SaaS platform, API gateway, or hospital electronic medical records (EMR) middleware.
+2. Sell, rent, lease, monetize, charge fees for, or commercially distribute this software or any derivative works based upon it.
+3. Integrate this software into any proprietary commercial product, healthcare application, or enterprise health-tech system.
+4. Remove, alter, or obscure any copyright notices, authorship attributions, or patent-pending notices.
+
+---
+
+## 3. Commercial Licensing Inquiries
+
+If you or your organization wish to license this software for commercial deployment, enterprise pilot programs, or proprietary integration, please contact the Author directly at:  
+📧 **founder@sicce.health**
+
+---
+
+## 4. Disclaimer of Warranty & Medical Liability
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE. 
+
+THIS SOFTWARE IS AN ADMINISTRATIVE TERMINOLOGY TRANSLATION MIDDLEWARE AND DOES NOT CONSTITUTE A MEDICAL DEVICE OR AUTONOMOUS CLINICAL DIAGNOSTIC SYSTEM (NON-SAMD). CLINICAL OVERSIGHT IS REQUIRED AT ALL TIMES.

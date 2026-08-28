@@ -12,8 +12,9 @@
 [![SNOMED CT](https://img.shields.io/badge/Terminology-SNOMED_CT_/_LOINC_/_RxNorm-0A85EA)](https://www.snomed.org/)
 [![ABDM Compatible](https://img.shields.io/badge/ABDM-M1_%26_M2_Ready-138808)](https://abdm.gov.in/)
 [![NHCX Pre-Adjudication](https://img.shields.io/badge/NHCX-Insurance_Pre--Adjudication-4B0082)](https://nhcx.abdm.gov.in/)
+[![License: PolyForm Noncommercial](https://img.shields.io/badge/License-PolyForm_Noncommercial_1.0-orange.svg)](LICENSE)
+[![IP: Proprietary Clinical Tech](https://img.shields.io/badge/IP-Proprietary_%26_Pat._Pending-8A2BE2.svg)](LICENSE)
 [![CI Status](https://img.shields.io/badge/CI-Passing-brightgreen?logo=githubactions&logoColor=white)](https://github.com/safevoice009/snomed-ct/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Tests: 40/40 Passing](https://img.shields.io/badge/Tests-40%2F40%20Passing-brightgreen)](tests/)
 
 <br>
@@ -27,16 +28,56 @@
 
 ---
 
+> [!IMPORTANT]
+> **⚖️ Intellectual Property & Academic Evaluation Notice**  
+> This software and architectural implementation represents the proprietary clinical research and intellectual property of **Dr. Baddam Sucharith Reddy**.  
+> It is published as **Source-Available under the PolyForm Noncommercial License 1.0.0** specifically for **academic evaluation, university admissions assessment (Universitat Rovira i Virgili - URV), and scientific peer review**.  
+> **Commercial exploitation, unauthorized SaaS hosting, and monetization are strictly prohibited.** For enterprise pilot partnerships or commercial licensing inquiries, contact: `founder@sicce.health`.
+
+---
+
 ## 📑 Table of Contents
+- [Executive Overview & Visual Pillars](#-executive-overview--core-pillars)
 - [Clinical Problem Statement](#-clinical-problem-statement)
 - [Interactive Demo & Translation Example](#-interactive-demo--translation-example)
-- [Architecture & Pipeline](#-architecture--pipeline-overview)
+- [System Architecture & Pipeline](#-architecture--pipeline-overview)
 - [Key Technical Innovations](#-key-technical-innovations)
-- [Quickstart & Local Setup](#-quickstart--local-setup)
 - [Live API Testing via cURL](#-live-api-testing-via-curl)
+- [Quickstart & Local Setup](#-quickstart--local-setup)
 - [Automated Verification (40/40 Tests)](#-automated-test-suite--verification)
 - [Enterprise & On-Premises Deployment](#-docker--on-premises-deployment)
-- [Academic Citation & Attribution](#-academic-citation)
+- [Academic Citation & Intellectual Property](#-academic-citation--intellectual-property)
+
+---
+
+## 🏛️ Executive Overview & Core Pillars
+
+<table width="100%">
+<tr>
+<td width="50%" valign="top">
+
+### 🧠 1. Clinical NLP & Multilingual NER
+Extracts symptoms, clinical findings, and medication orders from messy handwritten prescriptions, voice dictations, and Hinglish clinical narratives (*"sar dard x 3d"*, *"pet me marod"*).
+</td>
+<td width="50%" valign="top">
+
+### 💊 2. Dual-Track Terminology Engine
+Normalizes proprietary Indian pharmaceutical brand names (*Tab. Dolo 650*, *Ascoril LS*) to active international substances (**SNOMED CT & RxNorm**) while preserving prescribed clinical intent.
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🇮🇳 3. ABDM Milestone 1 & 2 Interoperability
+Generates schema-validated **HL7 FHIR R4 `OPConsultRecord` Bundles** matching National Resource Centre for EHR Standards (NRCeS) and Ayushman Bharat Digital Mission profiles.
+</td>
+<td width="50%" valign="top">
+
+### 🛡️ 4. NHCX Claim Pre-Adjudication
+Evaluates clinical diagnostic codes against IRDAI / TPA guidelines before submission, generating a 0–100% pre-submission approval score to prevent insurance claim rejections.
+</td>
+</tr>
+</table>
 
 ---
 
@@ -65,7 +106,7 @@ Rx:
 ```
 
 ### SICCE Normalized Semantic Output
-| Extracted Entity | Entity Type | Prescribed Form | Standardized Concept & Code | System |
+| Extracted Entity | Entity Type | Prescribed Form | Standardized Concept & Code | Terminology System |
 | :--- | :--- | :--- | :--- | :--- |
 | **sar dard** | Symptom | *Headache* | `25064002 \| Headache (finding) \|` | **SNOMED CT** |
 | **jalan** | Symptom | *Pyrosis / Heartburn* | `16331000 \| Heartburn (finding) \|` | **SNOMED CT** |
@@ -247,13 +288,11 @@ docker-compose -f docker-compose.enterprise.yml up -d
 
 ---
 
-## 📚 Academic Citation
-
-If you use SICCE or its terminology architectures in your research or digital health prototypes, please cite:
+## 📚 Academic Citation & Intellectual Property
 
 ```bibtex
 @software{sicce_clinical_engine_2026,
-  author = {Baddam Sucharith Reddy},
+  author = {Dr. Baddam Sucharith Reddy},
   title = {SICCE: SNOMED-India Clinical Coding Engine & ABDM/FHIR Interoperability Gateway},
   year = {2026},
   publisher = {GitHub},
@@ -264,6 +303,11 @@ If you use SICCE or its terminology architectures in your research or digital he
 
 ---
 
-## 📄 License
+## 📄 License & Commercial Rights
 
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
+Copyright (c) 2025–2026 **Dr. Baddam Sucharith Reddy**. All Rights Reserved.
+
+This project is licensed under the **[PolyForm Noncommercial License 1.0.0](LICENSE)**.
+- **Permitted**: Academic evaluation (including Universitat Rovira i Virgili - URV Admissions Committee), scientific peer review, and non-commercial educational research.
+- **Strictly Prohibited**: Commercial deployment, SaaS API hosting, or redistribution for business purposes without prior written authorization.
+- For commercial licensing or enterprise pilots, contact: `founder@sicce.health`.
