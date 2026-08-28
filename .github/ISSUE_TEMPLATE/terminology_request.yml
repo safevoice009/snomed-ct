@@ -1,0 +1,28 @@
+name: 💊 Terminology Expansion Request
+description: Request addition of an Indian brand name, regional vernacular synonym, or OPD refset condition
+title: "[Terminology Request]: "
+labels: ["enhancement", "terminology"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide the verifiable clinical details for the requested brand mapping or vernacular term.
+  - type: input
+    id: brand_or_term
+    attributes:
+      label: Brand Name or Vernacular Term
+      placeholder: e.g. "Augmentin 625 Duo" or "Chhati me jalan"
+    validations:
+      required: true
+  - type: input
+    id: active_molecules
+    attributes:
+      label: Active Pharmaceutical Ingredients & Strength
+      placeholder: e.g. "Amoxicillin 500mg + Clavulanic Acid 125mg"
+    validations:
+      required: true
+  - type: input
+    id: snomed_code
+    attributes:
+      label: Target SNOMED CT Concept ID (if known)
+      placeholder: e.g. "372687004"

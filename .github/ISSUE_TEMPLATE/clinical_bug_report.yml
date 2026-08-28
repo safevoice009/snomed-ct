@@ -1,0 +1,33 @@
+name: 🩺 Clinical Bug Report
+description: Report a parsing error, wrong terminology code, or medication safety issue
+title: "[Clinical Bug]: "
+labels: ["clinical-safety", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a clinical bug report. Accuracy and patient safety are our highest priorities.
+  - type: textarea
+    id: input_text
+    attributes:
+      label: Input Clinical Text or Image Description
+      description: The exact prescription text, clinical narrative, or brand name tested.
+      placeholder: e.g. "Pt c/o sar dard x 3 days, Tab. Dolo 650 BD"
+    validations:
+      required: true
+  - type: textarea
+    id: observed_behavior
+    attributes:
+      label: Observed Output
+      description: What code or FHIR bundle was returned by SICCE?
+      placeholder: e.g. "Returned uncoded: true or incorrect SNOMED ID..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Clinical Terminology Code
+      description: What is the correct clinical concept ID (SNOMED CT / LOINC / RxNorm)?
+      placeholder: e.g. "387517004 | Paracetamol |"
+    validations:
+      required: true
