@@ -1,7 +1,7 @@
 # SICCE Living Status & Verification Dashboard
 
 **Last Verified Session**: August 24, 2026  
-**Governing Authority**: [`MASTER_DIRECTIVE.md`](file:///c:/Users/unbou/snomedct/snomed%20ct/MASTER_DIRECTIVE.md)  
+**Governing Authority**: [`MASTER_DIRECTIVE.md`](MASTER_DIRECTIVE.md)  
 **Current Status**: 🟡 **Phase 1/1.5 verified complete; awaiting founder gates (NRCeS, ABDM sandbox, real notes)**  
 **Pytest Suite**: `40 passed, 0 failed (100% pass rate)`  
 
@@ -24,7 +24,7 @@
 | :--- | :--- | :--- | :--- |
 | **1. Apply for Free NRCeS SNOMED CT License** | 🔴 **PENDING (HUMAN REQUIRED)** | `clinical_knowledge.db` contains **106 concepts / 327 descriptions / 99 brands** (OPD RefSet v1 + PMBJP public generic formulary). Real gigabyte RF2 snapshot files do not exist yet in `data/rf2/`. `/health` warns `degraded_unseeded_terminology`. | Register at [nrces.in](https://www.nrces.in), download official India Edition Snapshot `.zip`, and place in `data/rf2/`. Then run `python scripts/load_rf2.py`. |
 | **2. Supply 200+ Real De-identified Clinical Notes** | 🔴 **PENDING (HUMAN REQUIRED)** | `eval/notes.jsonl` currently has synthetic developer cases. System accuracy cannot be certified on synthetic data. | Export 200–300 de-identified OPD prescription notes and format into `eval/notes.jsonl`. |
-| **3. ABDM Sandbox Registration** | 🔴 **PENDING (HUMAN REQUIRED)** | Sandbox API credentials required for live M1/M2 testing at `sandbox.abdm.gov.in`. | Follow [`docs/ABDM_SANDBOX_REGISTRATION.md`](file:///c:/Users/unbou/snomedct/snomed%20ct/docs/ABDM_SANDBOX_REGISTRATION.md) to register and acquire client keys. |
+| **3. ABDM Sandbox Registration** | 🔴 **PENDING (HUMAN REQUIRED)** | Sandbox API credentials required for live M1/M2 testing at `sandbox.abdm.gov.in`. | Follow [`docs/ABDM_SANDBOX_REGISTRATION.md`](ABDM_SANDBOX_REGISTRATION.md) to register and acquire client keys. |
 
 ---
 

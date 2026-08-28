@@ -57,4 +57,4 @@ ABDM_CLIENT_ID="your_sandbox_client_id_here"
 ABDM_CLIENT_SECRET="your_sandbox_client_secret_here"
 ```
 
-When `ABDM_MODE=sandbox`, SICCE will automatically use `ABDMSandboxClient` in [`abha_gateway.py`](file:///c:/Users/unbou/snomedct/snomed%20ct/abha_gateway.py) to exchange client credentials for live ABDM access tokens.
+When `ABDM_MODE=sandbox`, SICCE will automatically use `ABDMSandboxClient` in [`abha_gateway.py`](../abha_gateway.py) to exchange client credentials for live ABDM access tokens.

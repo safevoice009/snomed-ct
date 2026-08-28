@@ -4,8 +4,15 @@ venv/
 ENV/
 .env
 .env*
+!.env.example
 
-# Data files (RF2 releases)
+# IDE & Editor artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data files (RF2 releases and large binaries)
 data/*
 !data/rf2/
 data/rf2/*
@@ -16,18 +23,34 @@ data/rf2/*
 !data/formulary/**
 *.zip
 *.tar.gz
+*.backup*
 
-# Compiled python files
+# SQLite temp files
+*.db-shm
+*.db-wal
+*.db.bak
+
+# Compiled Python files & cache
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Operating system files
 .DS_Store
 Thumbs.db
 .vercel
 
-# Logs and runtime artifacts
+# Logs, scratch, and runtime artifacts
 logs/
+*.log
 eval/results/
+scratch/
+chat_history/
+CONVERSATION_HISTORY.md
+dis.md
+fr.md
+imp.md
+implementation_plan.md
