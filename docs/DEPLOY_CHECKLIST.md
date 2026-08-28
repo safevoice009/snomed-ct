@@ -47,7 +47,7 @@ curl -X POST http://localhost:8000/api/v1/parse `
 
 ## ☁️ 3. Deploying to Render.com
 
-SICCE includes a native [`render.yaml`](file:///c:/Users/unbou/snomedct/snomed%20ct/render.yaml) blueprint:
+SICCE includes a native [`render.yaml`](../render.yaml) blueprint:
 
 1. **Connect GitHub Repository**:
    - Go to [Render Dashboard](https://dashboard.render.com/) -> **New** -> **Blueprint**.

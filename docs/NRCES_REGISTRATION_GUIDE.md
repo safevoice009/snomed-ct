@@ -50,7 +50,7 @@ Once approved (typically within 1–2 business days):
 3. Download the latest Snapshot ZIP (e.g. `SnomedCT_InternationalRF2_PRODUCTION_*.zip` + India Extension).
 4. Extract the `.txt` files from the `Snapshot/Terminology/` folder into your repository at:
    ```
-   c:\Users\unbou\snomedct\snomed ct\data\rf2\
+   data/rf2/
    ```
    *(Files: `sct2_Concept_Snapshot_*.txt` and `sct2_Description_Snapshot-en_*.txt`)*
 5. Run the one-command loader:

@@ -1,6 +1,6 @@
 # Eagle's Eye View — SICCE Project Architecture & Status
 
-**Governing Directive**: [`MASTER_DIRECTIVE.md`](file:///c:/Users/unbou/snomedct/snomed%20ct/MASTER_DIRECTIVE.md) (Version 1.0)  
+**Governing Directive**: [`MASTER_DIRECTIVE.md`](MASTER_DIRECTIVE.md) (Version 1.0)  
 **Last Verified Session**: August 23, 2026
 
 The **SNOMED-India Clinical Coding Engine (SICCE)** is a B2B clinical middleware translation gateway that transforms messy clinician inputs (prescriptions, voice, notes) into validated, ABDM-compliant FHIR R4 bundles and NHCX claim payloads with measured accuracy and zero fabricated data.
@@ -57,7 +57,7 @@ flowchart TD
 
 ## 🎯 Phase 1 Definition-of-Done Verification Summary
 
-All Phase 1 tasks from [`MASTER_DIRECTIVE.md`](file:///c:/Users/unbou/snomedct/snomed%20ct/MASTER_DIRECTIVE.md) have been implemented and verified:
+All Phase 1 tasks from [`MASTER_DIRECTIVE.md`](MASTER_DIRECTIVE.md) have been implemented and verified:
 1. **Real Terminology Engine**: `scripts/load_rf2.py` SQLite FTS5 table schema in `clinical_knowledge.db` with active SNOMED concept, description, and brand lookups.
 2. **Zero Fabricated Data**: Purged silent fake fallbacks; explicit `HTTP 502` error handling.
 3. **Security Hardening**: Argon2id password hashing, locked CORS origin whitelist, authenticated WhatsApp webhook, and explicit `"mode": "mock"` labeling.
