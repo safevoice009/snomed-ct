@@ -8,7 +8,7 @@ Security, clinical data integrity, and privacy are foundational to the **SICCE**
 
 If you discover a security vulnerability or potential data safety risk within this repository:
 1. Please **do not** report security vulnerabilities through public GitHub issues.
-2. Send a detailed description of the issue to the maintainers via email at: `security@sicce.health` (or open a Private Security Advisory on GitHub).
+2. Send a detailed description of the issue to the maintainers via email at: `support@trochlea.online` (or open a Private Security Advisory on GitHub).
 3. Include:
    - Steps to reproduce the issue.
    - Potential impact on clinical data or infrastructure.
