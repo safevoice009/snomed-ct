@@ -31,7 +31,7 @@
 > [!IMPORTANT]
 > **⚖️ Intellectual Property & Academic Evaluation Notice**  
 > This software and architectural implementation represents the proprietary clinical research and intellectual property of **Dr. Baddam Sucharith Reddy**.  
-> It is published as **Source-Available under the PolyForm Noncommercial License 1.0.0** specifically for **academic evaluation, university admissions assessment (Universitat Rovira i Virgili - URV), and scientific peer review**.  
+> It is published as **Source-Available under the PolyForm Noncommercial License 1.0.0** specifically for **academic evaluation, institutional admissions assessment, and scientific peer review**.  
 > **Commercial exploitation, unauthorized SaaS hosting, and monetization are strictly prohibited.** For enterprise pilot partnerships or commercial licensing inquiries, contact: `founder@sicce.health`.
 
 ---
@@ -308,6 +308,6 @@ docker-compose -f docker-compose.enterprise.yml up -d
 Copyright (c) 2025–2026 **Dr. Baddam Sucharith Reddy**. All Rights Reserved.
 
 This project is licensed under the **[PolyForm Noncommercial License 1.0.0](LICENSE)**.
-- **Permitted**: Academic evaluation (including Universitat Rovira i Virgili - URV Admissions Committee), scientific peer review, and non-commercial educational research.
+- **Permitted**: Academic evaluation, institutional admissions review, scientific peer review, and non-commercial educational research.
 - **Strictly Prohibited**: Commercial deployment, SaaS API hosting, or redistribution for business purposes without prior written authorization.
 - For commercial licensing or enterprise pilots, contact: `founder@sicce.health`.

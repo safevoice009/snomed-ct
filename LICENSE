@@ -9,7 +9,7 @@
 
 ## 1. Grant of License for Academic Evaluation & Non-Commercial Use
 
-Subject to the terms and conditions of this License, the Author hereby grants to any individual, academic institution, or evaluation committee (including the Admissions Committee and Faculty of **Universitat Rovira i Virgili - URV**, Spain) a worldwide, non-exclusive, non-sublicensable, royalty-free license to:
+Subject to the terms and conditions of this License, the Author hereby grants to any individual, academic institution, faculty, admissions committee, or scientific reviewer a worldwide, non-exclusive, non-sublicensable, royalty-free license to:
 
 1. **Inspect and Review**: View, browse, analyze, and evaluate the source code, architecture, and documentation.
 2. **Academic Verification**: Compile, execute, and run the automated test suites (`pytest`) and local server instances solely for academic assessment, peer review, scientific research, and verification of technical competencies.
