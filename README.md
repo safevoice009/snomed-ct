@@ -1,9 +1,5 @@
 <div align="center">
 
-<img src="docs/assets/sicce_social_preview.png" alt="SICCE Header Banner" width="100%" style="border-radius: 12px; max-width: 1000px;" />
-
-<br><br>
-
 # 🏥 SICCE: SNOMED-India Clinical Coding Engine & ABDM/FHIR Middleware
 
 **A high-throughput, privacy-first Clinical NLP and Terminology Resolution Gateway bridging unstructured point-of-care clinical documentation into validated, semantically coded HL7 FHIR R4 Bundles and NHCX Insurance Claim Payloads.**
@@ -103,22 +99,7 @@ Government mandates (**ABDM** in India, **EHDS** in the European Union) require 
 
 ---
 
-## 💡 Interactive Demo & Visual Inspection
-
-<table width="100%">
-<tr>
-<td width="50%" align="center" valign="top">
-  <img src="docs/assets/sicce_hero_preview.png" alt="Optical Prescription Intake" width="100%" style="border-radius: 8px; border: 1px solid #334155;" /><br>
-  <sub><b>Figure 1:</b> Point-of-Care Prescription Optical Intake & Normalization Pipeline</sub>
-</td>
-<td width="50%" align="center" valign="top">
-  <img src="docs/assets/sicce_workbench_preview.png" alt="Developer Workbench Console" width="100%" style="border-radius: 8px; border: 1px solid #334155;" /><br>
-  <sub><b>Figure 2:</b> Interactive Developer Workbench with Real-Time FHIR R4 JSON Inspector</sub>
-</td>
-</tr>
-</table>
-
-<br>
+## 💡 Interactive Translation Specification & Schema
 
 ### Input Clinical Narrative (Doctor's Note)
 ```text
@@ -239,18 +220,21 @@ Direct generic conversion destroys clinician intent. SICCE implements a dual-tra
 
 ---
 
-## 💻 Live API Testing via cURL
+## 🔒 API Specifications & Access Control
 
-Test the live production endpoint directly in your terminal:
+Access to the production API is protected by API key authorization to prevent resource abuse and ensure data governance.
 
 ```bash
 curl -X POST "https://snomed-ct-parser-1.onrender.com/api/v1/parse" \
      -H "Content-Type: application/json" \
-     -H "X-API-Key: sicce_live_-tLSpweWb8vrk0wjMqOQHwA9lc1yjsSwcY3eg6IZzic" \
+     -H "X-API-Key: <YOUR_AUTHORIZED_API_KEY>" \
      -d '{
        "text": "Pt c/o loose motion x 3 days, sar dard. Rx: Tab. Dolo 650mg BD x 3 days."
      }'
 ```
+
+> [!NOTE]
+> Production API keys are restricted to authorized healthcare institutions, research collaborators, and accredited academic admissions committees. To request an evaluation key, contact: `support@trochlea.online`.
 
 ---
 
