@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    name: Build, Ingest & Run Test Suite
     runs-on: ubuntu-latest
 
     steps:
@@ -20,13 +21,19 @@ jobs:
         python-version: '3.12'
 
     - name: Install uv package manager
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+        version: "latest"
 
-    - name: Install dependencies and build knowledge base
+    - name: Install dependencies
       run: |
         uv sync
+
+    - name: Build clinical knowledge index
+      run: |
         uv run python scripts/load_rf2.py --seed-only
 
-    - name: Run Pytest Suite
+    - name: Execute Pytest Suite (40 Tests)
       run: |
         uv run pytest -v tests/
